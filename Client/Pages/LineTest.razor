@@ -1,0 +1,84 @@
+
+@page "/linetest"
+@inject AppStateContainer state
+
+@using SectorModel.Client.Pages.Components
+@using SectorModel.Shared.Entities
+@using SectorModel.Client.Entities
+@using SectorModel.Client.Common
+
+
+<div class="row">
+    <div class="row">
+        <div class="col-4">
+            @foreach (Equity eq in state.SelectedEquityList)
+            {
+                <input type="checkbox" @bind="eq.IsSelected" /> @eq.SymbolName
+            }
+            <button @onclick="@( () => { refreshClick();  } )" class="btn-primary">Refresh</button>
+
+        </div>
+        <div>
+            <div class="col-3">
+                <div class="row">
+
+                   @GraphFragement
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code
+{
+    public CoreEquitySelector CoreEquities { get; set; }
+
+    public RenderFragment GraphFragement;
+
+    private string eqList;
+
+    protected override void OnInitialized()
+    {
+        eqList = string.Join(";",  state.SelectedEquityList.Where(x => x.IsSelected == true).Select(x=>x.Symbol).ToList());
+       // Console.WriteLine($"OnInitialized: {eqList}");
+    }
+
+    protected void refreshClick()
+    {
+        eqList = string.Join(";",  state.SelectedEquityList.Where(x => x.IsSelected == true).Select(x=>x.Symbol).ToList());
+        
+        GraphFragement = BuildGraph(eqList);
+
+        //Console.WriteLine($"refreshClick: {eqList}");
+
+    }
+
+    //private RenderFragment DrawGraph()
+    //{
+    //    Console.WriteLine($"DrawGraph: {eqList}");
+
+    //    return BuildGraph(eqList);
+    //}
+
+
+
+    RenderFragment BuildGraph(string eqList) => builder =>
+    {
+
+        builder.OpenComponent(1, typeof(LineChart));
+        builder.AddAttribute(2, "EquityList", eqList);
+        builder.AddAttribute(3, "Width", "700");
+        builder.AddAttribute(4, "Height", "500");
+        builder.AddAttribute(5, "Title", "Our Stocks");
+        builder.AddAttribute(6, "HorizontalGridLines", 10);
+        builder.AddAttribute(7, "VerticalGridLines", 10);
+        builder.AddAttribute(8, "StartDate", "01/01/2019");
+        builder.AddAttribute(9, "StopDate", "07/01/2019");  
+        builder.CloseComponent();
+
+    };
+
+
+}

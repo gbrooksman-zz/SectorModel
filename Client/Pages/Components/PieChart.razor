@@ -1,0 +1,106 @@
+﻿@using SectorModel.Client.Entities
+@using Microsoft.AspNetCore.Components
+@using System
+
+<figure>
+    <div class="piechart-main">
+        <svg width="@Width" height="@Height" viewBox="-1 -1 2 2 " style="transform: rotate(-0.25turn);margin-left:10px;margin-top:10px;">
+            @DrawSlices();
+        </svg>
+    </div>
+    <br />
+    <figcaption>
+        <ul>
+            @DrawLegend();
+        </ul>
+    </figcaption>
+</figure>
+
+
+@code
+{
+    [Parameter]
+    public string Width { get; set; } = "auto";
+
+    [Parameter]
+    public string Height { get; set; } = "auto";
+
+    [Parameter]
+    public IEnumerable<PieSlice> PieSlices { get; set; }
+
+    private class Point
+    {
+        public double X { get; set; }
+        public double Y { get; set; }
+    }
+
+    private RenderFragment DrawSlices()
+    {
+        RenderFragment frag = null;
+
+        decimal percentSum = 0;
+        double startX = 1;
+        double startY = 0;
+
+        foreach (var slice in PieSlices)
+        {
+            slice.StartingX = startX;
+            slice.StartingY = startY;
+
+            Point endingPoint = GetCoordinatesForPercent(slice.Percent + percentSum);
+
+            slice.EndingX = endingPoint.X;
+            slice.EndingY = endingPoint.Y;
+
+            frag += BuildSlice(slice);
+
+            percentSum += slice.Percent;
+            startX = slice.EndingX;
+            startY = slice.EndingY;
+        }
+
+        return frag;
+    }
+
+    private RenderFragment BuildSlice(PieSlice slice) => builder =>
+    {
+        builder.OpenElement(1, "path");
+        builder.AddAttribute(2, "d", GetPath(slice));
+        builder.AddAttribute(3, "fill", slice.Color);
+        builder.CloseElement();
+    };
+
+    private string GetPath(PieSlice slice)
+    {
+        int arcDirection = slice.Percent > (decimal) .5 ? 1 : 0;
+        return $"M {slice.StartingX} {slice.StartingY} A 1 1 0 {arcDirection} 1 {slice.EndingX} {slice.EndingY} L 0 0";
+    }
+
+    private Point GetCoordinatesForPercent(decimal percent)
+    {
+        return new Point()
+        {
+            X = Math.Cos(2 * Math.PI * (double) percent),
+            Y = Math.Sin(2 * Math.PI * (double) percent)
+        };
+    }
+
+    private RenderFragment DrawLegend()
+    {
+        RenderFragment frag = null;
+
+        foreach (PieSlice slice in PieSlices)
+        {
+            frag += BuildLegendEntry(slice);
+        }
+
+        return frag;
+    }
+
+    private RenderFragment BuildLegendEntry(PieSlice slice) => builder =>
+    {
+        builder.OpenElement(1, "li");
+        builder.AddContent(2, $"{slice.Name} :({slice.Percent * 100}%)");
+        builder.CloseElement();
+    };
+}

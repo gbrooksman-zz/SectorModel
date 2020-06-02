@@ -1,7 +1,80 @@
 ﻿@page "/"
+@page "/index"
+@inject AppStateContainer state
+@inject HttpClient httpClient
+@using SectorModel.Shared.Entities
+@using System.Collections.Generic
+@layout MainLayout
 
-<h1>Hello, world!</h1>
+@using Microsoft.AspNetCore.Components
+@using SectorModel.Client.Common.Menu
 
-Welcome to your new app.
+    <AppMenu MenuBuilder="@menuBuilderTop" />
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    <div class="container-fluid">
+        <div class="row">
+            <h34>Welcome to the Sector balance Guide</h34>
+            <p>
+                This site focuses on constructing an investment portfolio using nine ETF Sector Funds managed by 
+                State Street Global Advisors. This site is in no way affiliated with State Street Global
+                Advisors and does not offer investment advice.mThis site is intended to describe the investment
+                approach taken by the site authors and will in a future update allow readers to construct their
+                own sector models as well as compare sector funds in various ways. Stay tuned. 
+                The ten ETF sector funds that are the focus of this modeling process can be found by clicking the 'ETF List' button above.
+            </p>
+        </div>
+        <div class="row">
+            <h4>Developing the Core Model</h4>
+            <p>
+                The Core Model is made up of four or more of the nine available ETFs.
+                The selection of the particular sector and their relative weight in the overall modeling
+                is based on historical price movements of all nine of the ETFs, macroeconomic factors and analysis
+                of other factors.
+            </p>
+        </div>
+        <div class="row">
+            <a href="https://iexcloud.io">Data provided by IEX Cloud</a>
+            <br />
+            User: @state.UserName
+            <br />
+            Last Quote Update Date: @state.LastQuoteDate.ToShortDateString()
+            <br />
+        </div>
+    </div>
+
+@code
+{
+    protected MenuBuilder menuBuilderTop = new MenuBuilder();
+
+    protected override async Task OnInitializedAsync()
+    {
+        //stuff for testing - replace with a settings file
+
+        state.UserName = "geoffb";
+
+        state.UserId = Guid.Parse("85167398-7e35-11e9-92d7-0aefc68022c6");          //copied from db
+
+        state.CoreModelId = Guid.Parse("e81de052-9091-11e9-a901-0aefc68022c6");     //copied from db
+
+        state.SPDRModelID = Guid.Parse("dd28331a-a689-11e9-9557-0aefc68022c6");
+
+        state.LastQuoteDate = await httpClient.GetFromJsonAsync<DateTime>("quote/getlastquotedate");
+
+        if (state.SelectedEquityList == null)
+        {
+            state.SelectedEquityList = await httpClient.GetFromJsonAsync<List<Equity>>("equity/getall");
+        }
+
+        menuBuilderTop.AddItem(1, "Home", "/")
+                  .AddItem(2, "Current Model", "coregroup")
+                  .AddItem(3, "Past Models", "corehistory")
+                  .AddItem(4, "ETF List", "etflist")
+                  .AddItem(5, "Line Test", "linetest")
+                  .AddItem(6, "Sign Up", "Accounts/Signup");
+
+        if (state.UserName == "geoffb")
+        {
+            menuBuilderTop.AddItem(7, "Admin", "Accounts/Admin");
+        }
+    }
+}

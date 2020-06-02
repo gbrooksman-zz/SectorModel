@@ -1,0 +1,231 @@
+﻿@using SectorModel.Client
+@using SectorModel.Shared.Entities
+@using Microsoft.AspNetCore.Components
+@using SectorModel.Client.Common
+@using SectorModel.Client.Entities
+@using SectorModel.Client.Services
+
+@inject AppStateContainer state
+@inject HttpClient httpClient
+
+<figure>
+
+    <svg width="@Width" height="@Height" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <pattern id="grid" width="@gridWidth" height="@gridHeight" patternUnits="userSpaceOnUse">
+                <rect width="@gridWidth" height="@gridHeight" fill="white" />
+                <path d="M @gridWidth 0 L 0 0 0 @gridHeight" fill="none" stroke="gray" stroke-width="1" />
+            </pattern>
+        </defs>
+
+        <rect width="100%" height="100%" fill="url(#grid)" stroke="gray" stroke-width="1" />
+
+       @DrawDataElements()
+
+       @* <circle cx="690" cy="490" r="3" fill="red" />*@
+
+    </svg>
+</figure>
+
+<figcaption>
+    <ul>
+        @DrawLegend();
+    </ul>
+</figcaption>
+
+
+@code
+{
+    [Parameter]
+    public string EquityList { get; set; }
+
+    [Parameter]
+    public string StartDate { get; set; }
+
+    [Parameter]
+    public string StopDate { get; set; }
+
+    [Parameter]
+    public string Width { get; set; }
+
+    [Parameter]
+    public string Height { get; set; }
+
+    [Parameter]
+    public string Title { get; set; } = "Equities";
+
+    [Parameter]
+    public int HorizontalGridLines { get; set; } = 10;
+
+    [Parameter]
+    public int VerticalGridLines { get; set; } = 10;
+
+    [Parameter]
+    public bool RelativeCompare { get; set; }
+
+    protected double gridWidth = 0;
+    protected double gridHeight = 0;
+
+    private EquityService eSvc;
+
+    private List<EquityQuotes> equitiesWithQuotes = new List<EquityQuotes>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        DateTime beginDate = DateTime.Parse(StartDate);
+        DateTime endDate = DateTime.Parse(StopDate);
+
+        gridWidth = double.Parse(Width) / (double)HorizontalGridLines;
+        gridHeight = double.Parse(Height) / (double)VerticalGridLines;
+
+        eSvc = new EquityService(httpClient, state);
+
+        int quoteInterval = eSvc.GetInterval(beginDate, endDate);
+
+        equitiesWithQuotes = await httpClient.GetFromJsonAsync<List<EquityQuotes>>($"equity/GetEquitiesWithQuotes?EquityList={EquityList}&StartDate={beginDate}&StopDate={endDate}&QuoteInterval={quoteInterval}");
+    }
+
+
+
+
+    private string BuildChartItemPath( List<Quote> quotes)
+    {
+        decimal height = int.Parse(Height);
+        decimal width = int.Parse(Width);
+
+        decimal startY = height * (decimal).7 ;
+
+        string path = $"M 0 {startY} L";
+
+        decimal firstPrice = quotes.First().Price;
+        decimal lowPrice = quotes.Min(q => q.Price);
+        decimal highPrice = quotes.Max(q => q.Price);
+
+        decimal heightScaleFactor = height / ((highPrice - lowPrice) * 2 );
+        decimal widthScaleFactor = 0; // width / quotes.Count;
+        decimal x = 0;
+
+        foreach (var quote in quotes)
+        {
+            decimal price = quote.Price;
+            path += $" {x += widthScaleFactor} {(startY - ((firstPrice - price) * heightScaleFactor)) } ";
+            if (widthScaleFactor == 0) widthScaleFactor = width / quotes.Count;
+        }
+
+        Console.WriteLine($"quotes: {quotes.Count} ");
+
+        return path;
+    }
+
+
+    RenderFragment BuildLine(string linePath, int colorValue) => builder =>
+    {
+        builder.OpenElement(1, "path");
+        builder.AddAttribute(2, "d", linePath);
+        builder.AddAttribute(3, "fill", "none");
+        builder.AddAttribute(4, "stroke", ColorPicker.Get(colorValue));
+        builder.AddAttribute(5, "stroke-width", 2);
+        builder.CloseElement();
+    };
+
+    RenderFragment BuildLegendPath(string legendPath, string color, int xCoord, int yCoord) => builder =>
+    {
+        builder.OpenElement(1, "path");
+        builder.AddAttribute(2, "d", legendPath);
+        builder.AddAttribute(3, "fill", "none");
+        builder.AddAttribute(4, "stroke", color);
+        builder.AddAttribute(5, "stroke-width", 2);
+        builder.CloseElement();
+    };
+
+    RenderFragment BuildLegendText(string legendText, int xCoord, int yCoord) => builder =>
+    {
+        builder.OpenElement(1, "text");
+        builder.AddAttribute(3, "x", xCoord);
+        builder.AddAttribute(4, "y", yCoord);
+        builder.AddContent(5, legendText);
+        builder.CloseElement();
+    };
+
+    private RenderFragment DrawLegend()
+    {
+        RenderFragment frag = null;
+
+        string legendPath = string.Empty;
+
+        int xCoord = 0;
+        int yCoord = 0;
+        int i = 0;
+
+        foreach (string equity in EquityList.Split(",".ToCharArray()))
+        {
+            frag += BuildLegendPath(legendPath, ColorPicker.Get(i++), xCoord, yCoord);
+            frag += BuildLegendText(equity, xCoord, yCoord);
+        }
+
+        return frag;
+    }
+
+    private RenderFragment DrawDataElements()
+    {
+        RenderFragment frag = null;
+        string linePath = string.Empty;
+        string legendPath = string.Empty;
+        string legendText = string.Empty;
+
+        List<ChartItem> chartItems = new List<ChartItem>();
+
+        int x = 1;
+
+        foreach (EquityQuotes equityquote in equitiesWithQuotes)
+        {
+            List<Quote> quotes = equityquote.Quotes;
+
+            chartItems.Add(new ChartItem()
+            {
+                ColorIndex = x,
+                LowPrice = quotes.Min(q => q.Price),
+                HighPrice = quotes.Max(q => q.Price),
+                LegendText = equityquote.Equity.SymbolName,
+                StartPrice = quotes.FirstOrDefault().Price,
+                ChartPath = BuildChartItemPath(quotes)
+            }); ;
+
+            x++;
+        }
+
+        foreach (var chartItem in chartItems)
+        {
+            frag += BuildLine(chartItem.ChartPath, chartItem.ColorIndex);
+        }
+
+        return frag;
+    }
+
+
+    internal class ChartItem
+    {
+        internal ChartItem()
+        {
+
+        }
+
+        internal List<Quote> Quotes { get; set; }
+
+        internal decimal StartPrice { get; set; }
+
+        internal decimal HighPrice { get; set; }
+
+        internal decimal LowPrice { get; set; }
+
+        internal string ChartPath { get; set; }
+
+        internal string LegendPath { get; set; }
+
+        internal string LegendText { get; set; }
+
+        internal int ColorIndex { get; set; }
+
+    }
+
+}

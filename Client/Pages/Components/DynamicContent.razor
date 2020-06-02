@@ -1,0 +1,43 @@
+@inject AppStateContainer state
+@inject HttpClient httpClient
+@using System.Linq
+@using Microsoft.AspNetCore.Components
+@using SectorModel.Client.Entities
+
+
+@ShowContent(ContentId)
+
+
+@code
+{
+    [Parameter]
+    public string ContentId { get; set; }
+
+    public RenderFragment BuildContent(string paramIn) => builder =>
+    {       
+        var items = state.ContentItemList;
+
+        foreach(var item in items)
+        {
+            if (item.Id == paramIn)
+            {
+                builder.OpenElement(1, "h4");
+                builder.AddContent(2,item.Title);
+                builder.CloseElement();
+
+                builder.OpenElement(3, "p");
+                builder.AddContent(4,item.Text);
+                builder.CloseElement();
+            }
+        }
+    };
+
+    public RenderFragment ShowContent(string paramIn)
+    {
+        RenderFragment frag = null;
+
+        frag = BuildContent(paramIn);
+
+        return frag;
+    }   
+}

@@ -1,0 +1,92 @@
+﻿@page "/Accounts/signup"
+@using SectorModel.Shared.Entities
+@using System.Net.Http.Json
+
+@inject HttpClient httpClient
+@inject NavigationManager NavigationManager
+
+<div class="row" style="padding:20px">
+
+    <EditForm Model="@user" OnSubmit="@(HandleSubmit)">
+
+        <div class="row">
+            <div class="col-12">
+                <h4>Sign up for a SectorModel account</h4>
+                <br />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <label>Select a user name:</label>
+                <InputText id="userName" class="form-control" @bind-Value="@user.UserName" />
+                <br />
+                <label>Enter a password (no particular requirements)</label>
+                <InputText Id="password1" class="form-control" type="password" @bind-Value="@user.Password" />
+                <br />
+                <label>Confirm the password</label>
+                <InputText Id="password2" class="form-control" type="password" @bind-Value="@user.ConfirmPassword" />
+                <br />
+                <br />
+                <div class="row">
+                    <div class="col-6">
+                        <button type="submit">Submit</button>
+                    </div>
+                    <div class="col-6">
+                        <button @onclick="@(CloseThis)">Close</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <br />
+                        <br />
+                        <label style="color:@validationTextColor;">@ValidationMessage</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+
+@code
+{
+    public User user = new User();
+
+    private string ValidationMessage;
+
+    private string validationTextColor;
+
+    private void CloseThis()
+    {
+        NavigationManager.NavigateTo("../");
+    }
+
+    private async Task HandleSubmit()
+    {
+        validationTextColor = "red";
+        ValidationMessage = string.Empty;
+
+        var bExists = await httpClient.GetFromJsonAsync<bool>($"users/exists?userName={user.UserName}");
+
+        if (bExists)
+        {
+            ValidationMessage = "This user name has been taken. Please select another.";
+            return;
+        }
+
+        if ((user.Password != user.ConfirmPassword) && (user.Password.Trim().Length > 0))
+        {
+            ValidationMessage = "Passwords do not match. Please re-enter.";
+            return;
+        }
+
+        HttpResponseMessage response = await httpClient.PostAsJsonAsync<User>("users/save", user);
+        User mr = await response.Content.ReadFromJsonAsync<User>();
+
+        if (mr != null)
+        {
+            validationTextColor = "black";
+            ValidationMessage = "Your account has been created.";
+        }
+    }
+}

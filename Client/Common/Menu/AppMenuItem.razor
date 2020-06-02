@@ -1,0 +1,54 @@
+﻿@using SectorModel.Client.Common.Menu
+@using Microsoft.AspNetCore.Components
+
+@if (ChildContent != null)
+{
+    <li disabled="@(!IsEnabled)">
+        @ChildContent
+    </li>
+}
+else
+{
+    if (IsEnabled)
+    {
+        <NavLink href="@menuItem.Link" Match="@menuItem.Match">
+            @menuItem.Title
+        </NavLink>
+    }
+    else
+    {
+        @menuItem.Title
+    }
+}
+
+@code
+{
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public bool IsEnabled { get; set; } = true;
+
+    [Parameter]
+    public bool IsVisible { get; set; } = true;
+
+    [Parameter]
+    public string Css { get; set; } = string.Empty;
+
+    [Parameter]
+    public MenuItem menuItem { get; set; }
+
+    protected string CssString
+    {
+        get
+        {
+            var cssString = string.Empty;
+
+            cssString += $"{Css}";
+            cssString += !IsEnabled ? " disabled" : "";
+            cssString += !IsVisible ? " hidden" : "";
+
+            return cssString.Trim();
+        }
+    }
+}

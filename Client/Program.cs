@@ -19,6 +19,8 @@ namespace SectorModel.Client
 
             builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
+            builder.Services.AddSingleton<AppStateContainer>();
+
             await builder.Build().RunAsync();
         }
     }

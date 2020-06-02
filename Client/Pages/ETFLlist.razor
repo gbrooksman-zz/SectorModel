@@ -1,0 +1,44 @@
+@page "/etflist"
+@inject AppStateContainer state
+@inject HttpClient httpClient
+@using SectorModel.Client.Pages.Components
+@using SectorModel.Shared.Entities
+
+<div>
+    <div class="row">
+        <DataGrid Items="@equityList" TItem="ModelEquity">
+            <HeaderTemplate>
+                <th>Symbol</th>
+                <th>Name</th>
+                <th>Last Price</th>
+            </HeaderTemplate>
+            <RowTemplate>
+                <td>@context.Equity.Symbol</td>
+                <td>@context.Equity.SymbolName</td>
+                <td>@context.LastPrice</td>
+            </RowTemplate>
+            <FooterTemplate>
+                <td>
+                    @context.Count equities in list.
+                </td>
+                <td>
+                    Prices as of: @state.LastQuoteDate.ToShortDateString()
+                </td>
+            </FooterTemplate>
+        </DataGrid>
+    </div>
+</div>
+
+
+@code
+{
+    private UserModel model = new UserModel();
+    private List<ModelEquity> equityList = new List<ModelEquity>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        model = await httpClient.GetFromJsonAsync<UserModel>($"model/getmodel?modelId={state.SPDRModelID}");
+
+        equityList = await httpClient.GetFromJsonAsync<List<ModelEquity>>($"quote/getmodelbydate?modelId={state.SPDRModelID}&date={DateTime.Now.Date}");
+    }
+}

@@ -1,0 +1,137 @@
+@page "/corehistory"
+@inject AppStateContainer state
+@inject HttpClient httpClient
+@using SectorModel.Client.Entities
+@using SectorModel.Client.Common
+@using SectorModel.Client.Pages.Components
+@using SectorModel.Shared.Entities
+@using SectorModel.Client.Services
+
+<style>
+
+    /*div {
+        border: 1px solid #000000;
+    }*/
+
+    .divVisible {
+        display: block;
+    }
+
+    .divHidden {
+        display: none;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-4">
+            <h3>Core Model History</h3>
+        </div>
+        <div class="col-8 @showDiv">
+            <button style="padding:5px;" class="btn btn-link" @onclick="@(() => showPieChart = true)">Pie Chart</button>
+            <button style="padding:5px;" class="btn btn-link" @onclick="@(() => showPieChart = false)">Data table</button>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <DataGrid Items="@modelVersionList" TItem="UserModel">
+                <HeaderTemplate>
+                    <th>Version</th>
+                    <th>Start Date</th>
+                    <th>Stop Date</th>
+                    <th>Action</th>
+                </HeaderTemplate>
+                <RowTemplate>
+                    <td>@context.Version</td>
+                    <td>@context.StartDate.ToShortDateString()</td>
+                    <td>@FormatStopDate(context.StopDate, context.Active)</td>
+                    <td><button class="btn btn-primary" @onclick="@(() => ShowVersionInfo(@context))">Show</button></td>
+                </RowTemplate>
+            </DataGrid>
+        </div>
+        <div class="col-8">
+            <div class="container-fluid">
+                <div class="row">
+                    @if (showPieChart)
+                    {
+                        <div class="col-6">
+                            <PieChart Height="300" Width="300" PieSlices="@modelSlices" />
+                        </div>
+                        <div class="col-6">
+                            @modelVersionDescription
+                        </div>
+                    }
+                    else
+                    {
+                        <ModelEquityGrid ModelEquityList="@modelEquityList" />
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    List<PieSlice> modelSlices = new List<PieSlice>();
+    List<ModelEquity> modelEquityList = new List<ModelEquity>();
+    ContentService contentService = new ContentService();
+    bool showPieChart = true;
+
+    string showDiv = "divHidden";
+
+    string modelVersionId = string.Empty;
+
+    string modelVersionDescription = string.Empty;
+
+    protected async Task ShowVersionInfo(UserModel model)
+    {
+        showDiv = "divVisible";
+
+        modelVersionId = model.ModelVersionId.ToString();
+
+        modelEquityList = await httpClient.GetFromJsonAsync<List<ModelEquity>>($"quote/getmodelbydate?modelId={state.CoreModelId}&versionNumber={model.Version}&date={model.StartDate}");
+
+        int i = 1;
+        modelSlices.Clear();
+        foreach (ModelEquity meq in modelEquityList)
+        {
+            modelSlices.Add(new PieSlice()
+            {
+                Name = meq.Equity.Symbol,
+                Percent = meq.Percent,
+                Color = ColorPicker.Get(i)
+            });
+            i++;
+        }
+
+        modelVersionDescription = contentService.GetModelVersionDescription(model.Version);
+    }
+
+
+
+
+    protected string FormatStopDate(DateTime stopDate, bool isActive)
+    {
+        string ret = stopDate == DateTime.MinValue ? "" : stopDate.ToShortDateString();
+        if (string.IsNullOrEmpty(ret) && isActive)
+        {
+            ret = "(active)";
+        }
+
+        return ret;
+    }
+
+    protected string IsActive(bool isActive)
+    {
+        return isActive == true ? "(active)" : "";
+    }
+
+    List<UserModel> modelVersionList = new List<UserModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        modelVersionList = await httpClient.GetFromJsonAsync<List<UserModel>>($"model/getmodelversions?modelId={state.CoreModelId}");
+
+    }
+}
