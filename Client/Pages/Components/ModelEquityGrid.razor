@@ -4,7 +4,7 @@
 @using SectorModel.Shared.Entities
 
 
-<DataGrid Items="@ModelEquityList" TItem="ModelEquity">
+<DataGrid Items="@ModelEquityList" TItem="ModelItem">
     <HeaderTemplate>
         <th>Symbol</th>
         <th>Name</th>
@@ -45,7 +45,7 @@
 {
 
     [Parameter]
-    public List<ModelEquity> ModelEquityList { get; set; }
+    public List<ModelItem> ModelEquityList { get; set; }
 
     decimal totalValue = 0;
     decimal totalCost = 0;

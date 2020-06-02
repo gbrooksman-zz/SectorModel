@@ -66,12 +66,12 @@ namespace SectorModel.Server.Controllers
             }
         }      
 
-        [HttpGet]
+       /* [HttpGet]
         [Route("GetEquitiesWithQuotes")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-
-        public async Task<List<EquityQuotes>> GetEquitiesWithQuotes(string EquityList, DateTime StartDate, DateTime StopDate, int quoteInterval)
+*/
+   /*     public async Task<List<EquityQuotes>> GetEquitiesWithQuotes(string EquityList, DateTime StartDate, DateTime StopDate, int quoteInterval)
         {
             List<EquityQuotes> equitiesWithQuotes = new List<EquityQuotes>();
 
@@ -99,6 +99,6 @@ namespace SectorModel.Server.Controllers
             }
 
             return equitiesWithQuotes;
-        }
+        }*/
     }
 }

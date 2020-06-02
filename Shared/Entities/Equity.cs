@@ -10,7 +10,7 @@ namespace SectorModel.Shared.Entities
             
         }
 
-        public Guid Id {get; set;}
+
         public string SymbolName { get; set; }
 
         public string Symbol { get; set; }

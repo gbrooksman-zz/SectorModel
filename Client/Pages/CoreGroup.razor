@@ -29,14 +29,14 @@
     decimal totalValue = 0;
     decimal totalCost = 0;
 
-    List<ModelEquity> modelEquityList = new List<ModelEquity>();
-    UserModel model = new UserModel();
+    List<ModelItem> modelEquityList = new List<ModelItem>();
+    Model model = new Model();
 
     protected override async Task OnInitializedAsync()
     {
-        model = await httpClient.GetFromJsonAsync<UserModel>($"model/getmodel?modelId={state.CoreModelId}").ConfigureAwait(false);
+        model = await httpClient.GetFromJsonAsync<Model>($"model/getmodel?modelId={state.CoreModelId}").ConfigureAwait(false);
 
-        modelEquityList = await httpClient.GetFromJsonAsync<List<ModelEquity>>($"quote/getmodelbydate?modelId={state.CoreModelId}&date={DateTime.Now.Date}&versionNumber={model.Version}").ConfigureAwait(false);
+        modelEquityList = await httpClient.GetFromJsonAsync<List<ModelItem>>($"quote/getmodelbydate?modelId={state.CoreModelId}&date={DateTime.Now.Date}&versionNumber={model.Version}").ConfigureAwait(false);
 
         totalValue = modelEquityList.Sum(q => q.CurrentValue);
         totalCost = modelEquityList.Sum(q => q.Cost);

@@ -15,20 +15,20 @@ namespace SectorModel.Server.Controllers
     [ApiController]
     public class ModelController : ControllerBase
     {
-        private readonly UserModelManager umMgr;
+        private readonly ModelManager umMgr;
 
         public ModelController(IMemoryCache _cache, IConfiguration _config)
         {
-            umMgr = new UserModelManager(_cache, _config);
+            umMgr = new ModelManager(_cache, _config);
         }
 
         [HttpGet]
         [Route("GetModelList")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<UserModel>>> GetModelList(User user)
+        public async Task<ActionResult<List<Model>>> GetModelList(User user)
         {
-            List<UserModel> mgrResult = await umMgr.GetActiveModelList(user);
+            List<Model> mgrResult = await umMgr.GetActiveModelList(user);
 
             return Ok(mgrResult);
         }               
@@ -37,17 +37,17 @@ namespace SectorModel.Server.Controllers
         [Route("GetModel")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<UserModel>> GetModel(Guid modelId)
+        public async Task<ActionResult<Model>> GetModel(Guid modelId)
         { 
-            UserModel mgrResult = await umMgr.GetModel(modelId);
+            Model model = await umMgr.GetModel(modelId);
 
-            if (mgrResult == null)
+            if (model == null)
             {
-                return BadRequest(mgrResult);
+                return BadRequest(model);
             }
             else
             {
-                return Ok(mgrResult);
+                return Ok(model);
             }
         }
 
@@ -55,9 +55,9 @@ namespace SectorModel.Server.Controllers
         [Route("GetModelVersions")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<UserModel>>> GetModelVersions(Guid modelId)
+        public async Task<ActionResult<List<Model>>> GetModelVersions(Guid modelId)
         {
-            List<UserModel> mgrResult = await umMgr.GetModelVersions(modelId);
+            List<Model> mgrResult = await umMgr.GetModelVersions(modelId);
 
             if (mgrResult == null)
             {

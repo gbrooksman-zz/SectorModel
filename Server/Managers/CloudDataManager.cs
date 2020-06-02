@@ -25,14 +25,18 @@ namespace SectorModel.Server.Managers
 
         private static HttpClient client;
 
-        private readonly EquityGroupManager egMgr;
+        private readonly ModelManager egMgr;
+        private readonly ModelItemManager miMgr;
         private readonly QuoteManager qMgr;
+        private readonly EquityManager eMgr;
 
-       public CloudDataManager(IMemoryCache cache, IConfiguration config) : base(cache, config)
+        public CloudDataManager(IMemoryCache cache, IConfiguration config) : base(cache, config)
         {
-            egMgr = new EquityGroupManager(cache, config);
+            egMgr = new ModelManager(cache, config);
+            miMgr = new ModelItemManager(cache, config);
             qMgr = new QuoteManager(cache, config);
-           
+            eMgr = new EquityManager(cache, config);
+
             client = new HttpClient();
 
             apiToken = config.GetSection("IEXCloud").GetValue<string>("APIToken");
@@ -53,7 +57,14 @@ namespace SectorModel.Server.Managers
         {
             List<string> datesToLoad = GetDatesToLoad(lastQuoteDate);
 
-            List<Equity> egiList = await egMgr.GetGroupEquities(coregroupid).ConfigureAwait(false);
+            List<Equity> egiList = new List<Equity>();
+
+            var modelItems = await miMgr.GetModelEquityList(coregroupid).ConfigureAwait(false);
+
+            foreach (ModelItem item in modelItems)
+            {
+                egiList.Add(await eMgr.Get(item.EquityID));
+            }
 
             JsonSerializerOptions options = new JsonSerializerOptions
             {

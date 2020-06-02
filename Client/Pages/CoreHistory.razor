@@ -34,7 +34,7 @@
     </div>
     <div class="row">
         <div class="col-4">
-            <DataGrid Items="@modelVersionList" TItem="UserModel">
+            <DataGrid Items="@modelVersionList" TItem="Model">
                 <HeaderTemplate>
                     <th>Version</th>
                     <th>Start Date</th>
@@ -44,7 +44,7 @@
                 <RowTemplate>
                     <td>@context.Version</td>
                     <td>@context.StartDate.ToShortDateString()</td>
-                    <td>@FormatStopDate(context.StopDate, context.Active)</td>
+                    <td>@FormatStopDate(context.StopDate, context.IsActive)</td>
                     <td><button class="btn btn-primary" @onclick="@(() => ShowVersionInfo(@context))">Show</button></td>
                 </RowTemplate>
             </DataGrid>
@@ -74,7 +74,7 @@
 @code
 {
     List<PieSlice> modelSlices = new List<PieSlice>();
-    List<ModelEquity> modelEquityList = new List<ModelEquity>();
+    List<ModelItem> modelEquityList = new List<ModelItem>();
     ContentService contentService = new ContentService();
     bool showPieChart = true;
 
@@ -84,17 +84,17 @@
 
     string modelVersionDescription = string.Empty;
 
-    protected async Task ShowVersionInfo(UserModel model)
+    protected async Task ShowVersionInfo(Model model)
     {
         showDiv = "divVisible";
 
         modelVersionId = model.ModelVersionId.ToString();
 
-        modelEquityList = await httpClient.GetFromJsonAsync<List<ModelEquity>>($"quote/getmodelbydate?modelId={state.CoreModelId}&versionNumber={model.Version}&date={model.StartDate}");
+        modelEquityList = await httpClient.GetFromJsonAsync<List<ModelItem>>($"quote/getmodelbydate?modelId={state.CoreModelId}&versionNumber={model.Version}&date={model.StartDate}");
 
         int i = 1;
         modelSlices.Clear();
-        foreach (ModelEquity meq in modelEquityList)
+        foreach (ModelItem meq in modelEquityList)
         {
             modelSlices.Add(new PieSlice()
             {
@@ -127,11 +127,11 @@
         return isActive == true ? "(active)" : "";
     }
 
-    List<UserModel> modelVersionList = new List<UserModel>();
+    List<Model> modelVersionList = new List<Model>();
 
     protected override async Task OnInitializedAsync()
     {
-        modelVersionList = await httpClient.GetFromJsonAsync<List<UserModel>>($"model/getmodelversions?modelId={state.CoreModelId}");
+        modelVersionList = await httpClient.GetFromJsonAsync<List<Model>>($"model/getmodelversions?modelId={state.CoreModelId}");
 
     }
 }

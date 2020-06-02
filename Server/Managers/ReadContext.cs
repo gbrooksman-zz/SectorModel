@@ -7,21 +7,19 @@ using SectorModel.Shared.Entities;
 
 namespace SectorModel.Server.Managers
 {
-    public class SectorModelContext : DbContext
+    public class ReadContext : DbContext
     {
         public DbSet<Equity> Equities { get; set; }
-
-        public DbSet<EquityGroup> EquityGroups { get; set; }
-
-        public DbSet<EquityGroupItem> EquityGroupItems { get; set; }
 
         public DbSet<Quote> Quotes { get; set; }
 
         public DbSet<User> Users { get; set; }
 
-        public DbSet<UserModel> UserModels { get; set; }
+        public DbSet<Model> Models { get; set; }
 
-        public DbSet<UserModelComment> UserModelComments { get; set; }
+        public DbSet<ModelItem> ModelItems { get; set; }
+
+        public DbSet<ModelComment> ModelComments { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -31,6 +29,8 @@ namespace SectorModel.Server.Managers
                             Connect Timeout=30";
 
             optionsBuilder.UseSqlServer(connString);
+
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
     }
 }

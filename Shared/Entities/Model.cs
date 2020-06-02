@@ -1,27 +1,28 @@
 using System;
 
+
 namespace SectorModel.Shared.Entities
-{  
-    public class UserModel : BaseEntity
+{
+
+    public class Model : BaseEntity
     {
-        public UserModel()
+        public Model()
         {
             
         }
 
-        public Guid Id { get; set; }
 
-        public Guid UserId { get; set; }       
+        public Guid UserId { get; set; }
 
         public string Name { get; set; }
 
-        public bool Active {get; set;}
+        public bool IsActive { get; set; }
 
-        public DateTime StartDate {get; set;}
+        public DateTime StartDate { get; set; }
 
         public DateTime StopDate { get; set; }
 
-        public int StartValue { get; set; } 
+        public int StartValue { get; set; }
 
         public int StopValue { get; set; }
 

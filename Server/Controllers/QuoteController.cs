@@ -17,15 +17,15 @@ namespace SectorModel.Server.Controllers
     {
         private readonly QuoteManager qMgr;
         private readonly EquityManager eMgr;
-        private readonly EquityGroupManager egMgr;
-        private readonly UserModelManager umMgr;
+        private readonly ModelManager mMgr;
+        private readonly ModelItemManager miMgr;
 
         public QuoteController(IMemoryCache _cache, IConfiguration _config)
         {
             qMgr = new QuoteManager(_cache, _config);
             eMgr = new EquityManager(_cache, _config);
-            egMgr = new EquityGroupManager(_cache, _config);
-            umMgr = new UserModelManager(_cache, _config);
+            mMgr = new ModelManager(_cache, _config);
+            miMgr = new ModelItemManager(_cache, _config);
         }
 
         [HttpGet]
@@ -101,9 +101,9 @@ namespace SectorModel.Server.Controllers
         [Route("GetModelByDate")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<ModelEquity>>> GetModelByDate(Guid modelId, DateTime date, int versionNumber)
+        public async Task<ActionResult<List<ModelItem>>> GetModelByDate(Guid modelId, DateTime date, int versionNumber)
         {
-            List<ModelEquity> modelEquityList = await umMgr.GetModelEquityListByDate(modelId, date, versionNumber);
+            List<ModelItem> modelEquityList = await miMgr.GetModelEquityListByDate(modelId, date, versionNumber);
 
             if (modelEquityList == null)
             {

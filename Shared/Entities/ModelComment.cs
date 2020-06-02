@@ -2,14 +2,12 @@
 
 namespace SectorModel.Shared.Entities
 {
-    public class UserModelComment : BaseEntity
+    public class ModelComment : BaseEntity
     {
-        public UserModelComment()
+        public ModelComment()
         {
 
         }
-
-        public Guid Id { get; set; }
 
         public Guid ModelId { get; set; }
 

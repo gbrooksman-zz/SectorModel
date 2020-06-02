@@ -115,7 +115,7 @@ namespace SectorModel.Server.Managers
         {
             DateTime maxDate = DateTime.MinValue;
 
-            using (var db = new SectorModelContext())
+            using (var db = new WriteContext())
             {
                 maxDate = await db.Quotes.AsNoTracking().MaxAsync(q => q.Date);
             }
@@ -153,7 +153,7 @@ namespace SectorModel.Server.Managers
             {
                 List<DateTime> tradeDates = new List<DateTime>();
 
-                using (var db = new SectorModelContext())
+                using (var db = new WriteContext())
                 {
                     var quotes = db.Quotes.AsNoTracking().GroupBy(q => q.Date).Distinct();
                     await quotes.ForEachAsync( q => { tradeDates.Add(q.Key); });
@@ -196,7 +196,7 @@ namespace SectorModel.Server.Managers
 
             List<Quote> quotes = new List<Quote>();
 
-            using (var db = new SectorModelContext())
+            using (var db = new WriteContext())
             {
                 quotes = await db.Quotes.AsNoTracking().Where(q => q.EquityId == equityId)
                                         .OrderBy(q => q.Date)
@@ -221,7 +221,7 @@ namespace SectorModel.Server.Managers
         { 
             try
             {
-                using var db = new SectorModelContext();
+                using var db = new WriteContext();
                 await db.Quotes.AddAsync(quote);
                 await db.SaveChangesAsync();
 
@@ -262,7 +262,7 @@ namespace SectorModel.Server.Managers
             int x = 0;
             try
             {
-                using var db = new SectorModelContext();
+                using var db = new WriteContext();
                 db.Quotes.Remove(quote);
                 x = await db.SaveChangesAsync();
 

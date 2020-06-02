@@ -6,7 +6,7 @@
 
 <div>
     <div class="row">
-        <DataGrid Items="@equityList" TItem="ModelEquity">
+        <DataGrid Items="@equityList" TItem="ModelItem">
             <HeaderTemplate>
                 <th>Symbol</th>
                 <th>Name</th>
@@ -32,13 +32,13 @@
 
 @code
 {
-    private UserModel model = new UserModel();
-    private List<ModelEquity> equityList = new List<ModelEquity>();
+    private Model model = new Model();
+    private List<ModelItem> equityList = new List<ModelItem>();
 
     protected override async Task OnInitializedAsync()
     {
-        model = await httpClient.GetFromJsonAsync<UserModel>($"model/getmodel?modelId={state.SPDRModelID}");
+        model = await httpClient.GetFromJsonAsync<Model>($"model/getmodel?modelId={state.SPDRModelID}");
 
-        equityList = await httpClient.GetFromJsonAsync<List<ModelEquity>>($"quote/getmodelbydate?modelId={state.SPDRModelID}&date={DateTime.Now.Date}");
+        equityList = await httpClient.GetFromJsonAsync<List<ModelItem>>($"quote/getmodelbydate?modelId={state.SPDRModelID}&date={DateTime.Now.Date}");
     }
 }

@@ -14,8 +14,8 @@ namespace SectorModel.Client
 
         public string UserName { get; set; }
         public Guid UserId { get; set; }
-        public List<ModelEquity> ModelEquityList { get; set; }
-        public List<UserModel> UserModels { get; set; }
+        public List<ModelItem> ModelEquityList { get; set; }
+        public List<Model> UserModels { get; set; }
         public DateTime LastQuoteDate { get; set; }
         public Guid CoreModelId { get; set; }
         public Guid SPDRModelID { get; set; }

@@ -16,27 +16,7 @@ namespace SectorModel.Server.Managers
         {
             cache = _cache;
             config = _config;
-
-           
           
         }
-    }
-
-    public static class DBTables
-    {
-        public static readonly string Equities = "equities";
-
-        public static readonly string EquityGroups = "equitygroups";
-
-        public static readonly string Quotes = "quotes";
-
-        public static readonly string EquityItems = "equityitems";
-
-        public static readonly string Models = "models";
-
-        public static readonly string Users = "users";
-
-        public static readonly string UserModels = "usermodels";
-
     }
 }

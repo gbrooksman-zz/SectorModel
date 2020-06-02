@@ -1,15 +1,14 @@
 using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SectorModel.Shared.Entities
 {
-    public class ModelEquity : BaseEntity
+    public class ModelItem : BaseEntity
     {
-        public ModelEquity()
+        public ModelItem()
         {
             
         }
-
-        public Guid Id { get; set; }
 
         public Guid ModelId { get; set; }
 
@@ -23,12 +22,16 @@ namespace SectorModel.Shared.Entities
 
         public int Version { get; set; }
 
+        [NotMapped]
         public Equity Equity { get; set; }
 
+        [NotMapped]
         public decimal LastPrice { get; set; }
 
+        [NotMapped]
         public DateTime LastPriceDate { get; set; }
 
+        [NotMapped]
         public decimal CurrentValue { get; set; }
 
 

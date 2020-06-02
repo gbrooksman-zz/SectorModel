@@ -23,8 +23,8 @@ namespace SectorModel.Server.Managers
             
             try
             {
-                using var db = new SectorModelContext();
-                users = await db.Users.AsNoTracking().Where(u => u.Active == true).ToListAsync();
+                using var db = new ReadContext();
+                users = await db.Users.Where(u => u.Active == true).ToListAsync();
 
                 //using (NpgsqlConnection db = new NpgsqlConnection(connString))
                 //{
@@ -50,8 +50,8 @@ namespace SectorModel.Server.Managers
             
             try
             {
-                using var db = new SectorModelContext();
-                user = await db.Users.AsNoTracking().Where(u => u.Id == id).FirstOrDefaultAsync();
+                using var db = new ReadContext();
+                user = await db.Users.Where(u => u.Id == id).FirstOrDefaultAsync();
                 //using NpgsqlConnection db = new NpgsqlConnection(connString);
                 //{
                 //    mgrResult = await db.QueryFirstOrDefaultAsync<User>(@"SELECT * FROM users 
@@ -75,6 +75,9 @@ namespace SectorModel.Server.Managers
               
             try
             {
+                using var db = new ReadContext();
+                user = await db.Users.Where(u => u.UserName.ToLower() == userName.ToLower()).FirstOrDefaultAsync();
+
                 //using (NpgsqlConnection db = new NpgsqlConnection(connString))
                 //{
                 //   user = await db.QueryFirstOrDefaultAsync<User>(@"SELECT * 
@@ -82,7 +85,7 @@ namespace SectorModel.Server.Managers
                 //                                WHERE user_name = @p1", 
                 //                                new { p1 = userName }).ConfigureAwait(false);
                 //}
-               // mgrResult = user;
+                // mgrResult = user;
             }
             catch(Exception ex)
             {
@@ -96,10 +99,17 @@ namespace SectorModel.Server.Managers
 
         public async Task<bool> Validate(string userName, string password)
         {
-            bool mgrResult = false;
+            User user = new User();
 
             try
             {
+                using var db = new ReadContext();
+                user = await db.Users.Where(u => u.UserName.ToLower() == userName.ToLower()
+                                        && u.Password == password
+                                        && u.Active == true)
+                                        .FirstOrDefaultAsync();
+
+
                 //using (NpgsqlConnection db = new NpgsqlConnection(connString))
                 //{
                 //    User user = await db.QueryFirstOrDefaultAsync<User>(@"SELECT * 
@@ -112,13 +122,13 @@ namespace SectorModel.Server.Managers
                 //    mgrResult = (user != default(User));
                 //}
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.Error("UserManager::Validate",ex);
                 throw;
             }
             
-            return mgrResult;
+            return user != null;
         }
 
         public async Task<User> Save(User user)
@@ -127,6 +137,10 @@ namespace SectorModel.Server.Managers
             {
                 if (user.Id == Guid.Empty)
                 {
+                    using var db = new WriteContext();
+                    db.Add(user);
+                    await db.SaveChangesAsync();
+
                     //using NpgsqlConnection db = new NpgsqlConnection(connString);
                     //{                        
                     //    string sql = $"INSERT INTO USERS (USER_NAME, PASSWORD)  VALUES ( @p1 , @p2)";
@@ -135,6 +149,10 @@ namespace SectorModel.Server.Managers
                 }
                 else
                 {
+                    using var db = new WriteContext();
+                    db.Update(user);
+                    await db.SaveChangesAsync();
+
                     //using NpgsqlConnection db = new NpgsqlConnection(connString);
                     //{
                     //    await db.UpdateAsync(user).ConfigureAwait(false);

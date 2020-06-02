@@ -15,21 +15,23 @@ namespace SectorModel.Server.Controllers
     [ApiController]
     public class EquityGroupController : ControllerBase
     {
-        private readonly EquityGroupManager egMgr;
+        private readonly ModelManager egMgr;
+        private readonly ModelItemManager miMgr;
 
         public EquityGroupController(IMemoryCache _cache, IConfiguration _config)
         {
-            egMgr = new EquityGroupManager(_cache, _config);
+            egMgr = new ModelManager(_cache, _config);
+            miMgr = new ModelItemManager(_cache, _config);
         }
 
-        [HttpGet]
+       /* [HttpGet]
         [Route("GetList")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<EquityGroup>>> GetList()
+        public async Task<ActionResult<List<Model>>> GetList()
         {
-            List<EquityGroup> mgrResult = await egMgr.GetList();
-            if (!mgrResult.Any())
+            List<Model> modelList = await egMgr.GetActiveModelList();
+            if (!modelList.Any())
             {
                 return Problem(
                     detail:"",
@@ -41,17 +43,17 @@ namespace SectorModel.Server.Controllers
             }
             else
             {
-                return Ok(mgrResult);
-            }
-        }
+                return Ok(modelList);
+            }*/
+       // }
 
         [HttpGet]
         [Route("GetGroupItems")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<EquityGroupItem>>> GetGroupItems(Guid equityGroupid)
+        public async Task<ActionResult<List<ModelItem>>> GetGroupItems(Guid modelId)
         {
-            List<EquityGroupItem> mgrResult = await egMgr.GetGroupItemsList(equityGroupid);
+            List<ModelItem> mgrResult = await miMgr.GetModelEquityList(modelId);
             if (!mgrResult.Any())
             {
                 return BadRequest(mgrResult);
@@ -66,9 +68,9 @@ namespace SectorModel.Server.Controllers
         [Route("GetCount")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<int>> GetCount(Guid equityGroupid)
+        public async Task<ActionResult<int>> GetCount(Guid modelId)
         {
-            int mgrResult = await egMgr.GetItemsCount(equityGroupid);
+            int mgrResult = await miMgr.GetEquitiesInModelsCount(modelId);
             if (mgrResult == 0)
             {
                 return BadRequest(mgrResult);

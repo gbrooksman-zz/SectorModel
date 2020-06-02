@@ -68,7 +68,7 @@
 
     private EquityService eSvc;
 
-    private List<EquityQuotes> equitiesWithQuotes = new List<EquityQuotes>();
+  //  private List<Quote> equitiesWithQuotes = new List<EquityQuotes>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -82,7 +82,7 @@
 
         int quoteInterval = eSvc.GetInterval(beginDate, endDate);
 
-        equitiesWithQuotes = await httpClient.GetFromJsonAsync<List<EquityQuotes>>($"equity/GetEquitiesWithQuotes?EquityList={EquityList}&StartDate={beginDate}&StopDate={endDate}&QuoteInterval={quoteInterval}");
+       // equitiesWithQuotes = await httpClient.GetFromJsonAsync<List<EquityQuotes>>($"equity/GetEquitiesWithQuotes?EquityList={EquityList}&StartDate={beginDate}&StopDate={endDate}&QuoteInterval={quoteInterval}");
     }
 
 
@@ -175,9 +175,9 @@
 
         List<ChartItem> chartItems = new List<ChartItem>();
 
-        int x = 1;
+        //int x = 1;
 
-        foreach (EquityQuotes equityquote in equitiesWithQuotes)
+       @* foreach (EquityQuotes equityquote in equitiesWithQuotes)
         {
             List<Quote> quotes = equityquote.Quotes;
 
@@ -192,7 +192,7 @@
             }); ;
 
             x++;
-        }
+        }*@
 
         foreach (var chartItem in chartItems)
         {

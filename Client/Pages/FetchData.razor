@@ -35,8 +35,8 @@
 
     private async Task ListEquityGroups()
     {
-        var response = await httpClient.GetFromJsonAsync<List<EquityGroup>>($"equitygroup/getlist");
-        List<EquityGroup> equityGroupList = response.ToList();
+        var response = await httpClient.GetFromJsonAsync<List<Model>>($"equitygroup/getlist");
+        List<Model> equityGroupList = response.ToList();
 
         foreach (var equityGroup in equityGroupList)
         {
