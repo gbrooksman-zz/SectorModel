@@ -32,20 +32,12 @@ namespace SectorModel.Server.Managers
                 using var db = new ReadContext();
                 modelItem = await db.ModelItems
                                     .Where(i => i.Id == modelEquityId 
-                                    && i.Version == 1)
+                                    && i.Version == versionNumber)
                                     .FirstOrDefaultAsync();
-
-                //using NpgsqlConnection db = new NpgsqlConnection(connString);
-                //{
-                //    mgrResult = await db.QueryFirstOrDefaultAsync<ModelEquity>(@" SELECT * 
-                //                                            FROM model_equities 
-                //                                            WHERE id = @p1 and version = @p2",
-                //                                            new { p1 = modelEquityId, p2 = versionNumber }).ConfigureAwait(false);
-                //}
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "UserModelManager::GetModelEquity");
+                Log.Error(ex, "ModelItemManager::GetModelEquity");
                 throw;
             }
 
@@ -68,18 +60,10 @@ namespace SectorModel.Server.Managers
                     && i.Version == versionNumber)
                     .ToListAsync();
 
-                //using NpgsqlConnection db = new NpgsqlConnection(connString);
-                //var qResult = await db.QueryAsync<ModelEquity>(@" SELECT * 
-                //                                    FROM model_equities 
-                //                                    WHERE model_id = @p1 and version = @p2",
-                //    new { p1 = modelId, p2 = thisModel.Version }).ConfigureAwait(false);
-
-                //List<ModelItem> modelEquityList = new List<ModelItem>(); //qResult.ToList();
-
                 foreach (ModelItem modelEquity in modelEquityList)
                 {
-                    modelEquity.Equity = eqMgr.Get(modelEquity.EquityID).Result;
-                    Quote quote = qMgr.GetByEquityIdAndDate(modelEquity.EquityID, quoteDate).Result;
+                    modelEquity.Equity = await eqMgr.Get(modelEquity.EquityID);
+                    Quote quote = await qMgr.GetByEquityIdAndDate(modelEquity.EquityID, quoteDate);
                     if (quote != null)
                     {
                         modelEquity.LastPrice = quote.Price;
@@ -92,7 +76,7 @@ namespace SectorModel.Server.Managers
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "UserModelManager::GetModelEquityListByDate");
+                Log.Error(ex, "ModelItemManager::GetModelEquityListByDate");
                 throw;
             }
 
@@ -110,21 +94,10 @@ namespace SectorModel.Server.Managers
                                     .Where(i => i.Id == modelId
                                     && i.Version == versionNumber)
                                     .ToListAsync();
-
-                //using NpgsqlConnection db = new NpgsqlConnection(connString);
-                //{
-                //    var qResult = await db.QueryAsync<ModelEquity>(@"SELECT * 
-                //                                            FROM model_equities 
-                //                                            WHERE model = @p1 
-                //                                            AND version = @p2", 
-                //                                            new { p1 = modelId, p2 = versionNumber }).ConfigureAwait(false);
-
-                //    mgrResult  = qResult.ToList();
-                //}
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "UserModelManager::GetModelEquityList");
+                Log.Error(ex, "ModelItemManager::GetModelEquityList");
                 throw;
             }
 
@@ -138,21 +111,13 @@ namespace SectorModel.Server.Managers
             try
             {
                 using var db = new ReadContext();
-                {
-                    itemCount = await db.ModelItems
-                                        .Where(i => i.EquityID == equityId)
-                                        .CountAsync();
-                }
-
-                //using NpgsqlConnection db = new NpgsqlConnection(connString);
-                //mgrResult = await db.QueryFirstOrDefaultAsync<int>(@"SELECT count(*)  
-                //                                                        FROM model_equities 
-                //                                                        WHERE equity_id = @p1 ",
-                //                    new { p1 = equityId }).ConfigureAwait(false);
+                itemCount = await db.ModelItems
+                                    .Where(i => i.EquityID == equityId)
+                                    .CountAsync();
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "EquityManager::GetEquitiesInModelsCount");
+                Log.Error(ex, "ModelItemManager::GetEquitiesInModelsCount");
                 throw;
             }
 
@@ -176,26 +141,11 @@ namespace SectorModel.Server.Managers
                         db.Update(modelItem);                        
                     }
                     await db.SaveChangesAsync();
-                }
-
-
-                //using (NpgsqlConnection db = new NpgsqlConnection(connString))
-                //{
-                //    if (modelEquity.Id != default)
-                //    {
-                //        await db.UpdateAsync(modelEquity).ConfigureAwait(false);
-                //    }
-                //    else
-                //    { 
-                //        await db.InsertAsync(modelEquity).ConfigureAwait(false);
-                //    }
-                //} 
-
-               
+                }               
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "UserModelManager::Save");
+                Log.Error(ex, "ModelItemManager::Save");
                 throw;
             }
 
@@ -216,16 +166,10 @@ namespace SectorModel.Server.Managers
                 using var db = new WriteContext();
                 db.Remove(modelEquity);
                 x = await db.SaveChangesAsync();
-
-                //using NpgsqlConnection db = new NpgsqlConnection(connString);
-                //{
-                //    mgrResult = await db.DeleteAsync(modelEquity).ConfigureAwait(false);
-                //}
-
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "UserModelManager::RemoveEquity");
+                Log.Error(ex, "ModelItemManager::RemoveEquity");
                 throw;
             }
 

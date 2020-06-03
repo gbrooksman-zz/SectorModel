@@ -18,7 +18,7 @@ namespace SectorModel.Server.Managers
         }
 
 
-        public async Task<bool> Save(ModelComment modelComment)
+        public async Task<bool> Add(ModelComment modelComment)
         {
             int x = 0;
             try
@@ -29,7 +29,7 @@ namespace SectorModel.Server.Managers
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "UserModelCommentManager::Save");
+                Log.Error(ex, "ModelCommentManager::Add");
                 throw;
             }
 
@@ -49,7 +49,7 @@ namespace SectorModel.Server.Managers
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "UserModelManager::GetModelEquity");
+                Log.Error(ex, "ModelCommentManager::GetModelComments");
                 throw;
             }
 

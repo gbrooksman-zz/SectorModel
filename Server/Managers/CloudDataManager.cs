@@ -96,7 +96,7 @@ namespace SectorModel.Server.Managers
                                 Volume = iexQuote.Volume
                             };
 
-                            await qMgr.Add(quote).ConfigureAwait(false);
+                            await qMgr.Add(quote);
                         }
                     }
 
@@ -126,20 +126,19 @@ namespace SectorModel.Server.Managers
     }
 
 
-
-    public class IEXQuote
+    internal class IEXQuote
     {
-        public IEXQuote()
+        internal IEXQuote()
         {
 
         }
 
-        public string Symbol { get; set; }
+        internal string Symbol { get; set; }
 
-        public decimal UClose { get; set; }
+        internal decimal UClose { get; set; }
 
-        public string Date { get; set; }
+        internal string Date { get; set; }
 
-        public int Volume { get; set; }
+        internal int Volume { get; set; }
     }
 }

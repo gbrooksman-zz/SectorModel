@@ -29,17 +29,12 @@ namespace SectorModel.Server.Managers
             {
                 using var db = new ReadContext();
                 modelList = await db.Models
-                                    .Where(i => i.UserId == user.Id).ToListAsync();  
-
-                //using NpgsqlConnection db = new NpgsqlConnection(connString);
-                //mgrResult = (List<UserModel>)await db.QueryAsync<UserModel>(@" SELECT * 
-                //                                    FROM user_models 
-                //                                    WHERE user_id = @p1 and active = true",
-                //                    new { p1 = user.Id }).ConfigureAwait(false);
+                                    .Where(i => i.UserId == user.Id)
+                                    .ToListAsync();  
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "UserModelManager::GetActiveModelList");
+                Log.Error(ex, "ModelManager::GetActiveModelList");
                 throw;
             } 
 
@@ -65,27 +60,11 @@ namespace SectorModel.Server.Managers
                                         .Where(i => i.Id == modelId
                                         && i.Version == versionNumber)
                                         .FirstOrDefaultAsync();
-
                 }
-
-                //using NpgsqlConnection db = new NpgsqlConnection(connString);
-                //if (versionNumber == 0)
-                //{
-                //    versionNumber = await db.QuerySingleAsync<int>(@" SELECT MAX(version) 
-                //                                    FROM user_models 
-                //                                    WHERE id = @p1 ",
-                //                                new { p1 = modelId }).ConfigureAwait(false);
-                //}
-
-
-                //userModel = await db.QuerySingleAsync<UserModel>(@" SELECT * 
-                //                                FROM user_models 
-                //                                WHERE id = @p1 and version = @p2",
-                //                            new { p1 = modelId, p2 = versionNumber }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "UserModelManager::GetModel");
+                Log.Error(ex, "ModelManager::GetModel");
                 throw;
             }
 
@@ -104,17 +83,10 @@ namespace SectorModel.Server.Managers
                     .Where(i => i.Id == modelId
                     && i.Version == versionNumber)
                     .FirstOrDefaultAsync();
-
-                //using NpgsqlConnection db = new NpgsqlConnection(connString);
-                //UserModel model = await db.QueryFirstOrDefaultAsync<UserModel>(@" SELECT * 
-                //                                    FROM user_models 
-                //                                    WHERE id = @p1 and version = @p2",
-                //    new { p1 = modelId, p2 = versionNumber }).ConfigureAwait(false);
-                //mgrResult.Entity = model;
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "UserModelManager::GetModelVersion");
+                Log.Error(ex, "ModelManager::GetModelVersion");
                 throw;
             }
 
@@ -130,7 +102,7 @@ namespace SectorModel.Server.Managers
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "UserModelManager::GetModelVersions");
+                Log.Error(ex, "ModelManager::GetModelVersions");
                 throw;
             }
 
@@ -143,15 +115,6 @@ namespace SectorModel.Server.Managers
             return await db.Models
                 .Where(i => i.Id == modelId)
                 .ToListAsync();
-
-            //using (NpgsqlConnection db = new NpgsqlConnection(connString))
-            //{
-            //    modelList = (List<UserModel>) await db.QueryAsync<UserModel>(@" SELECT * 
-            //                                        FROM user_models 
-            //                                        WHERE id = @p1",
-            //                                        new { p1 = modelId }).ConfigureAwait(false);
-            //}
-
         }
 
 
@@ -160,38 +123,33 @@ namespace SectorModel.Server.Managers
             List<Model> modelList = await GetModelList(modelId);
 
             return modelList.Where(m => m.StartDate >= startdate && m.StopDate <= stopdate).Any();
-        }
+        }     
 
-
-     
-
-        public async Task<Model> Save(Model userModel)
+        public async Task<Model> Save(Model model)
         {            
             try
             {
-                if (userModel.Id == Guid.Empty)
+                using (var db = new WriteContext())
                 {
-                    //using NpgsqlConnection db = new NpgsqlConnection(connString);
-                    //{
-                    //    await db.InsertAsync(userModel).ConfigureAwait(false);
-                    //}
+                    if (model.Id == Guid.Empty)
+                    {
+                        db.Models.Add(model);
+                    }
+                    else
+                    {
+                        db.Models.Update(model);
+                    }
+                    await db.SaveChangesAsync();
                 }
-                else
-                {
-                    //using NpgsqlConnection db = new NpgsqlConnection(connString);
-                    //{
-                    //    await db.UpdateAsync(userModel).ConfigureAwait(false);
-                    //}
-                }           
                 
             }
             catch(Exception ex)
             {
-                Log.Error(ex, "UserModelManager::Save");
+                Log.Error(ex, "ModelManager::Save");
                 throw;
             } 
 
-            return userModel;
+            return model;
         }
 
         internal async Task<Model> IncrementVersionAndSave(Guid modelId, int currentVersion)
@@ -199,15 +157,10 @@ namespace SectorModel.Server.Managers
             Model thisModel = GetModel(modelId, currentVersion).Result;
             thisModel.Version++;
 
-            thisModel = await Save(thisModel).ConfigureAwait(false);
+            thisModel = await Save(thisModel);
 
             return thisModel;
         }
-
-        #region model equities
-
-       
-    #endregion
     }
 }
 

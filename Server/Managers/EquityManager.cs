@@ -34,13 +34,6 @@ namespace SectorModel.Server.Managers
             {
                 using var db = new ReadContext();
                 equityList = await db.Equities.ToListAsync();
-
-                //equityList = await cache.GetOrCreateAsync(CacheKeys.EQUITY_LIST, entry =>
-                //{
-                //    using NpgsqlConnection db = new NpgsqlConnection(connString);
-                //    return Task.FromResult(db.Query<Equity>("SELECT * FROM equities").ToList());
-                //}).ConfigureAwait(false);
-
             }
             catch (Exception ex)
             {
@@ -51,12 +44,6 @@ namespace SectorModel.Server.Managers
             return equityList;
         }
 
-
-        /// <summary>
-        /// handles a comma-delimited list of symbols
-        /// </summary>
-        /// <param name="symbols"></param>
-        /// <returns></returns>
         public async Task<List<Equity>> GetList(string symbols)
         {
             List<Equity> equityMatchList = new List<Equity>();
@@ -65,13 +52,13 @@ namespace SectorModel.Server.Managers
 
             try
             {
-                List<Equity> equityList = await GetAll().ConfigureAwait(false);
+                List<Equity> equityList = await GetAll();
 
                 foreach (var symbol in symbolList)
                 {
                     Equity eq = equityList.Where(e => e.Symbol.ToUpper() == symbol.ToUpper()).FirstOrDefault();
 
-                    if (eq != default(Equity))
+                    if (eq != null)
                     {
                         equityMatchList.Add(eq);
                     }
@@ -84,43 +71,16 @@ namespace SectorModel.Server.Managers
             }
 
             return equityMatchList;
-        }       
-
-       /* private async Task<List<Equity>> GetAllEquities()
-        {           
-            List<Equity> equityList = new List<Equity>();
-
-            try
-            {
-
-                //equityList = await cache.GetOrCreateAsync(CacheKeys.EQUITY_LIST, entry =>
-                //{
-                //    using NpgsqlConnection db = new NpgsqlConnection(connString);
-                //    return Task.FromResult(db.Query<Equity>("SELECT * FROM equities").ToList());
-                //});              
-            }
-            catch (Exception ex)
-            {
-                Log.Error("EquityManager::GetAllEquities", ex);
-                throw;
-            }
-
-            return equityList;
-        }*/
+        }   
 
         public async Task<Equity> Get(Guid equityId)
         {
             Equity equity = new Equity();
 
-            using var db = new ReadContext();
-            equity = await db.Equities.Where(i => i.Id == equityId).FirstOrDefaultAsync();
-
             try
             {
-                //                using NpgsqlConnection db = new NpgsqlConnection(connString);
-                //                mgrResult = await db.QueryFirstOrDefaultAsync<Equity>(@"SELECT * 
-                //                                                                        FROM equities 
-                //                                                                        WHERE id = @p1 ", new { p1 = equityId }).ConfigureAwait(false);
+                using var db = new ReadContext();
+                equity = await db.Equities.Where(i => i.Id == equityId).FirstOrDefaultAsync(); 
             }
             catch (Exception ex)
             {
@@ -135,22 +95,15 @@ namespace SectorModel.Server.Managers
         {
             Equity equity = new Equity();
 
-            try{
+            try
+            {
                 using var db = new ReadContext();
-                equity = await db.Equities.Where(i => i.Symbol == symbol).FirstOrDefaultAsync();
+                equity = await db.Equities.Where(i => i.Symbol.ToUpper() == symbol.ToUpper()).FirstOrDefaultAsync();
 
-                //equity = await cache.GetOrCreateAsync<Equity>(CacheKeys.EQUITY + symbol, entry =>
-                //{
-                //    //using NpgsqlConnection db = new NpgsqlConnection(connString);
-                //    //return Task.FromResult(db.QueryFirstOrDefault<Equity>(@"SELECT * 
-                //    //                            FROM equities 
-                //    //                            WHERE LOWER(symbol) = @p1 ",
-                //    //            new { p1 = symbol.ToLower() }));
-                //});
             }
             catch(Exception ex)
             {
-                Log.Error("EquityManager::GGetBySymbolet",ex);
+                Log.Error("EquityManager::GetBySymbol",ex);
                 throw;
             }
 
@@ -160,12 +113,9 @@ namespace SectorModel.Server.Managers
         #region CRUD
 
         public async Task<Equity> Save(Equity equity)
-        {
-            Equity mgrResult = new Equity();
-            
+        {            
             try
             {
-
                 using var db = new WriteContext();
                 {
                     if (equity.Id != Guid.Empty)
@@ -178,19 +128,6 @@ namespace SectorModel.Server.Managers
                     }
                     await db.SaveChangesAsync();
                 }
-
-
-                //if (equity.Id == Guid.Empty)
-                //{
-                //    using NpgsqlConnection db = new NpgsqlConnection(connString);
-                //    await db.InsertAsync(equity).ConfigureAwait(false);
-                //}
-                //else
-                //{
-                //    using NpgsqlConnection db = new NpgsqlConnection(connString);
-                //    await db.UpdateAsync(equity).ConfigureAwait(false);
-                //}           
-                // mgrResult = equity;
             }
             catch (Exception ex)
             {               
@@ -221,9 +158,6 @@ namespace SectorModel.Server.Managers
                     using var db = new WriteContext();
                     db.Remove(equity);
                     x = await db.SaveChangesAsync();
-
-                    //using NpgsqlConnection db = new NpgsqlConnection(connString);
-                    //mgrResult = await db.DeleteAsync(equity).ConfigureAwait(false);
                 }
                 else
                 {

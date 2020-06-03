@@ -98,7 +98,7 @@ namespace SectorModel.Server.Managers
 
             try
             {
-                List<Quote> quoteList = await GetByEquityId(equityid).ConfigureAwait(false);
+                List<Quote> quoteList = await GetByEquityId(equityid);
 
                 quote = quoteList.OrderByDescending(q => q.Date).FirstOrDefault();  
             }
@@ -113,14 +113,8 @@ namespace SectorModel.Server.Managers
 
         public async Task<DateTime> GetLastQuoteDate()
         {
-            DateTime maxDate = DateTime.MinValue;
-
-            using (var db = new WriteContext())
-            {
-                maxDate = await db.Quotes.AsNoTracking().MaxAsync(q => q.Date);
-            }
-
-            return maxDate;
+            using var db = new ReadContext();
+            return await db.Quotes.MaxAsync(q => q.Date);
         }
       
         public async Task<Quote> GetByEquityIdAndDate(Guid equityId, DateTime date)
@@ -131,7 +125,7 @@ namespace SectorModel.Server.Managers
             {
                 DateTime tradeDate = await GetNearestQuoteDate(date);
 
-                var quoteList = await GetByEquityId(equityId).ConfigureAwait(false);
+                var quoteList = await GetByEquityId(equityId);
 
                 quote = quoteList.Where(q => q.Date == tradeDate).FirstOrDefault();
             }
@@ -153,17 +147,11 @@ namespace SectorModel.Server.Managers
             {
                 List<DateTime> tradeDates = new List<DateTime>();
 
-                using (var db = new WriteContext())
+                using (var db = new ReadContext())
                 {
-                    var quotes = db.Quotes.AsNoTracking().GroupBy(q => q.Date).Distinct();
+                    var quotes = db.Quotes.GroupBy(q => q.Date).Distinct();
                     await quotes.ForEachAsync( q => { tradeDates.Add(q.Key); });
                 }
-
-                    //List<DateTime> tradeDates = cache.GetOrCreate<List<DateTime>>(CacheKeys.TRADING_DATES, entry =>
-                    //{
-                    //    using NpgsqlConnection db = new NpgsqlConnection(connString);
-                    //    return db.Query<DateTime>(@"SELECT DISTINCT(date) FROM quotes ORDER BY 1 DESC").ToList();
-                    //});
 
                 bool foundIt = false;
 
@@ -191,27 +179,10 @@ namespace SectorModel.Server.Managers
 
         internal async Task<List<Quote>> GetByEquityId(Guid equityId)
         {
-            //return await cache.GetOrCreateAsync<List<Quote>>(CacheKeys.QUOTE_LIST + equityId, entry =>
-            // {
-
-            List<Quote> quotes = new List<Quote>();
-
-            using (var db = new WriteContext())
-            {
-                quotes = await db.Quotes.AsNoTracking().Where(q => q.EquityId == equityId)
-                                        .OrderBy(q => q.Date)
-                                        .ToListAsync();
-            }
-            return quotes;
-
-                //using NpgsqlConnection db = new NpgsqlConnection(connString);
-                //return Task.FromResult(db.Query<Quote>(@"   SELECT * 
-                //                                             FROM quotes 
-                //                                             WHERE equity_id = @p1",
-                //            new { p1 = equityId })
-                //            .OrderBy(q => q.Date)
-                //            .ToList());
-              //  });
+            using var db = new ReadContext();
+            return await db.Quotes.Where(q => q.EquityId == equityId)
+                                    .OrderBy(q => q.Date)
+                                    .ToListAsync();
         }
 
 
@@ -222,30 +193,9 @@ namespace SectorModel.Server.Managers
             try
             {
                 using var db = new WriteContext();
-                await db.Quotes.AddAsync(quote);
+                db.Quotes.Add(quote);
                 await db.SaveChangesAsync();
 
-                //using NpgsqlConnection db = new NpgsqlConnection(base.connString);
-                //{
-                //    string sql = @"INSERT INTO QUOTES 
-                //                (   DATE, PRICE, VOLUME,
-                //                    CREATED_AT, UPDATED_AT, 
-                //                    EQUITY_ID, RATE_OF_CHANGE
-                //                )  
-                //                VALUES ( @p1 , @p2, @p3, @p4, @p5, @p6, @p7 )";
-
-                //    await db.ExecuteAsync(sql,
-                //        new
-                //        {
-                //            p1 = quote.Date,
-                //            p2 = quote.Price,
-                //            p3 = quote.Volume,
-                //            p4 = DateTime.Now,
-                //            p5 = DateTime.Now,
-                //            p6 = quote.EquityId,
-                //            p7 = quote.RateOfChange
-                //        }).ConfigureAwait(false);
-                //}
             }
             catch(Exception ex)
             {
@@ -265,13 +215,6 @@ namespace SectorModel.Server.Managers
                 using var db = new WriteContext();
                 db.Quotes.Remove(quote);
                 x = await db.SaveChangesAsync();
-
-                //if (eqMgr.Get(quote.EquityId).Result != default(Equity))
-                //{
-                //    using NpgsqlConnection db = new NpgsqlConnection(base.connString);
-                //    await db.DeleteAsync(quote).ConfigureAwait(false);
-                //}
-
             }
             catch(Exception ex)
             {               
