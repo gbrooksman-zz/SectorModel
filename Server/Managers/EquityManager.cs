@@ -16,11 +16,11 @@ namespace SectorModel.Server.Managers
         // an equity is an investment vehicle identified by a symbol 
         // that is included in the api's data
 
-        private readonly ModelItemManager miMgr;
+       // private readonly ModelItemManager miMgr;
 
         public EquityManager(IMemoryCache cache, IConfiguration config) : base(cache, config)
         {
-            miMgr = new ModelItemManager(cache, config);
+           // miMgr = new ModelItemManager(cache, config);
         }
 
       
@@ -138,7 +138,12 @@ namespace SectorModel.Server.Managers
             return equity;
         }
 
-      
+
+        public async Task<bool> IsEquityInAnyModel(Guid equityId)
+        {
+            using var db = new ReadContext();
+            return await db.ModelItems.Where(m => m.EquityID == equityId).AnyAsync();
+        }
 
         public async Task<bool> Delete(Guid equityId)
         {
@@ -150,10 +155,10 @@ namespace SectorModel.Server.Managers
             };            
             
             try
-            {   
-                int count = await miMgr.GetEquitiesInModelsCount(equity.Id);
+            {
+                bool isUsed = await IsEquityInAnyModel(equityId);
 
-                if (count == 0)
+                if (!isUsed)
                 {
                     using var db = new WriteContext();
                     db.Remove(equity);
@@ -161,7 +166,7 @@ namespace SectorModel.Server.Managers
                 }
                 else
                 {
-                    throw new APIException( APIException.EQUITY_USED, 
+                    throw new APIException(APIException.EQUITY_USED,
                                                             APIException.EQUITY_USED_MESSAGE);
                 }
             }

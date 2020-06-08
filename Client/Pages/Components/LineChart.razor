@@ -70,7 +70,7 @@
 
   //  private List<Quote> equitiesWithQuotes = new List<EquityQuotes>();
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
         DateTime beginDate = DateTime.Parse(StartDate);
         DateTime endDate = DateTime.Parse(StopDate);

@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SectorModel.Server", "Server\SectorModel.Server.csproj", "{E9B0861F-EE55-445F-B70F-A1CB972D5FB4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SectorModel.Server", "Server\SectorModel.Server.csproj", "{E9B0861F-EE55-445F-B70F-A1CB972D5FB4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SectorModel.Client", "Client\SectorModel.Client.csproj", "{F94D7CC2-EEBC-4A0A-91EA-EB2F8414F0FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SectorModel.Client", "Client\SectorModel.Client.csproj", "{F94D7CC2-EEBC-4A0A-91EA-EB2F8414F0FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SectorModel.Shared", "Shared\SectorModel.Shared.csproj", "{CFF2664F-9413-40B4-BB48-EE2513FBA730}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SectorModel.Shared", "Shared\SectorModel.Shared.csproj", "{CFF2664F-9413-40B4-BB48-EE2513FBA730}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

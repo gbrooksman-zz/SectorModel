@@ -15,8 +15,7 @@ namespace SectorModel.Server.Managers
         public BaseManager(IMemoryCache _cache, IConfiguration _config)
         {
             cache = _cache;
-            config = _config;
-          
+            config = _config;          
         }
     }
 }

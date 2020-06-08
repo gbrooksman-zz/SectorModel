@@ -6,7 +6,6 @@
 @using System.Collections.Generic
 @layout MainLayout
 
-@using Microsoft.AspNetCore.Components
 @using SectorModel.Client.Common.Menu
 
     <AppMenu MenuBuilder="@menuBuilderTop" />
@@ -50,9 +49,9 @@
     {
         //stuff for testing - replace with a settings file
 
-        state.UserName = "geoffb";
+        state.UserName = "geoff";
 
-        state.UserId = Guid.Parse("85167398-7e35-11e9-92d7-0aefc68022c6");          //copied from db
+        state.UserId = Guid.Parse("e7d01e07-fc95-453c-a6b7-734bef1859e7");          //copied from db
 
         state.CoreModelId = Guid.Parse("e81de052-9091-11e9-a901-0aefc68022c6");     //copied from db
 
@@ -72,7 +71,7 @@
                   .AddItem(5, "Line Test", "linetest")
                   .AddItem(6, "Sign Up", "Accounts/Signup");
 
-        if (state.UserName == "geoffb")
+        if (state.UserName == "geoff")
         {
             menuBuilderTop.AddItem(7, "Admin", "Accounts/Admin");
         }
