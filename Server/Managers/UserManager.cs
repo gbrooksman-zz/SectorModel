@@ -7,17 +7,17 @@ using System.Threading.Tasks;
 using SectorModel.Shared.Entities;
 using Serilog;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace SectorModel.Server.Managers
 {
     public class UserManager : BaseManager
     {
-        private readonly IConfiguration config;
-        private readonly IAppSettings appSettings;
+        
+        private readonly AppSettings appSettings;
 
-        public UserManager(IMemoryCache _cache, IConfiguration _config, IAppSettings _appSettings) : base(_cache, _config)
+        public UserManager(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings) : base(_cache, _config)
         {
-            config = _config;
             appSettings = _appSettings;
         }
 
@@ -74,7 +74,7 @@ namespace SectorModel.Server.Managers
             
             return user;
         }
-
+    
 
         public async Task<bool> Validate(string userName, string password)
         {

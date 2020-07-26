@@ -16,9 +16,9 @@ namespace SectorModel.Server.Controllers
     public class UsersController : ControllerBase
     {
         private readonly UserManager userMgr;
-        private readonly IAppSettings appSettings;
+        private readonly AppSettings appSettings;
 
-        public UsersController(IMemoryCache _cache, IConfiguration _config, IAppSettings _appSettings)
+        public UsersController(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings)
         {
             appSettings = _appSettings;
 
@@ -75,6 +75,6 @@ namespace SectorModel.Server.Controllers
         {
             var result = await userMgr.Validate(username, password).ConfigureAwait(false);
             return Ok(result);           
-        }
+        }              
     }
 }

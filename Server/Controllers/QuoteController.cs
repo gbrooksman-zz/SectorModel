@@ -8,6 +8,7 @@ using SectorModel.Server.Managers;
 using System.Threading.Tasks;
 using SectorModel.Shared.Entities;
 using System.Linq;
+using SectorModel.Shared;
 
 namespace SectorModel.Server.Controllers
 {
@@ -20,9 +21,9 @@ namespace SectorModel.Server.Controllers
         private readonly ModelManager mMgr;
         private readonly ModelItemManager miMgr;
 
-        private readonly IAppSettings appSettings;
+        private readonly AppSettings appSettings;
 
-        public QuoteController(IMemoryCache _cache, IConfiguration _config, IAppSettings _appSettings)
+        public QuoteController(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings)
         {
             appSettings = _appSettings;
 

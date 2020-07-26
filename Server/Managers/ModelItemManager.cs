@@ -16,9 +16,9 @@ namespace SectorModel.Server.Managers
         private readonly QuoteManager qMgr;
         private readonly ModelManager mMgr;
         private readonly IConfiguration config;
-        private readonly IAppSettings appSettings;
+        private readonly AppSettings appSettings;
 
-        public ModelItemManager(IMemoryCache _cache, IConfiguration _config, IAppSettings _appSettings
+        public ModelItemManager(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings
 ) : base(_cache, _config)
         {
             config = _config;

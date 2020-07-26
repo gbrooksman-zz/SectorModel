@@ -13,9 +13,9 @@ namespace SectorModel.Server.Managers
     public class ModelCommentManager : BaseManager
     {
         private readonly IConfiguration config;
-        private readonly IAppSettings appSettings;
+        private readonly AppSettings appSettings;
 
-        public ModelCommentManager(IMemoryCache _cache, IConfiguration _config, IAppSettings _appSettings) : base(_cache, _config)
+        public ModelCommentManager(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings) : base(_cache, _config)
         {
             config = _config;
             appSettings = _appSettings;

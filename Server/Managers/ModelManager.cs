@@ -15,9 +15,9 @@ namespace SectorModel.Server.Managers
         private readonly EquityManager eqMgr;
         private readonly QuoteManager qMgr;
         private readonly IConfiguration config;
-        private readonly IAppSettings appSettings;
+        private readonly AppSettings appSettings;
 
-        public ModelManager(IMemoryCache _cache, IConfiguration _config, IAppSettings _appSettings
+        public ModelManager(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings
 ) : base(_cache, _config)
         {
             appSettings = _appSettings;

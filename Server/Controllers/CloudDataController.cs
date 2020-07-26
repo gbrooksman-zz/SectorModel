@@ -18,7 +18,7 @@ namespace SectorModel.Server.Controllers
     {
         private readonly CloudDataManager cdMgr;       
 
-        public CloudDataController(IMemoryCache _cache, IConfiguration _config, IAppSettings _appSettings)
+        public CloudDataController(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings)
         {
            cdMgr = new CloudDataManager(_cache, _config, _appSettings);
         }

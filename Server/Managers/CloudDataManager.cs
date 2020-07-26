@@ -29,9 +29,9 @@ namespace SectorModel.Server.Managers
         private readonly ModelItemManager miMgr;
         private readonly QuoteManager qMgr;
         private readonly EquityManager eMgr;
-        private readonly IAppSettings appSettings;
+        private readonly AppSettings appSettings;
 
-        public CloudDataManager(IMemoryCache cache, IConfiguration config, IAppSettings _appSettings) : base(cache, config)
+        public CloudDataManager(IMemoryCache cache, IConfiguration config, AppSettings _appSettings) : base(cache, config)
         {
             appSettings = _appSettings;
 

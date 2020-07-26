@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
 using System;
+using SectorModel.Shared.Entities;
+using System.IO;
 
 namespace SectorModel.Server
 {
@@ -15,6 +17,13 @@ namespace SectorModel.Server
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+
+            var builder = new ConfigurationBuilder()
+                   .SetBasePath(Directory.GetCurrentDirectory())
+                   .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                   .AddJsonFile($"secretsettings.json", optional: true);
+
+            Configuration = builder.Build();
         }
 
         public IConfiguration Configuration { get; }
@@ -23,18 +32,11 @@ namespace SectorModel.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            IConfigurationSection section = Configuration.GetSection("SERVER");
-            AppSettings appSettings = new AppSettings
-            {
-                UserName = section.GetValue<string>("USERNAME"),
-                DBConnectionString = section.GetValue<string>("DATABASECONNECTIONSTRING"),
-                IEXCloudAPIKey = section.GetValue<string>("IEXCLOUDAPIKEY"),
-                UserGuid = section.GetValue<Guid>("USERGUID"),
-                CoreModelId = section.GetValue<Guid>("COREMODELID"),
-                SPDRModelId = section.GetValue<Guid>("SPDRMODELID")
-            };
+            AppSettings appState = new AppSettings();
+            
+            appState.IEXCloudAPIKey = Configuration.GetValue<string>("IEXCloudAPIKey");
 
-            services.AddSingleton<IAppSettings>(appSettings);
+            services.AddSingleton(appState);
 
             services.AddControllersWithViews();
             services.AddRazorPages();
@@ -43,6 +45,7 @@ namespace SectorModel.Server
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

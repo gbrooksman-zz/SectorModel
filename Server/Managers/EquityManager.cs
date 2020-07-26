@@ -19,9 +19,9 @@ namespace SectorModel.Server.Managers
         // private readonly ModelItemManager miMgr;
 
         private readonly IConfiguration config;
-        private readonly IAppSettings appSettings;
+        private readonly AppSettings appSettings;
 
-        public EquityManager(IMemoryCache cache, IConfiguration _config, IAppSettings _appSettings) : base(cache, _config)
+        public EquityManager(IMemoryCache cache, IConfiguration _config, AppSettings _appSettings) : base(cache, _config)
         {
             config = _config;
             appSettings = _appSettings;

@@ -1,5 +1,5 @@
 @page "/etflist"
-@inject AppStateContainer state
+@inject SectorModel.Shared.Entities.AppSettings state
 @inject HttpClient httpClient
 @using SectorModel.Client.Pages.Components
 @using SectorModel.Shared.Entities
@@ -37,8 +37,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        model = await httpClient.GetFromJsonAsync<Model>($"model/getmodel?modelId={state.SPDRModelID}");
+        model = await httpClient.GetFromJsonAsync<Model>($"model/getmodel?modelId={state.SPDRModelId}");
 
-        equityList = await httpClient.GetFromJsonAsync<List<ModelItem>>($"quote/getmodelbydate?modelId={state.SPDRModelID}&date={DateTime.Now.Date}");
+        equityList = await httpClient.GetFromJsonAsync<List<ModelItem>>($"quote/getmodelbydate?modelId={state.SPDRModelId}&date={DateTime.Now.Date}");
     }
 }

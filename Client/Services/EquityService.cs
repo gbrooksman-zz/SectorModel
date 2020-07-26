@@ -13,10 +13,10 @@ namespace SectorModel.Client.Services
     public class EquityService
     {
 
-        private readonly AppStateContainer state;
+        private readonly AppSettings state;
         private readonly HttpClient httpClient;
 
-        public EquityService(HttpClient _httpClient, AppStateContainer _state)
+        public EquityService(HttpClient _httpClient, AppSettings _state)
         {
             httpClient = _httpClient;
             state = _state;

@@ -1,4 +1,4 @@
-﻿namespace SectorModel.Client.Entities
+﻿/*namespace SectorModel.Client.Entities
 {
     public class ContentItem
     {
@@ -15,4 +15,4 @@
 
         public string Text { get; set; }
     }
-}
+}*/

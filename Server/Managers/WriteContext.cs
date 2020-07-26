@@ -12,7 +12,7 @@ namespace SectorModel.Server.Managers
     {
         private readonly string connString;
 
-        public WriteContext(IAppSettings appSettings)
+        public WriteContext(AppSettings appSettings)
         {
             connString = appSettings.DBConnectionString;
         }
