@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Linq;
+using System;
 
 namespace SectorModel.Server
 {
@@ -22,6 +23,18 @@ namespace SectorModel.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            IConfigurationSection section = Configuration.GetSection("SERVER");
+            AppSettings appSettings = new AppSettings
+            {
+                UserName = section.GetValue<string>("USERNAME"),
+                DBConnectionString = section.GetValue<string>("DATABASECONNECTIONSTRING"),
+                IEXCloudAPIKey = section.GetValue<string>("IEXCLOUDAPIKEY"),
+                UserGuid = section.GetValue<Guid>("USERGUID"),
+                CoreModelId = section.GetValue<Guid>("COREMODELID"),
+                SPDRModelId = section.GetValue<Guid>("SPDRMODELID")
+            };
+
+            services.AddSingleton<IAppSettings>(appSettings);
 
             services.AddControllersWithViews();
             services.AddRazorPages();

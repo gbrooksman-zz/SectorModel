@@ -14,11 +14,18 @@ namespace SectorModel.Server.Managers
     {
         private readonly EquityManager eqMgr;
         private readonly QuoteManager qMgr;
+        private readonly IConfiguration config;
+        private readonly IAppSettings appSettings;
 
-        public ModelManager(IMemoryCache _cache, IConfiguration _config) : base(_cache, _config)
+        public ModelManager(IMemoryCache _cache, IConfiguration _config, IAppSettings _appSettings
+) : base(_cache, _config)
         {
-            eqMgr = new EquityManager(_cache, _config);
-            qMgr = new QuoteManager(_cache, _config);
+            appSettings = _appSettings;
+            config = _config;
+
+            eqMgr = new EquityManager(_cache, config, appSettings);
+            qMgr = new QuoteManager(_cache, config, appSettings);
+            
         }
 
         public async Task<List<Model>> GetActiveModelList(User user)
@@ -27,7 +34,7 @@ namespace SectorModel.Server.Managers
            
             try
             {
-                using var db = new ReadContext();
+                using var db = new ReadContext(appSettings);
                 modelList = await db.Models
                                     .Where(i => i.UserId == user.Id)
                                     .ToListAsync();  
@@ -46,7 +53,7 @@ namespace SectorModel.Server.Managers
             Model model = new Model();
             try
             {
-                using (var db = new ReadContext())
+                using (var db = new ReadContext(appSettings))
                 {
                     if (versionNumber == 0)
                     {
@@ -78,7 +85,7 @@ namespace SectorModel.Server.Managers
             Model model = new Model();
             try
             {
-                using var db = new ReadContext();
+                using var db = new ReadContext(appSettings);
                 model = await db.Models
                     .Where(i => i.Id == modelId
                     && i.Version == versionNumber)
@@ -111,7 +118,7 @@ namespace SectorModel.Server.Managers
 
         private async Task<List<Model>> GetModelList(Guid modelId)
         {
-            using var db = new ReadContext();
+            using var db = new ReadContext(appSettings);
             return await db.Models
                 .Where(i => i.Id == modelId)
                 .ToListAsync();
@@ -129,7 +136,7 @@ namespace SectorModel.Server.Managers
         {            
             try
             {
-                using (var db = new WriteContext())
+                using (var db = new WriteContext(appSettings))
                 {
                     if (model.Id == Guid.Empty)
                     {

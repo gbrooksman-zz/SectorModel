@@ -17,6 +17,6 @@ namespace SectorModel.Shared.Entities
         [NotMapped]
         public string ConfirmPassword { get; set; }
 
-        public bool Active { get; set; }
+        public bool IsActive { get; set; }
     }
 }

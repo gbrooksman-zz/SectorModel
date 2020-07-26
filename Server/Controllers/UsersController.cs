@@ -16,10 +16,13 @@ namespace SectorModel.Server.Controllers
     public class UsersController : ControllerBase
     {
         private readonly UserManager userMgr;
+        private readonly IAppSettings appSettings;
 
-        public UsersController(IMemoryCache _cache, IConfiguration _config)
+        public UsersController(IMemoryCache _cache, IConfiguration _config, IAppSettings _appSettings)
         {
-            userMgr = new UserManager(_cache, _config);
+            appSettings = _appSettings;
+
+            userMgr = new UserManager(_cache, _config, appSettings);
         }
 
         [HttpGet]
@@ -59,7 +62,7 @@ namespace SectorModel.Server.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> Save( User user)
         {    
-            user.Active = true;  
+            user.IsActive = true;  
             var result = await userMgr.Save(user); 
             return Ok(result);            
         }

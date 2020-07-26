@@ -29,17 +29,20 @@ namespace SectorModel.Server.Managers
         private readonly ModelItemManager miMgr;
         private readonly QuoteManager qMgr;
         private readonly EquityManager eMgr;
+        private readonly IAppSettings appSettings;
 
-        public CloudDataManager(IMemoryCache cache, IConfiguration config) : base(cache, config)
+        public CloudDataManager(IMemoryCache cache, IConfiguration config, IAppSettings _appSettings) : base(cache, config)
         {
-            egMgr = new ModelManager(cache, config);
-            miMgr = new ModelItemManager(cache, config);
-            qMgr = new QuoteManager(cache, config);
-            eMgr = new EquityManager(cache, config);
+            appSettings = _appSettings;
+
+            egMgr = new ModelManager(cache, config, appSettings);
+            miMgr = new ModelItemManager(cache, config, appSettings);
+            qMgr = new QuoteManager(cache, config, appSettings);
+            eMgr = new EquityManager(cache, config, appSettings);
 
             client = new HttpClient();
 
-            apiToken = config.GetSection("IEXCloud").GetValue<string>("APIToken");
+            apiToken = appSettings.IEXCloudAPIKey;
 
             baseURL = "https://cloud.iexapis.com/stable/stock/";
             quoteURL = "/chart/date/";
@@ -53,13 +56,13 @@ namespace SectorModel.Server.Managers
             return inDate.ToString("yyyyMMdd");
         }       
 
-        public async Task<bool> UpdateQuotes(DateTime lastQuoteDate, Guid coregroupid)
+        public async Task<bool> UpdateQuotes(DateTime lastQuoteDate, Guid coreModelId)
         {
             List<string> datesToLoad = GetDatesToLoad(lastQuoteDate);
 
             List<Equity> egiList = new List<Equity>();
 
-            var modelItems = await miMgr.GetModelEquityList(coregroupid).ConfigureAwait(false);
+            var modelItems = await miMgr.GetModelEquityList(coreModelId).ConfigureAwait(false);
 
             foreach (ModelItem item in modelItems)
             {

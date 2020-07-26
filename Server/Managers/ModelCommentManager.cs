@@ -12,9 +12,13 @@ namespace SectorModel.Server.Managers
 {
     public class ModelCommentManager : BaseManager
     {
-        public ModelCommentManager(IMemoryCache _cache, IConfiguration _config) : base(_cache, _config)
-        {
+        private readonly IConfiguration config;
+        private readonly IAppSettings appSettings;
 
+        public ModelCommentManager(IMemoryCache _cache, IConfiguration _config, IAppSettings _appSettings) : base(_cache, _config)
+        {
+            config = _config;
+            appSettings = _appSettings;
         }
 
 
@@ -23,7 +27,7 @@ namespace SectorModel.Server.Managers
             int x = 0;
             try
             {
-                using var db = new WriteContext();               
+                using var db = new WriteContext(appSettings);               
                 db.Add(modelComment);                 
                 x = await db.SaveChangesAsync();
             }
@@ -42,7 +46,7 @@ namespace SectorModel.Server.Managers
 
             try
             {
-                using var db = new ReadContext();
+                using var db = new ReadContext(appSettings);
                 modelCommentList = await db.ModelComments
                                     .Where(i => i.ModelId == modelId)                                    
                                     .ToListAsync();

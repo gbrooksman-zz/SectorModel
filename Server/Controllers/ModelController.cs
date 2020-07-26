@@ -16,10 +16,12 @@ namespace SectorModel.Server.Controllers
     public class ModelController : ControllerBase
     {
         private readonly ModelManager umMgr;
+        private readonly IAppSettings appSettings;
 
-        public ModelController(IMemoryCache _cache, IConfiguration _config)
+        public ModelController(IMemoryCache _cache, IConfiguration _config, IAppSettings _appSettings)
         {
-            umMgr = new ModelManager(_cache, _config);
+            appSettings = _appSettings;
+            umMgr = new ModelManager(_cache, _config, appSettings);
         }
 
         [HttpGet]

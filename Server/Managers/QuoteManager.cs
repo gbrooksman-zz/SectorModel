@@ -14,10 +14,16 @@ namespace SectorModel.Server.Managers
     public class QuoteManager : BaseManager
     {
         private readonly EquityManager eqMgr;
+        private readonly IConfiguration config;
+        private readonly IAppSettings appSettings;
 
-        public QuoteManager(IMemoryCache cache, IConfiguration config) : base(cache, config)
-        {            
-            eqMgr = new EquityManager(cache, config);
+        public QuoteManager(IMemoryCache cache, IConfiguration _config, IAppSettings _appSettings) : base(cache, _config)
+        {
+            appSettings = _appSettings;
+            config = _config;
+
+            eqMgr = new EquityManager(cache, config, appSettings);
+            
         }
       
         public async Task<List<Quote>> GetByEquityIdAndDateRange(Guid equityId, DateTime startdate, DateTime stopdate)
@@ -113,8 +119,15 @@ namespace SectorModel.Server.Managers
 
         public async Task<DateTime> GetLastQuoteDate()
         {
-            using var db = new ReadContext();
-            return await db.Quotes.MaxAsync(q => q.Date);
+            DateTime lastDate = new DateTime(2015, 1, 1);
+
+            using var db = new ReadContext(appSettings);
+            if (db.Quotes.Count() > 0)
+            {
+                lastDate = await db.Quotes.MaxAsync(q => q.Date);
+            }
+
+            return lastDate;
         }
       
         public async Task<Quote> GetByEquityIdAndDate(Guid equityId, DateTime date)
@@ -147,7 +160,7 @@ namespace SectorModel.Server.Managers
             {
                 List<DateTime> tradeDates = new List<DateTime>();
 
-                using (var db = new ReadContext())
+                using (var db = new ReadContext(appSettings))
                 {
                     var quotes = db.Quotes.GroupBy(q => q.Date).Distinct();
                     await quotes.ForEachAsync( q => { tradeDates.Add(q.Key); });
@@ -179,7 +192,7 @@ namespace SectorModel.Server.Managers
 
         internal async Task<List<Quote>> GetByEquityId(Guid equityId)
         {
-            using var db = new ReadContext();
+            using var db = new ReadContext(appSettings);
             return await db.Quotes.Where(q => q.EquityId == equityId)
                                     .OrderBy(q => q.Date)
                                     .ToListAsync();
@@ -192,7 +205,7 @@ namespace SectorModel.Server.Managers
         { 
             try
             {
-                using var db = new WriteContext();
+                using var db = new WriteContext(appSettings);
                 db.Quotes.Add(quote);
                 await db.SaveChangesAsync();
 
@@ -212,7 +225,7 @@ namespace SectorModel.Server.Managers
             int x = 0;
             try
             {
-                using var db = new WriteContext();
+                using var db = new WriteContext(appSettings);
                 db.Quotes.Remove(quote);
                 x = await db.SaveChangesAsync();
             }

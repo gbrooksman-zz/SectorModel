@@ -16,11 +16,15 @@ namespace SectorModel.Server.Managers
         // an equity is an investment vehicle identified by a symbol 
         // that is included in the api's data
 
-       // private readonly ModelItemManager miMgr;
+        // private readonly ModelItemManager miMgr;
 
-        public EquityManager(IMemoryCache cache, IConfiguration config) : base(cache, config)
+        private readonly IConfiguration config;
+        private readonly IAppSettings appSettings;
+
+        public EquityManager(IMemoryCache cache, IConfiguration _config, IAppSettings _appSettings) : base(cache, _config)
         {
-           // miMgr = new ModelItemManager(cache, config);
+            config = _config;
+            appSettings = _appSettings;
         }
 
       
@@ -32,7 +36,7 @@ namespace SectorModel.Server.Managers
 
             try
             {
-                using var db = new ReadContext();
+                using var db = new ReadContext(appSettings);
                 equityList = await db.Equities.ToListAsync();
             }
             catch (Exception ex)
@@ -79,7 +83,7 @@ namespace SectorModel.Server.Managers
 
             try
             {
-                using var db = new ReadContext();
+                using var db = new ReadContext(appSettings);
                 equity = await db.Equities.Where(i => i.Id == equityId).FirstOrDefaultAsync(); 
             }
             catch (Exception ex)
@@ -97,7 +101,7 @@ namespace SectorModel.Server.Managers
 
             try
             {
-                using var db = new ReadContext();
+                using var db = new ReadContext(appSettings);
                 equity = await db.Equities.Where(i => i.Symbol.ToUpper() == symbol.ToUpper()).FirstOrDefaultAsync();
 
             }
@@ -116,7 +120,7 @@ namespace SectorModel.Server.Managers
         {            
             try
             {
-                using var db = new WriteContext();
+                using var db = new WriteContext(appSettings);
                 {
                     if (equity.Id != Guid.Empty)
                     {
@@ -141,7 +145,7 @@ namespace SectorModel.Server.Managers
 
         public async Task<bool> IsEquityInAnyModel(Guid equityId)
         {
-            using var db = new ReadContext();
+            using var db = new ReadContext(appSettings);
             return await db.ModelItems.Where(m => m.EquityID == equityId).AnyAsync();
         }
 
@@ -160,7 +164,7 @@ namespace SectorModel.Server.Managers
 
                 if (!isUsed)
                 {
-                    using var db = new WriteContext();
+                    using var db = new WriteContext(appSettings);
                     db.Remove(equity);
                     x = await db.SaveChangesAsync();
                 }

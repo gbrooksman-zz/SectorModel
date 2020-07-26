@@ -12,9 +12,13 @@ namespace SectorModel.Server.Managers
 {
     public class UserManager : BaseManager
     {
-        public UserManager(IMemoryCache _cache, IConfiguration _config) : base(_cache, _config)
-        {
+        private readonly IConfiguration config;
+        private readonly IAppSettings appSettings;
 
+        public UserManager(IMemoryCache _cache, IConfiguration _config, IAppSettings _appSettings) : base(_cache, _config)
+        {
+            config = _config;
+            appSettings = _appSettings;
         }
 
         public async Task<List<User>> GetAllUsers()
@@ -23,8 +27,8 @@ namespace SectorModel.Server.Managers
             
             try
             {
-                using var db = new ReadContext();
-                users = await db.Users.Where(u => u.Active == true).ToListAsync();
+                using var db = new ReadContext(appSettings);
+                users = await db.Users.Where(u => u.IsActive == true).ToListAsync();
             }
             catch (Exception ex)
             {
@@ -41,7 +45,7 @@ namespace SectorModel.Server.Managers
             
             try
             {
-                using var db = new ReadContext();
+                using var db = new ReadContext(appSettings);
                 user = await db.Users.Where(u => u.Id == id).FirstOrDefaultAsync();
             }
             catch(Exception ex)
@@ -59,7 +63,7 @@ namespace SectorModel.Server.Managers
               
             try
             {
-                using var db = new ReadContext();
+                using var db = new ReadContext(appSettings);
                 user = await db.Users.Where(u => u.UserName.ToLower() == userName.ToLower()).FirstOrDefaultAsync();
             }
             catch(Exception ex)
@@ -78,10 +82,10 @@ namespace SectorModel.Server.Managers
 
             try
             {
-                using var db = new ReadContext();
+                using var db = new ReadContext(appSettings);
                 user = await db.Users.Where(u => u.UserName.ToLower() == userName.ToLower()
                                         && u.Password == password
-                                        && u.Active == true)
+                                        && u.IsActive == true)
                                         .FirstOrDefaultAsync();
             }
             catch (Exception ex)
@@ -97,7 +101,7 @@ namespace SectorModel.Server.Managers
         {           
             try
             {
-                using (var db = new WriteContext())
+                using (var db = new WriteContext(appSettings))
                 {
                     if (user.Id == Guid.Empty)
                     {

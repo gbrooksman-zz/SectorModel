@@ -15,12 +15,18 @@ namespace SectorModel.Server.Managers
         private readonly EquityManager eqMgr;
         private readonly QuoteManager qMgr;
         private readonly ModelManager mMgr;
+        private readonly IConfiguration config;
+        private readonly IAppSettings appSettings;
 
-        public ModelItemManager(IMemoryCache _cache, IConfiguration _config) : base(_cache, _config)
+        public ModelItemManager(IMemoryCache _cache, IConfiguration _config, IAppSettings _appSettings
+) : base(_cache, _config)
         {
-            eqMgr = new EquityManager(_cache, _config);
-            qMgr = new QuoteManager(_cache, _config);
-            mMgr = new ModelManager(_cache, _config);
+            config = _config;
+            appSettings = _appSettings;
+
+            eqMgr = new EquityManager(_cache, config, appSettings);
+            qMgr = new QuoteManager(_cache, config, appSettings);
+            mMgr = new ModelManager(_cache, config, appSettings);            
         }
 
         public async Task<ModelItem> GetModelEquity(Guid modelEquityId, int versionNumber = 1)
@@ -29,7 +35,7 @@ namespace SectorModel.Server.Managers
 
             try
             {
-                using var db = new ReadContext();
+                using var db = new ReadContext(appSettings);
                 modelItem = await db.ModelItems
                                     .Where(i => i.Id == modelEquityId 
                                     && i.Version == versionNumber)
@@ -54,7 +60,7 @@ namespace SectorModel.Server.Managers
                 decimal startValue = thisModel.StartValue;
 
                 // add a > 0 check here?
-                using var db = new ReadContext();
+                using var db = new ReadContext(appSettings);
                 List<ModelItem> modelEquityList = await db.ModelItems
                     .Where(i => i.Id == modelId
                     && i.Version == versionNumber)
@@ -89,7 +95,7 @@ namespace SectorModel.Server.Managers
 
             try
             {
-                using var db = new ReadContext();
+                using var db = new ReadContext(appSettings);
                 modelItemList = await db.ModelItems
                                     .Where(i => i.Id == modelId
                                     && i.Version == versionNumber)
@@ -110,7 +116,7 @@ namespace SectorModel.Server.Managers
 
             try
             {
-                using var db = new ReadContext();
+                using var db = new ReadContext(appSettings);
                 itemCount = await db.ModelItems
                                     .Where(i => i.EquityID == equityId)
                                     .CountAsync();
@@ -130,7 +136,7 @@ namespace SectorModel.Server.Managers
         {
             try
             {
-                using var db = new WriteContext();
+                using var db = new WriteContext(appSettings);
                 {
                     if (modelItem.Id != Guid.Empty)
                     {
@@ -163,7 +169,7 @@ namespace SectorModel.Server.Managers
                     Id = modelEquityId
                 };
 
-                using var db = new WriteContext();
+                using var db = new WriteContext(appSettings);
                 db.Remove(modelEquity);
                 x = await db.SaveChangesAsync();
             }

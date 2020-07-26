@@ -24,7 +24,7 @@
 {
     private async Task UpdateQuotes()
     {
-        bool isOK = await httpClient.GetFromJsonAsync<bool>($"clouddata/updatequotes?lastquotedate={state.LastQuoteDate}&coregroupid={state.CoreModelId}");
+        bool isOK = await httpClient.GetFromJsonAsync<bool>($"clouddata/updatequotes?lastquotedate={state.LastQuoteDate}&coreModelId={state.CoreModelId}");
         
         if (isOK)
         {

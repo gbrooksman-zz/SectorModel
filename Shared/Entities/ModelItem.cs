@@ -14,7 +14,7 @@ namespace SectorModel.Shared.Entities
 
         public Guid EquityID { get; set; }      
 
-        public decimal Percent { get; set; }
+        public decimal Percentage { get; set; }
 
         public decimal Cost { get; set; }
 

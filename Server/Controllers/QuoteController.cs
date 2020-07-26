@@ -20,12 +20,16 @@ namespace SectorModel.Server.Controllers
         private readonly ModelManager mMgr;
         private readonly ModelItemManager miMgr;
 
-        public QuoteController(IMemoryCache _cache, IConfiguration _config)
+        private readonly IAppSettings appSettings;
+
+        public QuoteController(IMemoryCache _cache, IConfiguration _config, IAppSettings _appSettings)
         {
-            qMgr = new QuoteManager(_cache, _config);
-            eMgr = new EquityManager(_cache, _config);
-            mMgr = new ModelManager(_cache, _config);
-            miMgr = new ModelItemManager(_cache, _config);
+            appSettings = _appSettings;
+
+            qMgr = new QuoteManager(_cache, _config, appSettings);
+            eMgr = new EquityManager(_cache, _config, appSettings);
+            mMgr = new ModelManager(_cache, _config, appSettings);
+            miMgr = new ModelItemManager(_cache, _config, appSettings);
         }
 
         [HttpGet]

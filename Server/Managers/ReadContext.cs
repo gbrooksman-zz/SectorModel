@@ -3,12 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using SectorModel.Shared.Entities;
 
 namespace SectorModel.Server.Managers
 {
     public class ReadContext : DbContext
     {
+        private readonly string connString;
+
+        public ReadContext(IAppSettings appSettings)
+        {
+            connString = appSettings.DBConnectionString;
+        }
+
         public DbSet<Equity> Equities { get; set; }
 
         public DbSet<Quote> Quotes { get; set; }
@@ -23,14 +31,8 @@ namespace SectorModel.Server.Managers
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string connString = @" Data Source=(LocalDB)\MSSQLLocalDB;
-                            AttachDbFilename=C:\Users\42505\source\repos\SectorModel\Server\data\sectormodel.mdf;
-                            Integrated Security=True;
-                            Connect Timeout=30";
-
             optionsBuilder.UseSqlServer(connString);
-
-            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
+            optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         }
     }
 }

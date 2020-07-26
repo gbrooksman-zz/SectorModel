@@ -16,25 +16,20 @@ namespace SectorModel.Server.Controllers
     [ApiController]
     public class CloudDataController : ControllerBase
     {
-       // private readonly EquityManager eqMgr;
-       // private readonly QuoteManager qMgr;
         private readonly CloudDataManager cdMgr;       
 
-        public CloudDataController(IMemoryCache cache, IConfiguration config)
+        public CloudDataController(IMemoryCache _cache, IConfiguration _config, IAppSettings _appSettings)
         {
-          //  eqMgr = new EquityManager(cache, config);
-           // qMgr = new QuoteManager(cache, config);
-
-           cdMgr = new CloudDataManager(cache, config);
+           cdMgr = new CloudDataManager(_cache, _config, _appSettings);
         }
 
         [HttpGet]
         [Route("UpdateQuotes")]       
         [ProducesResponseType(StatusCodes.Status200OK)]
         //[ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<bool>> UpdateQuotes(DateTime lastQuoteDate, Guid coregroupid)
+        public async Task<ActionResult<bool>> UpdateQuotes(DateTime lastQuoteDate, Guid coreModelId)
         {
-            bool isOK = await cdMgr.UpdateQuotes(lastQuoteDate, coregroupid).ConfigureAwait(false);
+            bool isOK = await cdMgr.UpdateQuotes(lastQuoteDate, coreModelId).ConfigureAwait(false);
 
             return Ok(isOK);
         }

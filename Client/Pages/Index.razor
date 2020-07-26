@@ -36,6 +36,12 @@
             <br />
             User: @state.UserName
             <br />
+            UserID: @state.UserId
+            <br />
+            Core Model ID: @state.CoreModelId
+            <br />
+            SPDR Model ID: @state.SPDRModelID
+            <br />
             Last Quote Update Date: @state.LastQuoteDate.ToShortDateString()
             <br />
         </div>
@@ -47,17 +53,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        //stuff for testing - replace with a settings file
+        
 
-        state.UserName = "geoff";
-
-        state.UserId = Guid.Parse("e7d01e07-fc95-453c-a6b7-734bef1859e7");          //copied from db
-
-        state.CoreModelId = Guid.Parse("e81de052-9091-11e9-a901-0aefc68022c6");     //copied from db
-
-        state.SPDRModelID = Guid.Parse("dd28331a-a689-11e9-9557-0aefc68022c6");
-
-        state.LastQuoteDate = await httpClient.GetFromJsonAsync<DateTime>("quote/getlastquotedate");
+        state.LastQuoteDate = new DateTime(2015, 1, 1);  //await httpClient.GetFromJsonAsync<DateTime>("quote/getlastquotedate");
 
         if (state.SelectedEquityList == null)
         {

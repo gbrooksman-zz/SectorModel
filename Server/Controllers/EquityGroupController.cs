@@ -18,10 +18,10 @@ namespace SectorModel.Server.Controllers
         private readonly ModelManager egMgr;
         private readonly ModelItemManager miMgr;
 
-        public EquityGroupController(IMemoryCache _cache, IConfiguration _config)
+        public EquityGroupController(IMemoryCache _cache, IConfiguration _config, IAppSettings _appSettings)
         {
-            egMgr = new ModelManager(_cache, _config);
-            miMgr = new ModelItemManager(_cache, _config);
+            egMgr = new ModelManager(_cache, _config, _appSettings);
+            miMgr = new ModelItemManager(_cache, _config, _appSettings);
         }
 
        /* [HttpGet]
