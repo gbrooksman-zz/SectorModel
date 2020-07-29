@@ -8,32 +8,56 @@
 
 @using SectorModel.Client.Common.Menu
 
-    <AppMenu MenuBuilder="@menuBuilderTop" />
-
-    <div class="container-fluid">
-        <div class="row">
-            <h34>Welcome to the Sector balance Guide</h34>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <AppMenu MenuBuilder="@menuBuilderTop" />
+            <br />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <h4>Welcome to the Sector Model Guide</h4>
             <p>
-                This site focuses on constructing an investment portfolio using nine ETF Sector Funds managed by 
+                This site focuses on constructing an investment portfolio using the largest ETF Sector Funds managed by
                 State Street Global Advisors. This site is in no way affiliated with State Street Global
-                Advisors and does not offer investment advice.mThis site is intended to describe the investment
+                Advisors and does not offer investment advice. This site is intended to describe the investment
                 approach taken by the site authors and will in a future update allow readers to construct their
-                own sector models as well as compare sector funds in various ways. Stay tuned. 
+                own sector models as well as compare sector funds in various ways. Stay tuned.
                 The ten ETF sector funds that are the focus of this modeling process can be found by clicking the 'ETF List' button above.
             </p>
         </div>
-        <div class="row">
+    </div>
+    <br /><br />
+    <div class="row">
+        <div class="col-12">
+            <h4>Getting Started</h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <a href="/Accounts/Signup">Sign up -  create a new account</a>
+        </div>
+        <div class="col-6">
+            <a href="/Accounts/Login">Log in - existing account</a>
+        </div>
+    </div>
+    <br /><br />
+    <div class="row">
+        <div class="col-12">
             <h4>Developing the Core Model</h4>
             <p>
                 The Core Model is made up of four or more of the nine available ETFs.
                 The selection of the particular sector and their relative weight in the overall modeling
-                is based on historical price movements of all nine of the ETFs, macroeconomic factors and analysis
+                is based on historical price movements of all of the ETFs, macroeconomic factors and analysis
                 of other factors.
             </p>
         </div>
-        <div class="row">
+    </div>
+    <div class="row">
+        <div class="col-12">
             <a href="https://iexcloud.io">Data provided by IEX Cloud</a>
-            <br />
+           @* <br />
             User: @state.UserName
             <br />
             UserID: @state.UserId
@@ -43,9 +67,11 @@
             SPDR Model ID: @state.SPDRModelId
             <br />
             Last Quote Update Date: @state.LastQuoteDate.ToShortDateString()
-            <br />
+            <br />*@
         </div>
     </div>
+</div>
+
 
 @code
 {

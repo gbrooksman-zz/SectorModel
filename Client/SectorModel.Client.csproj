@@ -25,7 +25,6 @@
   <ItemGroup>
     <Folder Include="Common\Menu\" />
     <Folder Include="Services\" />
-    <Folder Include="Pages\Accounts\" />
     <Folder Include="Pages\Components\" />
   </ItemGroup>
 
