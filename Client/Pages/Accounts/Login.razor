@@ -1,9 +1,97 @@
 ﻿@page "/Accounts/Login"
-@inherits LayoutComponentBase
 
-<h3>Login</h3>
+@inject AppSettings appState
+@inject NavigationManager nav
+@inject HttpClient httpClient
+
+@using SectorModel.Shared.Entities;
+@using System.Net.Http.Json;
+
+<EditForm EditContext="editContext">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    
+
+    <div class="container text-center">
+        <div class="row text-center d-flex justify-content-center">
+            <div class="col-lg-12">
+                <p>Welcome to Sector Modelling!</p>
+                <p>This application is designed to be a simple way to create portfolio models based on Sector ETFs</p>
+            </div>
+        </div>
+        <div class="row  justify-content-center">
+            <div class="col-sm-4">
+                <p>Login to an existing account</p>
+            </div>
+        </div>
+
+        @BadLoginDisplay
+
+        <div class="row form-group justify-content-center">
+            <div class="col-sm-4">
+                <InputText class="form-control" type="text" id="txtEmail" size="25" 
+                           placeholder="email" @bind-Value="formUser.Email"></InputText>
+            </div>
+        </div>
+        <div class="row form-group justify-content-center">
+            <div class="col-sm-4">
+                <InputText class="form-control" type="password" id="txtPassword" size="25"
+                           placeholder="password" @bind-Value="formUser.Password"></InputText>
+            </div>
+        </div>
+        <div class="row form-group justify-content-center">
+            <div class="col-sm-4">
+                <button class="btn btn-primary" @onclick="LoginUser">Login</button>
+            </div>
+        </div>
+        <div class="row form-group justify-content-center">
+            <div class="col-sm-4">
+                <a class="btn btn-link" href="/Signup"> Create an account </a>
+            </div>
+        </div>
+    </div>
+</EditForm>
 
 @code
 {
+    private EditContext editContext;
+    private User formUser = new User();
 
+    private RenderFragment BadLoginDisplay { get; set; }
+
+    protected override void OnInitialized()
+    {
+        editContext = new EditContext(formUser);
+    }
+
+    private async Task LoginUser()
+    {
+        if (!string.IsNullOrEmpty(formUser.Email) && !string.IsNullOrEmpty(formUser.Password))
+        {
+            HttpResponseMessage response = await httpClient.PostAsJsonAsync("User/Validate", formUser);
+            bool isOK = await response.Content.ReadFromJsonAsync<bool>();
+
+            if (isOK)
+            {
+				nav.NavigateTo("/User/ModelList");
+			}
+			else
+			{
+				BadLoginDisplay = LoginError();
+			}
+              
+        }
+    }
+
+    RenderFragment LoginError() => builder =>
+    {
+        builder.OpenElement(0, "div");
+        builder.AddAttribute(1, "class", "row");
+        builder.OpenElement(2, "div");
+        builder.AddAttribute(3, "class", "col-12 h5");
+        builder.AddAttribute(4, "style", "color: Red;");
+        builder.AddContent(5, $"User name or password is incorrect");
+        builder.CloseElement();
+        builder.CloseElement();
+    };
 }

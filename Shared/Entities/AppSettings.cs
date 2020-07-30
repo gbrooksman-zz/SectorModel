@@ -18,7 +18,7 @@ namespace SectorModel.Shared.Entities
         public Guid CoreModelId { get; } = Guid.Parse("FAC8A666-74D8-4531-B3AD-DA7B95360462");
         public Guid SPDRModelId { get; } = Guid.Parse("4237E32A-5C60-4141-8658-FA357C28EF28");
         public List<Equity> SelectedEquityList { get; set; }
-        public string DBConnectionString { get; } = "Data Source=(LocalDB)\\MSSQLLocalDB;Initial Catalog=SectorModel;Integrated Security=True";
+        public string DBConnectionString { get; set; } 
         public string IEXCloudAPIKey { get; set; }
     }
 }

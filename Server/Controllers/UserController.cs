@@ -13,12 +13,12 @@ namespace SectorModel.Server.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class UserController : ControllerBase
     {
         private readonly UserManager userMgr;
         private readonly AppSettings appSettings;
 
-        public UsersController(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings)
+        public UserController(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings)
         {
             appSettings = _appSettings;
 
@@ -54,7 +54,7 @@ namespace SectorModel.Server.Controllers
             return Ok(result != null);
         }
 
-        [HttpPost("{user}")]
+        [HttpPost()]
         [Route("Save")]
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status201Created)]
@@ -67,14 +67,21 @@ namespace SectorModel.Server.Controllers
             return Ok(result);            
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("Validate")]
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> Validate(string username, string password)
+        public async Task<IActionResult> Validate(User user)
         {
-            var result = await userMgr.Validate(username, password).ConfigureAwait(false);
-            return Ok(result);           
+            var result = await userMgr.Validate(user);
+			if (result)
+			{
+            	return Ok(true);   
+			} 
+			else
+			{
+				return Unauthorized(false);
+			}       
         }              
     }
 }

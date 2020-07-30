@@ -19,7 +19,7 @@
         <div class="row">
             <div class="col-12">
                 <label>Select a user name:</label>
-                <InputText id="userName" class="form-control" @bind-Value="@user.UserName" />
+                <InputText id="userName" class="form-control" @bind-Value="@user.Email" />
                 <br />
                 <label>Enter a password (no particular requirements)</label>
                 <InputText Id="password1" class="form-control" type="password" @bind-Value="@user.Password" />
@@ -67,7 +67,7 @@
         validationTextColor = "red";
         ValidationMessage = string.Empty;
 
-        var bExists = await httpClient.GetFromJsonAsync<bool>($"users/exists?userName={user.UserName}");
+        var bExists = await httpClient.GetFromJsonAsync<bool>($"users/exists?userName={user.Email}");
 
         if (bExists)
         {

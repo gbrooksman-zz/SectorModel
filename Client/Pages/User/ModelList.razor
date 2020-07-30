@@ -1,0 +1,35 @@
+@page "/User/ModelList"
+
+
+@inject SectorModel.Shared.Entities.AppSettings appSettings
+@inject HttpClient httpClient
+@inject NavigationManager nav
+
+@using SectorModel.Shared.Entities
+@using System.Collections.Generic
+
+<SectorModel.Client.Pages.Components.Header/>
+
+ <div class="container">
+	<div class="row">
+		<div class="col-sm-12">
+			<input type="button" class="button button-primary" @onclick="GoToCoreModel" value="Go To Core Model"/>
+		</div>
+	</div>
+</div>
+
+
+@code
+{
+
+	protected override void OnInitialized()
+	{
+		
+	}
+
+	private void GoToCoreModel()
+	{
+		nav.NavigateTo("Core/CoreGroup");
+	}
+
+}

@@ -35,6 +35,7 @@ namespace SectorModel.Server
             AppSettings appState = new AppSettings();
             
             appState.IEXCloudAPIKey = Configuration.GetValue<string>("IEXCloudAPIKey");
+			appState.DBConnectionString = Configuration.GetValue<string>("DBConnectionString"); 
 
             services.AddSingleton(appState);
 

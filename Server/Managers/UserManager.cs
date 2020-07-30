@@ -64,7 +64,7 @@ namespace SectorModel.Server.Managers
             try
             {
                 using var db = new ReadContext(appSettings);
-                user = await db.Users.Where(u => u.UserName.ToLower() == userName.ToLower()).FirstOrDefaultAsync();
+                user = await db.Users.Where(u => u.Email.ToLower() == userName.ToLower()).FirstOrDefaultAsync();
             }
             catch(Exception ex)
             {
@@ -76,15 +76,13 @@ namespace SectorModel.Server.Managers
         }
     
 
-        public async Task<bool> Validate(string userName, string password)
+        public async Task<bool> Validate(User user)
         {
-            User user = new User();
-
             try
             {
                 using var db = new ReadContext(appSettings);
-                user = await db.Users.Where(u => u.UserName.ToLower() == userName.ToLower()
-                                        && u.Password == password
+                user = await db.Users.Where(u => u.Email.ToLower() == user.Email.ToLower()
+                                        && u.Password == user.Password
                                         && u.IsActive == true)
                                         .FirstOrDefaultAsync();
             }
