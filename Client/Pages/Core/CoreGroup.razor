@@ -1,6 +1,6 @@
-@page "/coregroup"
+@page "/Core/CoreGroup"
 
-@inject SectorModel.Shared.Entities.AppSettings state
+@inject AppSettings appSettings
 @inject HttpClient httpClient
 
 @using SectorModel.Client.Pages.Components
@@ -14,12 +14,12 @@
         <div class="col-6" style="text-align:right;">
             <span>Effective Date:@model.StartDate.ToShortDateString()</span>
             <br/>
-            <span>Last Quote Date:@state.LastQuoteDate.ToShortDateString()</span>
+            <span>Last Quote Date:@appSettings.LastQuoteDate.ToShortDateString()</span>
         </div>
     </div>
     <div class="row">
         <div class="col-12">
-            <ModelEquityGrid ModelEquityList="@modelEquityList" />
+           <ModelEquityGrid ModelEquityList="@modelEquityList" />
         </div>
     </div>
 </div>
@@ -34,9 +34,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        model = await httpClient.GetFromJsonAsync<Model>($"model/getmodel?modelId={state.CoreModelId}").ConfigureAwait(false);
+        Console.WriteLine($"core model id: {appSettings.CoreModelId}");
+        model = await httpClient.GetFromJsonAsync<Model>($"model/getmodel?modelId={appSettings.CoreModelId}");
 
-        modelEquityList = await httpClient.GetFromJsonAsync<List<ModelItem>>($"quote/getmodelbydate?modelId={state.CoreModelId}&date={DateTime.Now.Date}&versionNumber={model.Version}").ConfigureAwait(false);
+        modelEquityList = await httpClient.GetFromJsonAsync<List<ModelItem>>($"quote/getmodelbydate?modelId={appSettings.CoreModelId}&date={DateTime.Now.Date}&versionNumber={model.Version}").ConfigureAwait(false);
 
         totalValue = modelEquityList.Sum(q => q.CurrentValue);
         totalCost = modelEquityList.Sum(q => q.Cost);

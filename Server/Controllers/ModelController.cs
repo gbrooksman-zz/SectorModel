@@ -41,7 +41,7 @@ namespace SectorModel.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<Model>> GetModel(Guid modelId)
         { 
-            Model model = await umMgr.GetModel(modelId);
+            Model model = await umMgr.GetModel(modelId).ConfigureAwait(false);
 
             if (model == null)
             {

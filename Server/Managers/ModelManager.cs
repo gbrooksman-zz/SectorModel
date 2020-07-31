@@ -60,6 +60,7 @@ namespace SectorModel.Server.Managers
                         var models = await db.Models
                                             .Where(i => i.Id == modelId)
                                             .ToListAsync();
+
                         versionNumber = models.Select(i => i.Version).Max();
                     }
 

@@ -1,5 +1,5 @@
 using System;
-
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SectorModel.Shared.Entities
 {
@@ -22,9 +22,9 @@ namespace SectorModel.Shared.Entities
 
         public DateTime StopDate { get; set; }
 
-        public int StartValue { get; set; }
+        public decimal StartValue { get; set; }
 
-        public int StopValue { get; set; }
+        public decimal StopValue { get; set; }
 
         public int Version { get; set; }
 

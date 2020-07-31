@@ -10,13 +10,13 @@ namespace SectorModel.Shared.Entities
             
         }
 
-		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+		//[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
-		[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+		//[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime CreatedAt { get; set; }
 
-		[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+		//[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         public DateTime UpdatedAt { get; set; }
     }
 }

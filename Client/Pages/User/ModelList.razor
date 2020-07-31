@@ -13,7 +13,7 @@
  <div class="container">
 	<div class="row">
 		<div class="col-sm-12">
-			<input type="button" class="button button-primary" @onclick="GoToCoreModel" value="Go To Core Model"/>
+			<input type="button" class="button button-primary" @onclick="@( () => { GoToCoreModel();  } )" value="Go To Core Model"/>
 		</div>
 	</div>
 </div>
@@ -21,7 +21,6 @@
 
 @code
 {
-
 	protected override void OnInitialized()
 	{
 		
@@ -29,6 +28,7 @@
 
 	private void GoToCoreModel()
 	{
+		Console.WriteLine("heading to /Core/CoreGroup");
 		nav.NavigateTo("Core/CoreGroup");
 	}
 

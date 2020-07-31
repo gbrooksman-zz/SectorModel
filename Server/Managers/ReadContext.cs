@@ -12,7 +12,7 @@ namespace SectorModel.Server.Managers
     {
         private readonly string connString;
 
-        public ReadContext(AppSettings appSettings)
+        public ReadContext(AppSettings appSettings) 
         {
             connString = appSettings.DBConnectionString;
         }
@@ -31,8 +31,14 @@ namespace SectorModel.Server.Managers
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(connString);
-            optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            base.OnConfiguring(optionsBuilder);
+
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer(connString);
+                optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+            }
+           
         }
     }
 }
