@@ -97,7 +97,7 @@ namespace SectorModel.Server.Managers
             {
                 using var db = new ReadContext(appSettings);
                 modelItemList = await db.ModelItems
-                                    .Where(i => i.Id == modelId
+                                    .Where(i => i.ModelId.ToString().ToUpper() == modelId.ToString().ToUpper()
                                     && i.Version == versionNumber)
                                     .ToListAsync();
             }
