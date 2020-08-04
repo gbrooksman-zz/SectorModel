@@ -45,7 +45,7 @@ namespace SectorModel.Server.Managers
             apiToken = appSettings.IEXCloudAPIKey;
 
             baseURL = "https://cloud.iexapis.com/stable/stock/";
-            quoteURL = "/chart/date/";
+            quoteURL = "/chart/1d/";
             tokenURL = $"?chartByDay=true&token={apiToken}";
 
             client.BaseAddress = new Uri(baseURL);
