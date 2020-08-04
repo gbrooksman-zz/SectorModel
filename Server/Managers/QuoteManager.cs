@@ -162,8 +162,8 @@ namespace SectorModel.Server.Managers
 
                 using (var db = new ReadContext(appSettings))
                 {
-                    var quotes = db.Quotes.GroupBy(q => q.Date).Distinct();
-                    await quotes.ForEachAsync( q => { tradeDates.Add(q.Key); });
+                    tradeDates = db.Quotes.Select(q => q.Date).Distinct().ToList();
+                    //await quotes.ForEachAsync( q => { tradeDates.Add(q.Date); });
                 }
 
                 bool foundIt = false;

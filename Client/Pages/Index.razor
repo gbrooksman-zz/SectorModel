@@ -79,7 +79,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        state.LastQuoteDate = new DateTime(2015, 1, 1);  //await httpClient.GetFromJsonAsync<DateTime>("quote/getlastquotedate");
+        state.LastQuoteDate = await httpClient.GetFromJsonAsync<DateTime>("quote/getlastquotedate");
 
         if (state.SelectedEquityList == null)
         {

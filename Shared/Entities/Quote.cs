@@ -14,7 +14,7 @@ namespace SectorModel.Shared.Entities
 
         public decimal Price { get; set; }
 
-        public int Volume { get; set; }
+        public long Volume { get; set; }
 
         public decimal RateOfChange { get; set; }
     }

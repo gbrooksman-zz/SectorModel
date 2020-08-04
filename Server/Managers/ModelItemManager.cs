@@ -60,11 +60,13 @@ namespace SectorModel.Server.Managers
                 decimal startValue = thisModel.StartValue;
 
                 // add a > 0 check here?
-                using var db = new ReadContext(appSettings);
-                List<ModelItem> modelEquityList = await db.ModelItems
-                    .Where(i => i.ModelId == modelId
-                    && i.Version == versionNumber)
-                    .ToListAsync();
+                /* using var db = new ReadContext(appSettings);
+                 List<ModelItem> modelEquityList = await db.ModelItems
+                     .Where(i => i.ModelId == modelId
+                     && i.Version == versionNumber)
+                     .ToListAsync();*/
+
+                List<ModelItem> modelEquityList = await GetModelEquityList(modelId, versionNumber);
 
                 foreach (ModelItem modelEquity in modelEquityList)
                 {
