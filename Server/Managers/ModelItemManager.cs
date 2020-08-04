@@ -62,7 +62,7 @@ namespace SectorModel.Server.Managers
                 // add a > 0 check here?
                 using var db = new ReadContext(appSettings);
                 List<ModelItem> modelEquityList = await db.ModelItems
-                    .Where(i => i.Id == modelId
+                    .Where(i => i.ModelId == modelId
                     && i.Version == versionNumber)
                     .ToListAsync();
 
@@ -97,7 +97,7 @@ namespace SectorModel.Server.Managers
             {
                 using var db = new ReadContext(appSettings);
                 modelItemList = await db.ModelItems
-                                    .Where(i => i.Id == modelId
+                                    .Where(i => i.ModelId == modelId
                                     && i.Version == versionNumber)
                                     .ToListAsync();
             }
