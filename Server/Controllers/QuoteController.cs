@@ -138,12 +138,16 @@ namespace SectorModel.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<DateTime>> GetLastQuoteDate()
         {
-            DateTime mrLastQuoteDate = await qMgr.GetLastQuoteDate();
-            if (mrLastQuoteDate == null)
+            DateTime lastQuoteDate = await qMgr.GetLastQuoteDate();
+
+			appSettings.LastQuoteDate = lastQuoteDate;
+
+            if (lastQuoteDate == null)
             {
-                return BadRequest(mrLastQuoteDate);
+                return BadRequest(lastQuoteDate);
             }
-            return Ok(mrLastQuoteDate);
+			
+            return Ok(lastQuoteDate);
         }
 
 

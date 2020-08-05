@@ -1,19 +1,19 @@
-@page "/User/ModelList"
-
+@page "/User/StartPage"
 
 @inject AppSettings appSettings
 @inject HttpClient httpClient
 @inject NavigationManager nav
 
 @using SectorModel.Shared.Entities
-@using System.Collections.Generic
 
-<SectorModel.Client.Pages.Components.Header/>
+<AppHeader/>
+
+<ModelList/>
 
  <div class="container">
 	<div class="row">
 		<div class="col-sm-12">
-			<input type="button" class="button button-primary" @onclick="@( () => { GoToCoreModel();  } )" value="Go To Core Model"/>
+			<input type="button" class="button button-primary" @onclick="@( () => { GoToCoreModel(); } )" value="Go To Core Model"/>
 		</div>
 	</div>
 </div>
@@ -27,9 +27,7 @@
 	}
 
 	private void GoToCoreModel()
-	{
-		//Console.WriteLine("heading to /Core/CoreGroup");
+	{		
 		nav.NavigateTo("Core/CoreGroup");
 	}
-
 }

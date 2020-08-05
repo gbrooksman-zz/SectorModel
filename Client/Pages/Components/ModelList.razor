@@ -1,0 +1,44 @@
+@inject AppSettings appSettings
+@inject AppState appState
+@inject HttpClient httpClient
+@using SectorModel.Client.Common
+@using SectorModel.Shared.Entities
+
+<DataGrid Items="@UserModelList" TItem="Model" Context="m">
+    <HeaderTemplate>
+        <th>Name</th>
+        <th>Active?</th>
+        <th>Start Date</th>
+        <th>Stop Date</th>
+        <th>Start Value</th>
+		<th>Stop Value</th>
+        <th>Gain/Loss</th>
+		<th>Version</th>
+    </HeaderTemplate>
+    <RowTemplate>
+        <td>@m.Name</td>
+        <td>@m.IsActive</td>
+        <td>@m.StartDate</td>
+        <td>@m.StopDate</td>
+        <td>@m.StartValue.ToString("n")</td>
+        <td>@m.StopValue.ToString("n")</td>
+        <td>@Utils.CalcGainLoss(m.StartValue, m.StopValue).ToString("n") </td>
+		<td>@m.Version</td>
+    </RowTemplate>
+    <FooterTemplate>
+        <td colspan="4">
+            Models: @m.Count
+        </td>
+    </FooterTemplate>
+</DataGrid>
+
+@code
+{
+    List<Model> UserModelList { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+       UserModelList = await httpClient.GetFromJsonAsync<List<Model>>($"model/getmodellist?userid = {appState.CurrentUser.Id}");
+    }
+
+}

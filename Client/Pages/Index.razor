@@ -58,17 +58,6 @@
     <div class="row">
         <div class="col-12">
             <a href="https://iexcloud.io">Data provided by IEX Cloud</a>
-           @* <br />
-            User: @state.UserName
-            <br />
-            UserID: @state.UserId
-            <br />
-            Core Model ID: @state.CoreModelId
-            <br />
-            SPDR Model ID: @state.SPDRModelId
-            <br />
-            Last Quote Update Date: @state.LastQuoteDate.ToShortDateString()
-            <br />*@
         </div>
     </div>
 </div>
@@ -78,7 +67,7 @@
 {
     protected MenuBuilder menuBuilderTop = new MenuBuilder();
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
 
  		menuBuilderTop.AddItem(1, "Home", "/")
@@ -86,24 +75,6 @@
                   .AddItem(3, "Past Models", "corehistory")
                   .AddItem(4, "ETF List", "etflist")
                   .AddItem(5, "Line Test", "linetest")
-                  .AddItem(6, "Sign Up", "Accounts/Signup");
-
-        if (appState.CurrentUser.Email == "geoffbrooks1@hotmail.com")
-        {
-            menuBuilderTop.AddItem(7, "Admin", "Accounts/Admin");
-        }
-
-		//=============================================================================================
-		//initialize settings
-
-        appSettings.LastQuoteDate = await httpClient.GetFromJsonAsync<DateTime>("quote/getlastquotedate");
-
-        if (appState.AllEquities == null)
-        {
-            appState.AllEquities = await httpClient.GetFromJsonAsync<List<Equity>>("equity/getall");
-        }
-
-		//=============================================================================================
-       
+                  .AddItem(6, "Sign Up", "Accounts/Signup");   
     }
 }

@@ -30,9 +30,9 @@ namespace SectorModel.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<Model>>> GetModelList(Guid userId)
         {
-            List<Model> mgrResult = await umMgr.GetActiveModelList(userId);
+            List<Model> modelList = await umMgr.GetActiveModelList(userId);
 
-            return Ok(mgrResult);
+            return Ok(modelList);
         }               
 
         [HttpGet]
@@ -52,6 +52,64 @@ namespace SectorModel.Server.Controllers
                 return Ok(model);
             }
         }
+
+		[HttpGet]
+        [Route("GetCoreModel")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<Model>> GetCoreModel()
+        { 
+
+			Model model = new Model();
+
+			if (appSettings.CoreModel == null)
+			{
+            	model = await umMgr.GetModel(appSettings.CoreModelId);
+				appSettings.CoreModel = model;
+			}
+			else
+			{
+				model = appSettings.CoreModel;
+			}
+
+            if (model == null)
+            {
+                return BadRequest(model);
+            }
+            else
+            {
+                return Ok(model);
+            }
+        }
+
+		[HttpGet]
+        [Route("GetSPDReModel")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<Model>> GetSPDRModel()
+        { 
+
+			Model model = new Model();
+
+			if (appSettings.SPDRModel == null)
+			{
+            	model = await umMgr.GetModel(appSettings.SPDRModelId);
+				appSettings.SPDRModel = model;
+			}
+			else
+			{
+				model = appSettings.SPDRModel;
+			}
+
+            if (model == null)
+            {
+                return BadRequest(model);
+            }
+            else
+            {
+                return Ok(model);
+            }
+		}
 
         [HttpGet]
         [Route("GetModelVersions")]

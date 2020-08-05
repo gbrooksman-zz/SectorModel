@@ -41,13 +41,13 @@ namespace SectorModel.Server.Controllers
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
         public async Task<IActionResult> Get(string email)
         {
-            var result = await userMgr.GetOneByEmail(email);
-            return Ok(result);
+            var user = await userMgr.GetOneByEmail(email);
+            return Ok(user);
         }
 
         [HttpGet]
         [Route("Exists")]
-        [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public async Task<IActionResult> Exists(string email)
         {
             var result = await userMgr.GetOneByEmail(email).ConfigureAwait(false);

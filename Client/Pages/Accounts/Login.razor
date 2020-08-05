@@ -62,6 +62,9 @@
     protected override void OnInitialized()
     {
         editContext = new EditContext(formUser);
+
+		formUser.Email = "geoffbrooks1@hotmail.com";
+		formUser.Password = "test";
     }
 
     private async Task LoginUser()
@@ -75,7 +78,7 @@
             {
 				await InitState();
 
-				nav.NavigateTo("/User/ModelList");
+				nav.NavigateTo("/User/StartPage");
 			}
 			else
 			{
@@ -100,12 +103,36 @@
 
 	private async Task InitState()
 	{
-		appState.CurrentUser = await httpClient.GetFromJsonAsync<User>($"user/get?email={appState.CurrentUser.Email}");;
+		//=============================================================================================
+		//initialize settings
+
+        appSettings.LastQuoteDate = await httpClient.GetFromJsonAsync<DateTime>("quote/getlastquotedate");
+
+        appSettings.CoreModel =  await httpClient.GetFromJsonAsync<Model>("model/getcoremodel");
+
+		//=============================================================================================
+		//initialize state
+
+		if (appState.AllEquities == null)
+        {
+            appState.AllEquities = await httpClient.GetFromJsonAsync<List<Equity>>("equity/getall");
+        }
+
+		if (appState.CurrentUser == null)
+		{
+			appState.CurrentUser = await httpClient.GetFromJsonAsync<User>($"user/get?email={formUser.Email}");
+		}
+
+		Console.WriteLine($"user null: {appState.CurrentUser == null}");
+		Console.WriteLine($"user email: {appState.CurrentUser.Email}");
 
 		if (appState.AllUserModels == null)
 		{
-			appState.AllUserModels = await httpClient.GetFromJsonAsync<List<Model>>($"model/getmodellist?id={appState.CurrentUser.Id}");
+			appState.AllUserModels = await httpClient.GetFromJsonAsync<List<Model>>($"model/getmodellist?userId={appState.CurrentUser.Id}");
 		}
+
+		//=============================================================================================
+	
 
 	}
 }
