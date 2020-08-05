@@ -5,7 +5,7 @@
 @using SectorModel.Client.Entities
 @using SectorModel.Client.Services
 
-@inject SectorModel.Shared.Entities.AppSettings state
+@inject AppSettings appSettings
 @inject HttpClient httpClient
 
 <figure>
@@ -78,7 +78,7 @@
         gridWidth = double.Parse(Width) / (double)HorizontalGridLines;
         gridHeight = double.Parse(Height) / (double)VerticalGridLines;
 
-        eSvc = new EquityService(httpClient, state);
+        eSvc = new EquityService(httpClient, appSettings);
 
         int quoteInterval = eSvc.GetInterval(beginDate, endDate);
 

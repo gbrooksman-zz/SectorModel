@@ -28,9 +28,9 @@ namespace SectorModel.Server.Controllers
         [Route("GetModelList")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<Model>>> GetModelList(User user)
+        public async Task<ActionResult<List<Model>>> GetModelList(Guid userId)
         {
-            List<Model> mgrResult = await umMgr.GetActiveModelList(user);
+            List<Model> mgrResult = await umMgr.GetActiveModelList(userId);
 
             return Ok(mgrResult);
         }               

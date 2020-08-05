@@ -1,6 +1,7 @@
 ﻿@page "/"
 @page "/index"
-@inject SectorModel.Shared.Entities.AppSettings state
+@inject AppSettings appSettings
+@inject AppState appState
 @inject HttpClient httpClient
 @using SectorModel.Shared.Entities
 @using System.Collections.Generic
@@ -79,23 +80,30 @@
 
     protected override async Task OnInitializedAsync()
     {
-        state.LastQuoteDate = await httpClient.GetFromJsonAsync<DateTime>("quote/getlastquotedate");
 
-        if (state.SelectedEquityList == null)
-        {
-            state.SelectedEquityList = await httpClient.GetFromJsonAsync<List<Equity>>("equity/getall");
-        }
-
-        menuBuilderTop.AddItem(1, "Home", "/")
+ 		menuBuilderTop.AddItem(1, "Home", "/")
                   .AddItem(2, "Current Model", "coregroup")
                   .AddItem(3, "Past Models", "corehistory")
                   .AddItem(4, "ETF List", "etflist")
                   .AddItem(5, "Line Test", "linetest")
                   .AddItem(6, "Sign Up", "Accounts/Signup");
 
-        if (state.UserName == "geoff")
+        if (appState.CurrentUser.Email == "geoffbrooks1@hotmail.com")
         {
             menuBuilderTop.AddItem(7, "Admin", "Accounts/Admin");
         }
+
+		//=============================================================================================
+		//initialize settings
+
+        appSettings.LastQuoteDate = await httpClient.GetFromJsonAsync<DateTime>("quote/getlastquotedate");
+
+        if (appState.AllEquities == null)
+        {
+            appState.AllEquities = await httpClient.GetFromJsonAsync<List<Equity>>("equity/getall");
+        }
+
+		//=============================================================================================
+       
     }
 }

@@ -28,7 +28,7 @@ namespace SectorModel.Server.Managers
             
         }
 
-        public async Task<List<Model>> GetActiveModelList(User user)
+        public async Task<List<Model>> GetActiveModelList(Guid userId)
         {
             List<Model> modelList = new List<Model>();
            
@@ -36,7 +36,7 @@ namespace SectorModel.Server.Managers
             {
                 using var db = new ReadContext(appSettings);
                 modelList = await db.Models
-                                    .Where(i => i.UserId == user.Id)
+                                    .Where(i => i.UserId == userId)
                                     .ToListAsync();  
             }
             catch (Exception ex)

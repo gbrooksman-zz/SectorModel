@@ -1,5 +1,5 @@
 @page "/corehistory"
-@inject SectorModel.Shared.Entities.AppSettings state
+@inject AppSettings appSettings
 @inject HttpClient httpClient
 @using SectorModel.Client.Entities
 @using SectorModel.Client.Common
@@ -90,7 +90,7 @@
 
         modelVersionId = model.ModelVersionId.ToString();
 
-        modelEquityList = await httpClient.GetFromJsonAsync<List<ModelItem>>($"quote/getmodelbydate?modelId={state.CoreModelId}&versionNumber={model.Version}&date={model.StartDate}");
+        modelEquityList = await httpClient.GetFromJsonAsync<List<ModelItem>>($"quote/getmodelbydate?modelId={appSettings.CoreModelId}&versionNumber={model.Version}&date={model.StartDate}");
 
         int i = 1;
         modelSlices.Clear();
@@ -131,7 +131,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        modelVersionList = await httpClient.GetFromJsonAsync<List<Model>>($"model/getmodelversions?modelId={state.CoreModelId}");
+        modelVersionList = await httpClient.GetFromJsonAsync<List<Model>>($"model/getmodelversions?modelId={appSettings.CoreModelId}");
 
     }
 }

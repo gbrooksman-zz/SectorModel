@@ -1,5 +1,5 @@
 @page "/etflist"
-@inject SectorModel.Shared.Entities.AppSettings state
+@inject AppSettings appSettings
 @inject HttpClient httpClient
 @using SectorModel.Client.Pages.Components
 @using SectorModel.Shared.Entities
@@ -22,7 +22,7 @@
                     @context.Count equities in list.
                 </td>
                 <td>
-                    Prices as of: @state.LastQuoteDate.ToShortDateString()
+                    Prices as of: @appSettings.LastQuoteDate.ToShortDateString()
                 </td>
             </FooterTemplate>
         </DataGrid>
@@ -37,8 +37,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        model = await httpClient.GetFromJsonAsync<Model>($"model/getmodel?modelId={state.SPDRModelId}");
+        model = await httpClient.GetFromJsonAsync<Model>($"model/getmodel?modelId={appSettings.SPDRModelId}");
 
-        equityList = await httpClient.GetFromJsonAsync<List<ModelItem>>($"quote/getmodelbydate?modelId={state.SPDRModelId}&date={DateTime.Now.Date}");
+        equityList = await httpClient.GetFromJsonAsync<List<ModelItem>>($"quote/getmodelbydate?modelId={appSettings.SPDRModelId}&date={DateTime.Now.Date}");
     }
 }

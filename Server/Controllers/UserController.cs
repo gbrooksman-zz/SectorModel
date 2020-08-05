@@ -39,18 +39,18 @@ namespace SectorModel.Server.Controllers
         [HttpGet]
         [Route("Get")]
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Get(string userName)
+        public async Task<IActionResult> Get(string email)
         {
-            var result = await userMgr.GetOneByName(userName);
+            var result = await userMgr.GetOneByEmail(email);
             return Ok(result);
         }
 
         [HttpGet]
         [Route("Exists")]
         [ProducesResponseType(typeof(User), StatusCodes.Status200OK)]
-        public async Task<IActionResult> Exists(string userName)
+        public async Task<IActionResult> Exists(string email)
         {
-            var result = await userMgr.GetOneByName(userName).ConfigureAwait(false);
+            var result = await userMgr.GetOneByEmail(email).ConfigureAwait(false);
             return Ok(result != null);
         }
 

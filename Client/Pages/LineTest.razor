@@ -1,6 +1,7 @@
 
 @page "/linetest"
-@inject SectorModel.Shared.Entities.AppSettings state
+@inject AppSettings appSettings
+@inject AppState appState
 
 @using SectorModel.Client.Pages.Components
 @using SectorModel.Shared.Entities
@@ -11,7 +12,7 @@
 <div class="row">
     <div class="row">
         <div class="col-4">
-            @foreach (Equity eq in state.SelectedEquityList)
+            @foreach (Equity eq in appState.AllEquities)
             {
                 <input type="checkbox" @bind="eq.IsSelected" /> @eq.SymbolName
             }
@@ -41,27 +42,15 @@
 
     protected override void OnInitialized()
     {
-        eqList = string.Join(";",  state.SelectedEquityList.Where(x => x.IsSelected == true).Select(x=>x.Symbol).ToList());
-       // Console.WriteLine($"OnInitialized: {eqList}");
+        eqList = string.Join(";",  appState.AllEquities.Where(x => x.IsSelected == true).Select(x=>x.Symbol).ToList());
     }
 
     protected void refreshClick()
     {
-        eqList = string.Join(";",  state.SelectedEquityList.Where(x => x.IsSelected == true).Select(x=>x.Symbol).ToList());
+        eqList = string.Join(";",  appState.AllEquities.Where(x => x.IsSelected == true).Select(x=>x.Symbol).ToList());
         
         GraphFragement = BuildGraph(eqList);
-
-        //Console.WriteLine($"refreshClick: {eqList}");
-
     }
-
-    //private RenderFragment DrawGraph()
-    //{
-    //    Console.WriteLine($"DrawGraph: {eqList}");
-
-    //    return BuildGraph(eqList);
-    //}
-
 
 
     RenderFragment BuildGraph(string eqList) => builder =>

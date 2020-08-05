@@ -1,7 +1,8 @@
 ﻿@page "/Accounts/Admin"
 
 @inject HttpClient httpClient
-@inject SectorModel.Shared.Entities.AppSettings state
+@inject AppSettings appSettings
+@inject AppState appState
 
   <div class="container-fluid">
         <div class="row">
@@ -10,9 +11,9 @@
         <div class="row">
             <a href="https://iexcloud.io">Data provided by IEX Cloud</a>
             <br />
-            User: @state.UserName
+            User: @appState.CurrentUser.Email
             <br />
-            Last Quote Update Date: @state.LastQuoteDate.ToShortDateString()
+            Last Quote Update Date: @appSettings.LastQuoteDate.ToShortDateString()
             <br />
         </div>
     </div>
@@ -24,11 +25,11 @@
 {
     private async Task UpdateQuotes()
     {
-        bool isOK = await httpClient.GetFromJsonAsync<bool>($"clouddata/updatequotes?lastquotedate={state.LastQuoteDate}&coreModelId={state.CoreModelId}");
+        bool isOK = await httpClient.GetFromJsonAsync<bool>($"clouddata/updatequotes?lastquotedate={appSettings.LastQuoteDate}&coreModelId={appSettings.CoreModelId}");
         
         if (isOK)
         {
-            state.LastQuoteDate = DateTime.Now;
+            appSettings.LastQuoteDate = DateTime.Now;
         }
     }
 }

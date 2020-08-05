@@ -161,10 +161,7 @@ namespace SectorModel.Server.Managers
                 List<DateTime> tradeDates = new List<DateTime>();
 
                 using (var db = new ReadContext(appSettings))
-                {
-                    tradeDates = db.Quotes.Select(q => q.Date).Distinct().ToList();
-                    //await quotes.ForEachAsync( q => { tradeDates.Add(q.Date); });
-                }
+                tradeDates = await db.Quotes.Select(q => q.Date).Distinct().ToListAsync();
 
                 bool foundIt = false;
 

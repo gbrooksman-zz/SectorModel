@@ -1,6 +1,7 @@
 ﻿@page "/Accounts/Login"
 
-@inject AppSettings appState
+@inject AppSettings appSettings
+@inject AppState appState
 @inject NavigationManager nav
 @inject HttpClient httpClient
 
@@ -72,6 +73,8 @@
 
             if (isOK)
             {
+				await InitState();
+
 				nav.NavigateTo("/User/ModelList");
 			}
 			else
@@ -93,4 +96,16 @@
         builder.CloseElement();
         builder.CloseElement();
     };
+
+
+	private async Task InitState()
+	{
+		appState.CurrentUser = await httpClient.GetFromJsonAsync<User>($"user/get?email={appState.CurrentUser.Email}");;
+
+		if (appState.AllUserModels == null)
+		{
+			appState.AllUserModels = await httpClient.GetFromJsonAsync<List<Model>>($"model/getmodellist?id={appState.CurrentUser.Id}");
+		}
+
+	}
 }

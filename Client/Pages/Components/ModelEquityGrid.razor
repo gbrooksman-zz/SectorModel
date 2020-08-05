@@ -1,4 +1,4 @@
-@inject SectorModel.Shared.Entities.AppSettings state
+@inject AppSettings appSettings
 @inject HttpClient httpClient
 @using SectorModel.Client.Common
 @using SectorModel.Shared.Entities
@@ -53,7 +53,7 @@
 
     protected override void OnInitialized()
     {
-        lastquotedate = state.LastQuoteDate.ToShortDateString();
+        lastquotedate = appSettings.LastQuoteDate.ToShortDateString();
     }
 
     private decimal GetValue(decimal inValue)

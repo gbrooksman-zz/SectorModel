@@ -57,18 +57,18 @@ namespace SectorModel.Server.Managers
             return user;
         }
 
-        public async Task<User> GetOneByName(string userName)
+        public async Task<User> GetOneByEmail(string email)
         {
             User user = new User();
               
             try
             {
                 using var db = new ReadContext(appSettings);
-                user = await db.Users.Where(u => u.Email.ToLower() == userName.ToLower()).FirstOrDefaultAsync();
+                user = await db.Users.Where(u => u.Email.ToLower() == email.ToLower()).FirstOrDefaultAsync();
             }
             catch(Exception ex)
             {
-                Log.Error("UserManager::GetOneByName",ex);
+                Log.Error("UserManager::GetOneByEmail",ex);
                 throw;
             }
             

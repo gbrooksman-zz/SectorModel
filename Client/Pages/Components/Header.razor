@@ -1,4 +1,4 @@
-@inject AppSettings appSettings
+@inject AppState appState
 
  <div class="container">
 	<div class="row">
@@ -6,7 +6,7 @@
 			<p>Sector Modelling!</p>
 		</div>
 		<div class="col-sm-4">
-			<p>@appSettings.UserName</p>
+			<p>@appState.CurrentUser.Email</p>
 		</div>
 		<div class="col-sm-4">
 			<p>@DateTime.Now</p>

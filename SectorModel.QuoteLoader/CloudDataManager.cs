@@ -78,61 +78,47 @@ namespace SectorModel.QuoteLoader
                 IgnoreNullValues = true
             };
 
-            try
-            {
-                foreach (Equity e in egiList)
-                {
-                    Console.WriteLine($"loading quotes for {e.Symbol} {e.SymbolName}");
-                    foreach (string quoteDate in datesToLoad)
-                    {
-                        string url = $"{baseURL}{e.Symbol}{quoteURL}{quoteDate}{tokenURL}";
-                       // string url = $"{baseURL}XLF{quoteURL}{quoteDate}{tokenURL}";
+           
+			foreach (Equity e in egiList)
+			{
+				Console.WriteLine($"loading quotes for {e.Symbol} {e.SymbolName}");
+				foreach (string quoteDate in datesToLoad)
+				{
+					string url = $"{baseURL}{e.Symbol}{quoteURL}{quoteDate}{tokenURL}";
+					// string url = $"{baseURL}XLF{quoteURL}{quoteDate}{tokenURL}";
 
-                        string response = await client.GetStringAsync(new Uri(url)).ConfigureAwait(false);
+					string response = await client.GetStringAsync(new Uri(url)).ConfigureAwait(false);
 
-                        if (response != "[]")
-                        {
-                            string trimmedResponse = response.TrimStart("[".ToCharArray()).TrimEnd("]".ToCharArray());
+					if (response != "[]")
+					{
+						string trimmedResponse = response.TrimStart("[".ToCharArray()).TrimEnd("]".ToCharArray());
 
-                            IEXQuote iexQuote = JsonSerializer.Deserialize<IEXQuote>(trimmedResponse, options);
+						IEXQuote iexQuote = JsonSerializer.Deserialize<IEXQuote>(trimmedResponse, options);
 
-                            Quote quote = new Quote()
-                            {
-                                EquityId = e.Id,
-                                Date = DateTime.ParseExact(iexQuote.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture),
-                                Price = iexQuote.UClose,
-                                Volume = iexQuote.Volume
-                            };
+						Quote quote = new Quote()
+						{
+							EquityId = e.Id,
+							Date = DateTime.ParseExact(iexQuote.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture),
+							Price = iexQuote.UClose,
+							Volume = iexQuote.Volume
+						};
 
-                            await AddQuote(quote);
-                        }
-                    }
+						await AddQuote(quote);
+					}
+				}
 
-                }
-            }
-            catch (Exception ex)
-            {               
-                throw ex;
-            }
-
+			}
+           
             return true;
         }
 
         public async Task<Quote> AddQuote(Quote quote)
         {
-            try
-            {
-                using var db = new WriteContext(appSettings);
-                db.Quotes.Add(quote);
-                await db.SaveChangesAsync();
-
-            }
-            catch (Exception ex)
-            {
-                //Log.Error("QuoteManager::Add", ex);
-                throw ex;
-            }
-
+		
+			using var db = new WriteContext(appSettings);
+			db.Quotes.Add(quote);
+			await db.SaveChangesAsync();
+            
             return quote;
         }
 
@@ -141,16 +127,8 @@ namespace SectorModel.QuoteLoader
         {
             Equity equity = new Equity();
 
-            try
-            {
-                using var db = new ReadContext(appSettings);
-                equity = await db.Equities.Where(i => i.Id == equityId).FirstOrDefaultAsync();
-            }
-            catch (Exception ex)
-            {
-               // Log.Error("EquityManager::Get", ex);
-                throw;
-            }
+            using var db = new ReadContext(appSettings);
+            equity = await db.Equities.Where(i => i.Id == equityId).FirstOrDefaultAsync();
 
             return equity;
         }
@@ -159,20 +137,11 @@ namespace SectorModel.QuoteLoader
         {
             List<ModelItem> modelItemList = new List<ModelItem>();
 
-            try
-            {
                 using var db = new ReadContext(appSettings);
                 modelItemList = await db.ModelItems
                                     .Where(i => i.ModelId == modelId
                                     && i.Version == versionNumber)
-                                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-              //  Log.Error(ex, "ModelItemManager::GetModelEquityList");
-                throw;
-            }
-
+                                    .ToListAsync();            
             return modelItemList;
         }
 
