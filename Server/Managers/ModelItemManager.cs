@@ -53,22 +53,14 @@ namespace SectorModel.Server.Managers
         public async Task<List<ModelItem>> GetModelEquityListByDate(Guid modelId, DateTime quoteDate, int versionNumber = 0)
         {
             List<ModelItem> modelItemList = new List<ModelItem>();
+			
             try
             {
-                Model thisModel = mMgr.GetModel(modelId, versionNumber).Result;
+                Model thisModel = await mMgr.GetModel(modelId, versionNumber);
 
-                decimal startValue = thisModel.StartValue;
+                List<ModelItem> modelItems = await GetModelEquityList(modelId, versionNumber);
 
-                // add a > 0 check here?
-                /* using var db = new ReadContext(appSettings);
-                 List<ModelItem> modelEquityList = await db.ModelItems
-                     .Where(i => i.ModelId == modelId
-                     && i.Version == versionNumber)
-                     .ToListAsync();*/
-
-                List<ModelItem> modelEquityList = await GetModelEquityList(modelId, versionNumber);
-
-                foreach (ModelItem modelEquity in modelEquityList)
+                foreach (ModelItem modelEquity in modelItems)
                 {
                     modelEquity.Equity = await eqMgr.Get(modelEquity.EquityID);
                     Quote quote = await qMgr.GetByEquityIdAndDate(modelEquity.EquityID, quoteDate);
@@ -80,7 +72,7 @@ namespace SectorModel.Server.Managers
                     }
                 }
 
-                modelItemList = modelEquityList;
+                modelItemList = modelItems;
             }
             catch (Exception ex)
             {

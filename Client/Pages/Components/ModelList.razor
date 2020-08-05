@@ -8,6 +8,7 @@
     <HeaderTemplate>
         <th>Name</th>
         <th>Active?</th>
+		<th>Private?</th>
         <th>Start Date</th>
         <th>Stop Date</th>
         <th>Start Value</th>
@@ -18,6 +19,7 @@
     <RowTemplate>
         <td>@m.Name</td>
         <td>@m.IsActive</td>
+		<td>@m.IsPrivate</td>
         <td>@m.StartDate</td>
         <td>@m.StopDate</td>
         <td>@m.StartValue.ToString("n")</td>
@@ -34,11 +36,13 @@
 
 @code
 {
-    List<Model> UserModelList { get; set; }
 
+	[Parameter]    
+	public List<Model> UserModelList { get; set; }
+@* 
     protected override async Task OnInitializedAsync()
     {
-       UserModelList = await httpClient.GetFromJsonAsync<List<Model>>($"model/getmodellist?userid = {appState.CurrentUser.Id}");
-    }
+
+    } *@
 
 }

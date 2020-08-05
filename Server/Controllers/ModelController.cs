@@ -30,7 +30,7 @@ namespace SectorModel.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<Model>>> GetModelList(Guid userId)
         {
-            List<Model> modelList = await umMgr.GetActiveModelList(userId);
+            List<Model> modelList = await umMgr.GetModelList(userId);
 
             return Ok(modelList);
         }               
@@ -83,7 +83,7 @@ namespace SectorModel.Server.Controllers
         }
 
 		[HttpGet]
-        [Route("GetSPDReModel")]
+        [Route("GetSPDRModel")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<Model>> GetSPDRModel()

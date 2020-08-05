@@ -110,6 +110,8 @@
 
         appSettings.CoreModel =  await httpClient.GetFromJsonAsync<Model>("model/getcoremodel");
 
+		appSettings.SPDRModel =  await httpClient.GetFromJsonAsync<Model>("model/getspdrmodel");
+
 		//=============================================================================================
 		//initialize state
 
@@ -125,6 +127,7 @@
 
 		Console.WriteLine($"user null: {appState.CurrentUser == null}");
 		Console.WriteLine($"user email: {appState.CurrentUser.Email}");
+		Console.WriteLine($"user id: {appState.CurrentUser.Id}");
 
 		if (appState.AllUserModels == null)
 		{

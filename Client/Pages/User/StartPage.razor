@@ -1,6 +1,7 @@
 @page "/User/StartPage"
 
 @inject AppSettings appSettings
+@inject AppState appState
 @inject HttpClient httpClient
 @inject NavigationManager nav
 
@@ -8,12 +9,15 @@
 
 <AppHeader/>
 
-<ModelList/>
+<ModelList UserModelList="@appState.AllUserModels"/>
 
  <div class="container">
 	<div class="row">
-		<div class="col-sm-12">
-			<input type="button" class="button button-primary" @onclick="@( () => { GoToCoreModel(); } )" value="Go To Core Model"/>
+		<div class="col-sm-6">
+			<input type="button" id="btnCore" class="button button-primary" @onclick="@( () => { GoToCoreModel(); } )" value="Go To Core Model"/>
+		</div>
+		<div class="col-sm-6">
+			<input type="button" id="btnSPDR" class="button button-primary" @onclick="@( () => { GoToSPDRModel(); } )" value="Go To SPDR Model"/>
 		</div>
 	</div>
 </div>
@@ -21,13 +25,19 @@
 
 @code
 {
-	protected override void OnInitialized()
-	{
-		
-	}
+	//List<Model> modelList = new List<Model>();
+	//protected override async Task OnInitializedAsync()
+	//{
+		//modelList = await httpClient.GetFromJsonAsync<List<Model>>($"model/getmodellist?userid={appState.CurrentUser.Id}");
+	//}
 
 	private void GoToCoreModel()
 	{		
-		nav.NavigateTo("Core/CoreGroup");
+		nav.NavigateTo($"/Core/CoreModel/false");
+	}
+
+	private void GoToSPDRModel()
+	{		
+		nav.NavigateTo($"/Core/CoreModel/true");
 	}
 }

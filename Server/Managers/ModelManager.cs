@@ -28,7 +28,7 @@ namespace SectorModel.Server.Managers
             
         }
 
-        public async Task<List<Model>> GetActiveModelList(Guid userId)
+        public async Task<List<Model>> GetModelList(Guid userId, bool activeOnly = false, bool privateOnly = false)
         {
             List<Model> modelList = new List<Model>();
            
@@ -37,11 +37,19 @@ namespace SectorModel.Server.Managers
                 using var db = new ReadContext(appSettings);
                 modelList = await db.Models
                                     .Where(i => i.UserId == userId)
-                                    .ToListAsync();  
+                                    .ToListAsync(); 
+				if (activeOnly)
+				{
+					modelList = modelList.Where( i => i.IsActive == true).ToList();
+				} 
+				if (privateOnly)
+				{
+					modelList = modelList.Where( i => i.IsPrivate == true).ToList();
+				} 
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "ModelManager::GetActiveModelList");
+                Log.Error(ex, "ModelManager::GetModelList");
                 throw;
             } 
 
@@ -117,13 +125,13 @@ namespace SectorModel.Server.Managers
             return modelList;
         }
 
-        private async Task<List<Model>> GetModelList(Guid modelId)
-        {
-            using var db = new ReadContext(appSettings);
-            return await db.Models
-                .Where(i => i.Id == modelId)
-                .ToListAsync();
-        }
+        // private async Task<List<Model>> GetModelList(Guid modelId)
+        // {
+        //     using var db = new ReadContext(appSettings);
+        //     return await db.Models
+        //         .Where(i => i.Id == modelId)
+        //         .ToListAsync();
+        // }
 
 
         public async Task<bool> CheckDateRange(Guid modelId, DateTime startdate, DateTime stopdate)
