@@ -30,7 +30,7 @@
         <td>@Utils.CalcGainLoss(m.StartValue, m.StopValue).ToString("n") </td>
 		<td>@m.Version</td>
         <td>
-             <input type="button" id="btnEdit" class="button button-primary" @onclick="@( () => { EditModel(); } )" value="Save" />
+             <input type="button" id="btnEdit" class="button button-primary" @onclick="@( () => { EditModel(@m.Id); } )" value="Save" />
         </td>
     </RowTemplate>
     <FooterTemplate>
@@ -45,9 +45,8 @@
     [Parameter]
     public List<Model> UserModelList { get; set; }
 
-    private void EditModel()
+    private void EditModel(Guid modelId)
     {
-        nav.NavigateTo("/ModelEdit");
+        nav.NavigateTo($"/ModelEdit/{modelId}");
     }
-
 }
