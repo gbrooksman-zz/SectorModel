@@ -40,8 +40,17 @@ namespace SectorModel.Server.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<Model>> GetModel(Guid modelId)
-        { 
-            Model model = await umMgr.GetModel(modelId).ConfigureAwait(false);
+        {
+            return await Get(modelId);
+        }
+
+        [HttpGet]
+        [Route("Get")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<Model>> Get(Guid modelId)
+        {
+            Model model = await umMgr.GetModel(modelId);
 
             if (model == null)
             {
@@ -53,7 +62,7 @@ namespace SectorModel.Server.Controllers
             }
         }
 
-		[HttpGet]
+        [HttpGet]
         [Route("GetCoreModel")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]

@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SectorModel.Client", "Clien
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SectorModel.Shared", "Shared\SectorModel.Shared.csproj", "{CFF2664F-9413-40B4-BB48-EE2513FBA730}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SectorModel.QuoteLoader", "SectorModel.QuoteLoader\SectorModel.QuoteLoader.csproj", "{6B86D37B-CBC4-47A3-AB77-470830381403}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SectorModel.QuoteLoader", "SectorModel.QuoteLoader\SectorModel.QuoteLoader.csproj", "{6B86D37B-CBC4-47A3-AB77-470830381403}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

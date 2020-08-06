@@ -1,6 +1,8 @@
 @inject AppSettings appSettings
 @inject AppState appState
 @inject HttpClient httpClient
+@inject NavigationManager nav
+
 @using SectorModel.Client.Common
 @using SectorModel.Shared.Entities
 
@@ -8,13 +10,14 @@
     <HeaderTemplate>
         <th>Name</th>
         <th>Active?</th>
-		<th>Private?</th>
+        <th>Private?</th>
         <th>Start Date</th>
         <th>Stop Date</th>
         <th>Start Value</th>
-		<th>Stop Value</th>
+        <th>Stop Value</th>
         <th>Gain/Loss</th>
-		<th>Version</th>
+        <th>Version</th>
+        <th>Actions</th>
     </HeaderTemplate>
     <RowTemplate>
         <td>@m.Name</td>
@@ -26,6 +29,9 @@
         <td>@m.StopValue.ToString("n")</td>
         <td>@Utils.CalcGainLoss(m.StartValue, m.StopValue).ToString("n") </td>
 		<td>@m.Version</td>
+        <td>
+             <input type="button" id="btnEdit" class="button button-primary" @onclick="@( () => { EditModel(); } )" value="Save" />
+        </td>
     </RowTemplate>
     <FooterTemplate>
         <td colspan="4">
@@ -36,13 +42,12 @@
 
 @code
 {
+    [Parameter]
+    public List<Model> UserModelList { get; set; }
 
-	[Parameter]    
-	public List<Model> UserModelList { get; set; }
-@* 
-    protected override async Task OnInitializedAsync()
+    private void EditModel()
     {
-
-    } *@
+        nav.NavigateTo("/ModelEdit");
+    }
 
 }

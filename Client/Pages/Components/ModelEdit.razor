@@ -1,0 +1,64 @@
+﻿@page "/ModelEdit"
+@page "/ModelEdit/{modelId}"
+
+@inject AppSettings appSettings
+@inject AppState appState
+@inject NavigationManager nav
+@inject HttpClient httpClient
+
+@using SectorModel.Shared.Entities;
+@using System.Net.Http.Json;
+
+
+<EditForm EditContext="editContext">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="row form-group justify-content-center">
+        <div class="col-sm-4">
+            <InputText class="form-control" type="text" id="txtName" size="50"
+                       placeholder="model name" @bind-Value="editModel.Name"></InputText>
+        </div>
+    </div>
+
+    <div class="row form-group justify-content-center">
+        <div class="col-sm-4">
+            <InputCheckbox class="form-control" type="checkbox" id="chkPrivate"
+                           @bind-Value="editModel.IsPrivate"></InputCheckbox>
+        </div>
+    </div>
+
+    <div class="row form-group justify-content-center">
+        <div class="col-sm-4">
+            <InputCheckbox class="form-control" type="checkbox" id="chkActive"
+                           @bind-Value="editModel.IsActive"></InputCheckbox>
+        </div>
+    </div>
+
+    <div class="col-sm-6">
+        <input type="button" id="btnSave" class="button button-primary" @onclick="@( () => { SaveModel(); } )" value="Save" />
+    </div>
+
+</EditForm>
+
+@code
+{
+    private Model editModel = new Model();
+
+    private EditContext editContext;
+
+    [Parameter]
+    public Guid modelId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        editModel = await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={modelId}");
+
+        editContext = new EditContext(editModel);
+    }
+
+    private void SaveModel()
+    {
+
+    }
+}
