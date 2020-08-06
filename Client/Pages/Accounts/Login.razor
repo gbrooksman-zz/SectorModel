@@ -100,7 +100,6 @@
         builder.CloseElement();
     };
 
-
 	private async Task InitState()
 	{
 		//=============================================================================================
@@ -123,11 +122,7 @@
 		if (appState.CurrentUser == null)
 		{
 			appState.CurrentUser = await httpClient.GetFromJsonAsync<User>($"user/get?email={formUser.Email}");
-		}
-
-		Console.WriteLine($"user null: {appState.CurrentUser == null}");
-		Console.WriteLine($"user email: {appState.CurrentUser.Email}");
-		Console.WriteLine($"user id: {appState.CurrentUser.Id}");
+		}		
 
 		if (appState.AllUserModels == null)
 		{
@@ -135,7 +130,6 @@
 		}
 
 		//=============================================================================================
-	
 
 	}
 }

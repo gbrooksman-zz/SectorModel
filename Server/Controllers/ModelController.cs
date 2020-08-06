@@ -126,15 +126,33 @@ namespace SectorModel.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<Model>>> GetModelVersions(Guid modelId)
         {
-            List<Model> mgrResult = await umMgr.GetModelVersions(modelId);
+            List<Model> result = await umMgr.GetModelVersions(modelId);
 
-            if (mgrResult == null)
+            if (result == null)
             {
-                return BadRequest(mgrResult);
+                return BadRequest(result);
             }
             else
             {
-                return Ok(mgrResult);
+                return Ok(result);
+            }
+        }
+
+		[HttpPost]
+        [Route("Save")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<Model>> Save(Model model)
+        {
+            model = await umMgr.Save(model);
+
+            if (model == null)
+            {
+                return BadRequest(model);
+            }
+            else
+            {
+                return Ok(model);
             }
         }
     }

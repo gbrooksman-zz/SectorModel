@@ -6,39 +6,68 @@
 @inject NavigationManager nav
 @inject HttpClient httpClient
 
-@using SectorModel.Shared.Entities;
-@using System.Net.Http.Json;
+@using SectorModel.Shared.Entities
+@using System.Net.Http.Json
 
+<AppHeader/>
 
-<EditForm Model="@model" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
+<h4>@model.Name details</h4>
+
+<EditForm Model="model" OnValidSubmit="HandleValidSubmit">
+	<DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div class="row form-group">
-		<label>Name</label>
-        <div class="col-sm-4">
-            <InputText class="form-control" type="text" id="txtName" size="50"
-                       placeholder="model name" @bind-Value="model.Name"></InputText>
-        </div>
+    <div class="form-control">
+			<label>Name</label>
+            <InputText id="txtName" size="50" placeholder="model name" @bind-Value="model.Name"></InputText>
     </div>
 
-    <div class="row form-group">
-        <div class="col-sm-4">
-			<label for="chkPrivate" >Is Private?</label>
-            <InputCheckbox class="form-control" type="checkbox" id="chkPrivate"
-                           @bind-Value="model.IsPrivate"></InputCheckbox>
-        </div>
+    <div class="form-control">
+			<label for="chkPrivate" >Is Private?</label>	
+            <InputCheckbox id="chkPrivate" @bind-Value="model.IsPrivate"></InputCheckbox>
     </div>
 
-    <div class="row form-group">
-        <div class="col-sm-4">
-			<label for="chkActive" >Is Active?</label>
-            <InputCheckbox class="form-control" type="checkbox" id="chkActive"
-                           @bind-Value="model.IsActive"></InputCheckbox>
-        </div>
+    <div class="form-control">
+			<label for="chkActive" >Is Active?</label>	
+            <InputCheckbox id="chkActive" @bind-Value="model.IsActive"></InputCheckbox>
     </div>
 
-     <button class="btn btn-primary" type="submit">Save</button>
+	 <div class="form-control">
+			<label >Starting Date</label>	
+            <InputDate id="dtStartDate" @bind-Value="model.StartDate"></InputDate>
+    </div>
+
+	 <div class="form-control">
+			<label >Ending Date</label>	
+            <InputDate id="dtStopDate" @bind-Value="model.StopDate"></InputDate>
+    </div>
+
+	<div class="form-control">
+			<label>Starting Value</label>
+            <InputNumber id="txtStartingValue" size="50" placeholder="starting value" @bind-Value="model.StartValue"></InputNumber>
+    </div>
+
+	<div class="form-control">
+			<label>Ending Value</label>
+            <InputNumber id="txtEndingValue" size="50" placeholder="ending value" @bind-Value="model.StopValue"></InputNumber>
+    </div>
+
+	<div class="card">
+		<div class="card-body">
+			<label>Version: @model.Version</label>
+			<label>Created: @model.CreatedAt</label>
+			<label>Updated: @model.UpdatedAt</label>
+		</div>
+    </div>
+
+	<div class="row form-group">
+		<div class="col-sm-4">
+ 			<button class="btn btn-primary" type="submit">Save</button>
+		</div>
+		<div class="col-sm-8">
+ 			<button class="btn btn-secondary" type="button" @onclick="Close">Cancel</button>
+		</div>
+    </div>
 
 </EditForm>
 
@@ -51,14 +80,24 @@
 
     protected override async Task OnInitializedAsync()
     {
-        model = await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={modelId}");
+        model = await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={modelId}");			
+	}
 
-    }
 
     private async Task HandleValidSubmit()
-    {       
-        
+    { 
 
-       
+		Console.WriteLine("valid");
+
+		HttpResponseMessage response = await httpClient.PostAsJsonAsync("model/save", model);
+		
+		appState.AllUserModels = await httpClient.GetFromJsonAsync<List<Model>>($"model/getmodellist?userId={appState.CurrentUser.Id}");
+		
+		nav.NavigateTo("/User/StartPage");       
     }
+
+	private void Close()
+	{
+		nav.NavigateTo("/User/StartPage");
+	}
 }
