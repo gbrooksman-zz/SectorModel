@@ -63,7 +63,7 @@
                     }
                     else
                     {
-                        <ModelEquityGrid ModelEquityList="@modelEquityList" />
+                        <ModelEquityGrid ModelId="@appSettings.CoreModel.Id" ModelEquityList="@modelEquityList"/>
                     }
                 </div>
             </div>
@@ -105,7 +105,7 @@
             i++;
         }
 
-        modelVersionDescription = contentService.GetModelVersionDescription(model.Version);
+        //modelVersionDescription = contentService.GetModelVersionDescription(model.Version);
     }
 
 

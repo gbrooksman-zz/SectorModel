@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -30,7 +31,6 @@ namespace SectorModel.Shared.Entities
         public decimal StartValue { get; set; }
 
         public decimal StopValue { get; set; }
-
 	
         public int Version { get; set; }
 
@@ -38,5 +38,8 @@ namespace SectorModel.Shared.Entities
         public bool IsPrivate { get; set; }
 
         public Guid ModelVersionId { get; set; }
+
+		[NotMapped]
+		public List<ModelItem> Items { get; set; }
     }
 }

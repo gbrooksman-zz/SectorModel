@@ -101,22 +101,7 @@ namespace SectorModel.Server.Controllers
             }
             return Ok(mrQuoteList);
         }
-
-        [HttpGet]
-        [Route("GetModelByDate")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<ModelItem>>> GetModelByDate(Guid modelId, DateTime date, int versionNumber)
-        {
-            List<ModelItem> modelEquityList = await miMgr.GetModelEquityListByDate(modelId, date, versionNumber);
-
-            if (modelEquityList == null)
-            {
-                return BadRequest(modelEquityList);
-            }
-           
-            return Ok(modelEquityList);
-        }
+      
 
         [HttpGet]
         [Route("GetLast")]

@@ -29,7 +29,7 @@ namespace SectorModel.Server.Managers
             mMgr = new ModelManager(_cache, config, appSettings);            
         }
 
-        public async Task<ModelItem> GetModelEquity(Guid modelEquityId, int versionNumber = 1)
+        public async Task<ModelItem> GetModelEquity(Guid modelEquityId)
         {
             ModelItem modelItem = new ModelItem();
 
@@ -37,8 +37,7 @@ namespace SectorModel.Server.Managers
             {
                 using var db = new ReadContext(appSettings);
                 modelItem = await db.ModelItems
-                                    .Where(i => i.Id == modelEquityId 
-                                    && i.Version == versionNumber)
+                                    .Where(i => i.Id == modelEquityId)
                                     .FirstOrDefaultAsync();
             }
             catch (Exception ex)
@@ -48,42 +47,11 @@ namespace SectorModel.Server.Managers
             }
 
             return modelItem;
-        }
+        }  
 
-        public async Task<List<ModelItem>> GetModelEquityListByDate(Guid modelId, DateTime quoteDate, int versionNumber = 0)
-        {
-            List<ModelItem> modelItemList = new List<ModelItem>();
-			
-            try
-            {
-                Model thisModel = await mMgr.GetModel(modelId, versionNumber);
 
-                List<ModelItem> modelItems = await GetModelEquityList(modelId, versionNumber);
-
-                foreach (ModelItem modelEquity in modelItems)
-                {
-                    modelEquity.Equity = await eqMgr.Get(modelEquity.EquityID);
-                    Quote quote = await qMgr.GetByEquityIdAndDate(modelEquity.EquityID, quoteDate);
-                    if (quote != null)
-                    {
-                        modelEquity.LastPrice = quote.Price;
-                        modelEquity.LastPriceDate = quote.Date;
-                        modelEquity.CurrentValue = Math.Round((modelEquity.Shares * quote.Price), 2);
-                    }
-                }
-
-                modelItemList = modelItems;
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "ModelItemManager::GetModelEquityListByDate");
-                throw;
-            }
-
-            return modelItemList;
-        }
-
-        public async Task<List<ModelItem>> GetModelEquityList(Guid modelId, int versionNumber = 1)
+		//use this to get the latest version of a model's items
+        public async Task<List<ModelItem>> GetModelItems(Guid modelId)
         {
             List<ModelItem> modelItemList = new List<ModelItem>();
 
@@ -91,38 +59,23 @@ namespace SectorModel.Server.Managers
             {
                 using var db = new ReadContext(appSettings);
                 modelItemList = await db.ModelItems
-                                    .Where(i => i.ModelId == modelId
-                                    && i.Version == versionNumber)
+                                    .Where(i => i.ModelId == modelId)
                                     .ToListAsync();
+
+				if(modelItemList == null)
+				{
+					modelItemList = new List<ModelItem>();
+				}					
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "ModelItemManager::GetModelEquityList");
+                Log.Error(ex, "ModelItemManager::GetModelItems");
                 throw;
             }
 
             return modelItemList;
         }
 
-        public async Task<int> GetEquitiesInModelsCount(Guid equityId)
-        {
-            int itemCount = 0;
-
-            try
-            {
-                using var db = new ReadContext(appSettings);
-                itemCount = await db.ModelItems
-                                    .Where(i => i.EquityID == equityId)
-                                    .CountAsync();
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "ModelItemManager::GetEquitiesInModelsCount");
-                throw;
-            }
-
-            return itemCount;
-        }
 
         #region CRUD
 

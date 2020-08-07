@@ -24,8 +24,7 @@ namespace SectorModel.Server.Managers
             config = _config;
 
             eqMgr = new EquityManager(_cache, config, appSettings);
-            qMgr = new QuoteManager(_cache, config, appSettings);
-            
+            qMgr = new QuoteManager(_cache, config, appSettings);            
         }
 
         public async Task<List<Model>> GetModelList(Guid userId, bool activeOnly = false, bool privateOnly = false)
@@ -56,25 +55,15 @@ namespace SectorModel.Server.Managers
             return modelList;
         }
 
-        public async Task<Model> GetModel(Guid modelId, int versionNumber = 0)
+        public async Task<Model> GetModel(Guid modelId)
         {
             Model model = new Model();
             try
             {
                 using (var db = new ReadContext(appSettings))
-                {
-                    if (versionNumber == 0)
-                    {
-                        var models = await db.Models
-                                            .Where(i => i.Id == modelId)
-                                            .ToListAsync();
-
-                        versionNumber = models.Select(i => i.Version).Max();
-                    }
-
+                {                    
                     model = await db.Models
-                                        .Where(i => i.Id == modelId
-                                        && i.Version == versionNumber)
+                                        .Where(i => i.Id == modelId)
                                         .FirstOrDefaultAsync();
                 }
             }
@@ -85,54 +74,9 @@ namespace SectorModel.Server.Managers
             }
 
             return model;
-        }
+        }   
 
        
-
-        public async Task<Model> GetModelVersion(Guid modelId, int versionNumber)
-        {
-            Model model = new Model();
-            try
-            {
-                using var db = new ReadContext(appSettings);
-                model = await db.Models
-                    .Where(i => i.Id == modelId
-                    && i.Version == versionNumber)
-                    .FirstOrDefaultAsync();
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "ModelManager::GetModelVersion");
-                throw;
-            }
-
-            return model;
-        }
-
-        public async Task<List<Model>> GetModelVersions(Guid modelId)
-        {
-            List<Model> modelList;
-            try
-            {
-                modelList = await GetModelList(modelId);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "ModelManager::GetModelVersions");
-                throw;
-            }
-
-            return modelList;
-        }
-
-        // private async Task<List<Model>> GetModelList(Guid modelId)
-        // {
-        //     using var db = new ReadContext(appSettings);
-        //     return await db.Models
-        //         .Where(i => i.Id == modelId)
-        //         .ToListAsync();
-        // }
-
 
         public async Task<bool> CheckDateRange(Guid modelId, DateTime startdate, DateTime stopdate)
         {
@@ -168,15 +112,6 @@ namespace SectorModel.Server.Managers
             return model;
         }
 
-        internal async Task<Model> IncrementVersionAndSave(Guid modelId, int currentVersion)
-        {
-            Model thisModel = GetModel(modelId, currentVersion).Result;
-            thisModel.Version++;
-
-            thisModel = await Save(thisModel);
-
-            return thisModel;
-        }
     }
 }
 

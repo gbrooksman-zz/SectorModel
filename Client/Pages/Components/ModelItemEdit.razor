@@ -1,0 +1,72 @@
+@inject AppSettings appSettings
+@inject AppState appState
+@inject HttpClient httpClient
+@inject NavigationManager nav
+
+@using SectorModel.Client.Common
+@using SectorModel.Shared.Entities
+
+@inject AppState appState
+
+<EditForm Model="modelItem" OnValidSubmit="HandleValidSubmit">
+	<DataAnnotationsValidator />
+    <ValidationSummary />
+
+<select id="equityDDL" @bind="selectedSymbol">
+	<option></option>
+	@foreach (var equity in appState.AllEquities)
+	{
+		<option value="@equity.Symbol">@equity.SymbolName</option>
+	}
+</select>
+
+	<div class="form-control">
+			<label>Starting Value</label>
+            <InputNumber id="txtValue" size="50" placeholder="Percent of total model" @bind-Value="modelItem.Percentage"></InputNumber>
+    </div>
+
+		<div class="row form-group">
+		<div class="col-sm-4">
+ 			<button class="btn btn-primary" type="submit">Save</button>
+		</div>
+		<div class="col-sm-8">
+ 			<button class="btn btn-secondary" type="button" @onclick="Close">Cancel</button>
+		</div>
+    </div>
+	
+</EditForm>
+
+@code
+{
+	public ModelItem modelItem = new ModelItem();
+
+	[Parameter]
+    public Guid ModelId { get; set; }
+
+	public string selectedSymbol;
+	void HandleSelection(ChangeEventArgs e)
+    {
+        selectedSymbol = e.Value.ToString();
+       // Console.WriteLine("It is definitely: " + selectedSymbol);
+    }
+
+	private async Task HandleValidSubmit()
+    { 
+		Equity eq = appState.AllEquities.Where( e => e.Symbol == selectedSymbol).FirstOrDefault();
+		modelItem.EquityID = eq.Id;
+		modelItem.ModelId = ModelId;
+		modelItem.Version = appState.AllUserModels.Where(m => m.Id == ModelId).Max( i => i.Version);
+
+		HttpResponseMessage response = await httpClient.PostAsJsonAsync("model/saveitem", modelItem);
+		
+		appState.AllUserModels = await httpClient.GetFromJsonAsync<List<Model>>($"model/getmodellist?userId={appState.CurrentUser.Id}");
+		
+		//nav.NavigateTo($"/ModelItemList/{ModelId}");
+    }
+
+	private void Close()
+	{
+		//nav.NavigateTo($"/ModelItemList/{ModelId}");
+	}
+
+}

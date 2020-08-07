@@ -1,5 +1,4 @@
-@page "/Core/CoreModel"
-@page "/Core/CoreModel/{IsSPDR:bool}"
+@page "/ModelItemList/{modelId:guid}"
 
 @inject AppSettings appSettings
 @inject HttpClient httpClient
@@ -21,30 +20,22 @@
     </div>
     <div class="row">
         <div class="col-12">
-           <ModelEquityGrid ModelId="@model.Id" ModelEquityList="@modelEquityList"/>
+           <ModelEquityGrid ModelId="@model.Id" CanAdd="true" CanEdit="true" ModelEquityList="@modelEquityList" />
         </div>
     </div>
 </div>
 
 @code
 {
-    List<ModelItem> modelEquityList = new List<ModelItem>();
     Model model = new Model();
+	List<ModelItem> modelEquityList = new List<ModelItem>();
 
 	[Parameter]
-	public bool IsSPDR {get; set;}
+	public Guid modelId {get; set;}
 
     protected override async Task OnInitializedAsync()
-    {
-		if (IsSPDR)
-		{	
-			model = appSettings.SPDRModel;	
-		}
-		else
-		{
-			model = appSettings.CoreModel;
-		}	
-	
-        modelEquityList = await httpClient.GetFromJsonAsync<List<ModelItem>>($"quote/getmodelbydate?modelId={model.Id}&date={DateTime.Now.Date}&versionNumber={model.Version}").ConfigureAwait(false);
+    {	
+		model = await httpClient.GetFromJsonAsync<Model>($"model/GetLatestModelWithItems?modelId={modelId}");
+		modelEquityList = model.Items;
     }
 }

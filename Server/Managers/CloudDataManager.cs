@@ -62,7 +62,7 @@ namespace SectorModel.Server.Managers
 
             List<Equity> egiList = new List<Equity>();
 
-            var modelItems = await miMgr.GetModelEquityList(coreModelId).ConfigureAwait(false);
+            var modelItems = await miMgr.GetModelItems(coreModelId);
 
             foreach (ModelItem item in modelItems)
             {

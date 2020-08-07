@@ -65,7 +65,7 @@ namespace SectorModel.QuoteLoader
 
             List<Equity> egiList = new List<Equity>();
 
-            var modelItems = await GetModelEquityList(coreModelId).ConfigureAwait(false);
+            var modelItems = await GetModelItems(coreModelId);
 
             foreach (ModelItem item in modelItems)
             {
@@ -81,7 +81,7 @@ namespace SectorModel.QuoteLoader
            
 			foreach (Equity e in egiList)
 			{
-				Console.WriteLine($"loading quotes for {e.Symbol} {e.SymbolName}");
+			//	Console.WriteLine($"loading quotes for {e.Symbol} {e.SymbolName}");
 				foreach (string quoteDate in datesToLoad)
 				{
 					string url = $"{baseURL}{e.Symbol}{quoteURL}{quoteDate}{tokenURL}";
@@ -133,14 +133,13 @@ namespace SectorModel.QuoteLoader
             return equity;
         }
 
-        public async Task<List<ModelItem>> GetModelEquityList(Guid modelId, int versionNumber = 1)
+        public async Task<List<ModelItem>> GetModelItems(Guid modelId)
         {
             List<ModelItem> modelItemList = new List<ModelItem>();
 
                 using var db = new ReadContext(appSettings);
                 modelItemList = await db.ModelItems
-                                    .Where(i => i.ModelId == modelId
-                                    && i.Version == versionNumber)
+                                    .Where(i => i.ModelId == modelId)
                                     .ToListAsync();            
             return modelItemList;
         }

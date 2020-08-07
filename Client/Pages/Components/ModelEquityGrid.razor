@@ -3,6 +3,41 @@
 @using SectorModel.Client.Common
 @using SectorModel.Shared.Entities
 
+  @if (ShowDialog)
+        {
+            <div class="modal border border-dark" tabindex="-1" style="display:block;height:700px;" role="dialog">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <p class="modal-title">Add an Item to the Model</p>
+                           <button type="button" class="close" @onclick="HideDialog">
+                                <span aria-hidden="true">X</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-12">
+                                  <ModelItemEdit ModelId="@ModelId" />
+                                </div>
+                            </div>                            
+                            <br />
+                            <div class="row" style="margin:2px;height:450px;overflow-x: hidden;overflow-y: scroll;">
+                                <div class="container">
+                                   this is another row in the body
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+
+@if (CanAdd)
+{
+	<input type="button" id="btnAdd" class="btn btn-primary" @onclick="@( () => { ShowAddItem(); } )" value="Add" />
+}
+
 <DataGrid Items="@ModelEquityList" TItem="ModelItem">
     <HeaderTemplate>
         <th>Symbol</th>
@@ -12,6 +47,11 @@
         <th>Cost</th>
         <th>Current Value</th>
         <th>Gain/Loss</th>
+		@if (CanEdit)
+		{
+			<th>Actions</th>
+		}
+
     </HeaderTemplate>
     <RowTemplate>
         <td>@context.Equity.Symbol</td>
@@ -21,6 +61,13 @@
         <td>@GetCost(context.Cost).ToString("n")</td>
         <td>@GetValue(context.CurrentValue).ToString("n")</td>
         <td>@Utils.CalcGainLoss(context.CurrentValue, context.Cost).ToString("n") </td>
+		@if (CanEdit)
+		{
+			<td>
+				<input type="button" id="btnAdd" class="btn btn-info" @onclick="@( () => { ShowEditItem(); } )" value="Edit" />
+			</td>
+		}
+		<td></td>
     </RowTemplate>
     <FooterTemplate>
         <td colspan="4">
@@ -38,20 +85,29 @@
     </FooterTemplate>
 </DataGrid>
 
-
-
 @code
 {
-
     [Parameter]
-    public List<ModelItem> ModelEquityList { get; set; }
+    public Guid ModelId { get; set; }
+
+	[Parameter]
+	public bool CanAdd { get; set; } = false;
+
+	[Parameter]
+    public bool CanEdit { get; set; } = false;
+
+	[Parameter]
+	public List<ModelItem> ModelEquityList { get; set; }
+
+
+	 bool ShowDialog = false;
 
     decimal totalValue = 0;
     decimal totalCost = 0;
 
     protected override void OnInitialized()
     {
-      
+		//ModelEquityList = Model.Items;
     }
 
     private decimal GetValue(decimal inValue)
@@ -65,4 +121,19 @@
         totalCost += inValue;
         return inValue;
     }
+
+	private void ShowAddItem()
+	{
+		ShowDialog = true;
+	}
+
+	private void ShowEditItem()
+	{
+
+	}
+
+	private void HideDialog()
+	{
+		ShowDialog = false;
+	}
 }

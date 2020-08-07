@@ -15,13 +15,15 @@ namespace SectorModel.Server.Controllers
     [ApiController]
     public class ModelController : ControllerBase
     {
-        private readonly ModelManager umMgr;
+        private readonly ModelManager mMgr;
+		private readonly ModelItemManager miMgr;
         private readonly AppSettings appSettings;
 
         public ModelController(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings)
         {
             appSettings = _appSettings;
-            umMgr = new ModelManager(_cache, _config, appSettings);
+            mMgr = new ModelManager(_cache, _config, appSettings);
+			miMgr = new ModelItemManager(_cache, _config, appSettings);
         }
 
         [HttpGet]
@@ -30,7 +32,7 @@ namespace SectorModel.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<Model>>> GetModelList(Guid userId)
         {
-            List<Model> modelList = await umMgr.GetModelList(userId);
+            List<Model> modelList = await mMgr.GetModelList(userId);
 
             return Ok(modelList);
         }               
@@ -50,7 +52,7 @@ namespace SectorModel.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<Model>> Get(Guid modelId)
         {
-            Model model = await umMgr.GetModel(modelId);
+            Model model = await mMgr.GetModel(modelId);
 
             if (model == null)
             {
@@ -73,7 +75,7 @@ namespace SectorModel.Server.Controllers
 
 			if (appSettings.CoreModel == null)
 			{
-            	model = await umMgr.GetModel(appSettings.CoreModelId);
+            	model = await mMgr.GetModel(appSettings.CoreModelId);
 				appSettings.CoreModel = model;
 			}
 			else
@@ -102,7 +104,7 @@ namespace SectorModel.Server.Controllers
 
 			if (appSettings.SPDRModel == null)
 			{
-            	model = await umMgr.GetModel(appSettings.SPDRModelId);
+            	model = await mMgr.GetModel(appSettings.SPDRModelId);
 				appSettings.SPDRModel = model;
 			}
 			else
@@ -119,32 +121,14 @@ namespace SectorModel.Server.Controllers
                 return Ok(model);
             }
 		}
-
-        [HttpGet]
-        [Route("GetModelVersions")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<Model>>> GetModelVersions(Guid modelId)
-        {
-            List<Model> result = await umMgr.GetModelVersions(modelId);
-
-            if (result == null)
-            {
-                return BadRequest(result);
-            }
-            else
-            {
-                return Ok(result);
-            }
-        }
-
+       
 		[HttpPost]
         [Route("Save")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<Model>> Save(Model model)
         {
-            model = await umMgr.Save(model);
+            model = await mMgr.Save(model);
 
             if (model == null)
             {
@@ -153,6 +137,24 @@ namespace SectorModel.Server.Controllers
             else
             {
                 return Ok(model);
+            }
+        }
+
+		[HttpPost]
+        [Route("SaveItem")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<Model>> SaveItem(ModelItem modelItem)
+        {
+            modelItem = await miMgr.Save(modelItem);
+
+            if (modelItem == null)
+            {
+                return BadRequest(modelItem);
+            }
+            else
+            {
+                return Ok(modelItem);
             }
         }
     }

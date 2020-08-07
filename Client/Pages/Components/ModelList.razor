@@ -6,7 +6,7 @@
 @using SectorModel.Client.Common
 @using SectorModel.Shared.Entities
 
-<input type="button" id="btnEdit" class="button button-primary" @onclick="@( () => { AddModel(); } )" value="Add" />
+<input type="button" id="btnAdd" class="btn btn-primary" @onclick="@( () => { AddModel(); } )" value="Add" />
 
 <DataGrid Items="@UserModelList" TItem="Model" Context="m">
     <HeaderTemplate>
@@ -32,7 +32,8 @@
         <td>@Utils.CalcGainLoss(m.StartValue, m.StopValue).ToString("n") </td>
 		<td>@m.Version</td>
         <td>
-             <input type="button" id="btnEdit" class="button button-primary" @onclick="@( () => { EditModel(@m.Id); } )" value="Edit" />
+             <input type="button" id="btnDetails" class="btn btn-info" @onclick="@( () => { EditModel(@m.Id); } )" value="Details" />
+			 <input type="button" id="btnConfigure" class="btn btn-info" @onclick="@( () => { Configure(@m.Id); } )" value="Configure" />
         </td>
     </RowTemplate>
     <FooterTemplate>
@@ -50,6 +51,11 @@
     private void EditModel(Guid modelId)
     {
         nav.NavigateTo($"/ModelEdit/{modelId}/true");
+    }
+
+ 	private void Configure(Guid modelId)
+    {
+        nav.NavigateTo($"/ModelItemList/{modelId}");
     }
 
 	  private void AddModel()

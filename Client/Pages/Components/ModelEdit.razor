@@ -93,15 +93,13 @@
 			model.IsActive = true;
 			model.IsPrivate = true;
 			model.StopDate = DateTime.Now.AddYears(3);
+			model.Version = 1;
 		}		
 	}
 
 
     private async Task HandleValidSubmit()
     { 
-
-		Console.WriteLine("valid");
-
 		HttpResponseMessage response = await httpClient.PostAsJsonAsync("model/save", model);
 		
 		appState.AllUserModels = await httpClient.GetFromJsonAsync<List<Model>>($"model/getmodellist?userId={appState.CurrentUser.Id}");

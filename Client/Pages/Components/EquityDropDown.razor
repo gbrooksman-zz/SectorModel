@@ -1,0 +1,21 @@
+﻿@inject AppState appState
+
+<select id="equityDDL" @onchange="HandleSelection">
+	<option></option>
+	@foreach (var equity in appState.AllEquities)
+	{
+		<option value="@equity.Symbol">@equity.SymbolName</option>
+	}
+</select>
+
+
+@code
+{
+	string selectedString;
+	void HandleSelection(ChangeEventArgs e)
+    {
+        selectedString = e.Value.ToString();
+        Console.WriteLine("It is definitely: " + selectedString);
+    }
+
+}

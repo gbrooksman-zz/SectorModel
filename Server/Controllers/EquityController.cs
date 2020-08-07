@@ -65,41 +65,6 @@ namespace SectorModel.Server.Controllers
             {
                 return Ok(mgrResult);
             }
-        }      
-
-       /* [HttpGet]
-        [Route("GetEquitiesWithQuotes")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-*/
-   /*     public async Task<List<EquityQuotes>> GetEquitiesWithQuotes(string EquityList, DateTime StartDate, DateTime StopDate, int quoteInterval)
-        {
-            List<EquityQuotes> equitiesWithQuotes = new List<EquityQuotes>();
-
-            if (!string.IsNullOrEmpty(EquityList))
-            {
-                List<Quote> quotesList = new List<Quote>();
-
-                List<string> quotes = new List<string>(EquityList.Split(";".ToCharArray()));
-
-                quotesList = await qMgr.GetBySymbolListDateRangeWithInterval(quotes, StartDate, StopDate, quoteInterval);
-
-                List<Equity> mgrResult = await eqMgr.GetList(EquityList);
-
-                foreach (Equity equity in mgrResult)
-                {
-                    List<Quote> quoteList = quotesList.Where(q => q.EquityId == equity.Id)
-                                                            .OrderByDescending(q => q.Date)
-                                                            .ToList();
-                    equitiesWithQuotes.Add(new EquityQuotes
-                    {
-                        Equity = equity,
-                        Quotes = quoteList
-                    });
-                }
-            }
-
-            return equitiesWithQuotes;
-        }*/
+        }       
     }
 }
