@@ -1,5 +1,4 @@
-﻿@page "/ModelEdit"
-@page "/ModelEdit/{modelId:guid}"
+﻿@page "/ModelEdit/{modelId:guid}/{IsEdit:bool}"
 
 @inject AppSettings appSettings
 @inject AppState appState
@@ -78,9 +77,19 @@
     [Parameter]
     public Guid modelId { get; set; }
 
+	[Parameter]
+    public bool IsEdit { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        model = await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={modelId}");			
+		if (IsEdit)
+		{
+        	model = await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={modelId}");
+		}	
+		else
+		{
+			model.UserId = appState.CurrentUser.Id;
+		}		
 	}
 
 

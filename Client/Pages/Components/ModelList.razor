@@ -6,6 +6,8 @@
 @using SectorModel.Client.Common
 @using SectorModel.Shared.Entities
 
+<input type="button" id="btnEdit" class="button button-primary" @onclick="@( () => { AddModel(); } )" value="Add" />
+
 <DataGrid Items="@UserModelList" TItem="Model" Context="m">
     <HeaderTemplate>
         <th>Name</th>
@@ -47,6 +49,11 @@
 
     private void EditModel(Guid modelId)
     {
-        nav.NavigateTo($"/ModelEdit/{modelId}");
+        nav.NavigateTo($"/ModelEdit/{modelId}/true");
+    }
+
+	  private void AddModel()
+    {
+        nav.NavigateTo($"/ModelEdit/{Guid.Empty}/false");
     }
 }
