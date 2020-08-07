@@ -89,6 +89,10 @@
 		else
 		{
 			model.UserId = appState.CurrentUser.Id;
+			model.StartDate = DateTime.Now;
+			model.IsActive = true;
+			model.IsPrivate = true;
+			model.StopDate = DateTime.Now.AddYears(3);
 		}		
 	}
 

@@ -46,7 +46,7 @@
         </div>
         <div class="row form-group justify-content-center">
             <div class="col-sm-4">
-                <a class="btn btn-link" href="/Signup"> Create an account </a>
+                <a class="btn btn-link" href="/Accounts/Signup"> Create an account </a>
             </div>
         </div>
     </div>
@@ -71,7 +71,7 @@
     {
         if (!string.IsNullOrEmpty(formUser.Email) && !string.IsNullOrEmpty(formUser.Password))
         {
-            HttpResponseMessage response = await httpClient.PostAsJsonAsync("User/Validate", formUser);
+            HttpResponseMessage response = await httpClient.PostAsJsonAsync("user/validate", formUser);
             bool isOK = await response.Content.ReadFromJsonAsync<bool>();
 
             if (isOK)

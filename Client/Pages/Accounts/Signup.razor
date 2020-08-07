@@ -4,11 +4,12 @@
 @using System.Net.Http.Json
 
 @inject HttpClient httpClient
-@inject NavigationManager NavigationManager
+@inject NavigationManager nav
+@inject AppState appState
 
 <div class="row" style="padding:20px">
 
-    <EditForm Model="@user" OnSubmit="@(HandleSubmit)">
+    <EditForm Model="user" OnSubmit="HandleSubmit">
 
         <div class="row">
             <div class="col-12">
@@ -18,7 +19,7 @@
         </div>
         <div class="row">
             <div class="col-12">
-                <label>Select a user name:</label>
+                <label>Enter your email address</label>
                 <InputText id="userName" class="form-control" @bind-Value="@user.Email" />
                 <br />
                 <label>Enter a password (no particular requirements)</label>
@@ -30,10 +31,10 @@
                 <br />
                 <div class="row">
                     <div class="col-6">
-                        <button type="submit">Submit</button>
+                        <button class="btn btn-primary" type="submit">Submit</button>
                     </div>
                     <div class="col-6">
-                        <button @onclick="@(CloseThis)">Close</button>
+                        <button class="btn btn-secondary" @onclick="CloseThis">Cancel</button>
                     </div>
                 </div>
                 <div class="row">
@@ -59,7 +60,7 @@
 
     private void CloseThis()
     {
-        NavigationManager.NavigateTo("../");
+        nav.NavigateTo("/");
     }
 
     private async Task HandleSubmit()
@@ -67,27 +68,35 @@
         validationTextColor = "red";
         ValidationMessage = string.Empty;
 
-        var bExists = await httpClient.GetFromJsonAsync<bool>($"users/exists?userName={user.Email}");
+        var bExists = await httpClient.GetFromJsonAsync<bool>($"user/exists?email={user.Email}");
 
         if (bExists)
         {
-            ValidationMessage = "This user name has been taken. Please select another.";
+            ValidationMessage = "This email address has already been used.";
             return;
         }
 
-        if ((user.Password != user.ConfirmPassword) && (user.Password.Trim().Length > 0))
+		if (string.IsNullOrEmpty(user.Password))
+        {
+            ValidationMessage = "Blank passwords are not allowed. Please re-enter.";
+            return;
+        }
+
+        if (user.Password != user.ConfirmPassword)
         {
             ValidationMessage = "Passwords do not match. Please re-enter.";
             return;
         }
 
-        HttpResponseMessage response = await httpClient.PostAsJsonAsync<User>("users/save", user);
-        User mr = await response.Content.ReadFromJsonAsync<User>();
+        HttpResponseMessage response = await httpClient.PostAsJsonAsync<User>("user/save", user);
+        User newUser = await response.Content.ReadFromJsonAsync<User>();
 
-        if (mr != null)
+        if (newUser != null)
         {
             validationTextColor = "black";
-            ValidationMessage = "Your account has been created.";
+            ValidationMessage = "Your account has been created.";			
+
+			nav.NavigateTo("/Accounts/Login");
         }
     }
 }

@@ -50,8 +50,10 @@ namespace SectorModel.Server.Controllers
         [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
         public async Task<IActionResult> Exists(string email)
         {
-            var result = await userMgr.GetOneByEmail(email).ConfigureAwait(false);
-            return Ok(result != null);
+            User user = await userMgr.GetOneByEmail(email);
+			
+            return Ok(user != null);
+			
         }
 
         [HttpPost()]
