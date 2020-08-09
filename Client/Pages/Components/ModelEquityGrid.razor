@@ -38,7 +38,7 @@
 	<input type="button" id="btnAdd" class="btn btn-primary" @onclick="@( () => { ShowAddItem(); } )" value="Add" />
 }
 
-<DataGrid Items="@ModelEquityList" TItem="ModelItem">
+<DataGrid Items="@DisplayModel.ItemList" TItem="ModelItem">
     <HeaderTemplate>
         <th>Symbol</th>
         <th>Name</th>
@@ -97,7 +97,7 @@
     public bool CanEdit { get; set; } = false;
 
 	[Parameter]
-	public List<ModelItem> ModelEquityList { get; set; }
+	public Model DisplayModel { get; set; }
 
 
 	 bool ShowDialog = false;

@@ -20,7 +20,7 @@
     </div>
     <div class="row">
         <div class="col-12">
-           <ModelEquityGrid ModelId="@model.Id" CanAdd="true" CanEdit="true" ModelEquityList="@modelEquityList" />
+           <ModelEquityGrid Model="@model" CanAdd="true" CanEdit="true" />
         </div>
     </div>
 </div>
@@ -28,7 +28,7 @@
 @code
 {
     Model model = new Model();
-	List<ModelItem> modelEquityList = new List<ModelItem>();
+	//List<ModelItem> modelEquityList = new List<ModelItem>();
 
 	[Parameter]
 	public Guid modelId {get; set;}
@@ -36,6 +36,6 @@
     protected override async Task OnInitializedAsync()
     {	
 		model = await httpClient.GetFromJsonAsync<Model>($"model/GetLatestModelWithItems?modelId={modelId}");
-		modelEquityList = model.Items;
+		//modelEquityList = model.ItemList;
     }
 }

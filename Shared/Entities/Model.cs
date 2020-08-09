@@ -40,6 +40,6 @@ namespace SectorModel.Shared.Entities
         public Guid ModelVersionId { get; set; }
 
 		[NotMapped]
-		public List<ModelItem> Items { get; set; }
+		public List<ModelItem> ItemList { get; set; }
     }
 }
