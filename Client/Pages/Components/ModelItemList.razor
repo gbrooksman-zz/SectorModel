@@ -11,33 +11,33 @@
 <AppHeader/>
 
 @if (ShowDialog)
-        {
-            <div class="modal border border-dark" tabindex="-1" style="display:block;height:700px;" role="dialog">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <p class="modal-title">Add an Item to the Model</p>
-                           <button type="button" class="close" @onclick="HideDialog">
-                                <span aria-hidden="true">X</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-12">
-                                  @* <ModelItemEdit ModelItem="@modelItem" /> *@
-                                </div>
-                            </div>                            
-                            <br />
-                            <div class="row" style="margin:2px;height:450px;overflow-x: hidden;overflow-y: scroll;">
-                                <div class="container">
-                                   this is another row in the body
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
+{
+	<div class="modal border border-dark" tabindex="-1" style="display:block;height:700px;" role="dialog">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<p class="modal-title">Add an Item to the Model</p>
+					<button type="button" class="close" @onclick="HideDialog">
+						<span aria-hidden="true">X</span>
+					</button>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-12">
+							<ModelItemEdit EditModelItem="@modelItem" /> 
+						</div>
+					</div>                            
+					<br />
+					<div class="row" style="margin:2px;height:450px;overflow-x: hidden;overflow-y: scroll;">
+						<div class="container">
+							this is another row in the body
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
 
 <div class="container-fluid">
     <div class="row">
@@ -62,12 +62,22 @@
 					<th>Name</th>
 					<th>Percent</th>
 					<th>Last Price</th>
+					@if(CanEdit)
+					{
+						<th>Actions</th>
+					}
 				</HeaderTemplate>
 				<RowTemplate>
 					<td>@m.Equity.Symbol</td>
 					<td>@m.Equity.SymbolName</td>
 					<td>@Math.Round(m.Percentage, 0)</td>
 					<td>@m.LastPrice</td>
+					@if(CanEdit)
+					{
+						<td>
+							<input type="button" class="btn btn-secondary" value="Edit" @onclick="( () => {EditItem(m);})"/>
+							</td>
+					}
 				</RowTemplate>
 				<FooterTemplate>
 					<td colspan="4">
@@ -106,7 +116,9 @@
 
 	Model model = new Model();
 
-	 List<ModelItem> modelEquityList = new List<ModelItem>();
+	ModelItem modelItem = new ModelItem();
+
+	List<ModelItem> modelEquityList = new List<ModelItem>();
 
     protected override async Task OnInitializedAsync()
     {	
@@ -129,6 +141,12 @@
 
 	private void ShowAddItem()
 	{
+		ShowDialog = true;
+	}
+
+	private void EditItem(ModelItem item)
+	{
+		modelItem = item;
 		ShowDialog = true;
 	}
 
