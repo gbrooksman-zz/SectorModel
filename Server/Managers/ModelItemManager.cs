@@ -103,20 +103,18 @@ namespace SectorModel.Server.Managers
             return modelItem;
         }
 
-        public async Task<bool> RemoveEquity(Guid modelEquityId)
+        public async Task<bool> RemoveModelItem(Guid modelItemId)
         {
             int x = 0;
 
             try
             {
-                ModelItem modelEquity = new ModelItem()
-                {
-                    Id = modelEquityId
-                };
+                using var dbR = new ReadContext(appSettings);
+                ModelItem mi = dbR.ModelItems.Find(modelItemId);
 
-                using var db = new WriteContext(appSettings);
-                db.Remove(modelEquity);
-                x = await db.SaveChangesAsync();
+                using var dbW = new WriteContext(appSettings);
+                dbW.ModelItems.Remove(mi);
+                x = await dbW.SaveChangesAsync();
             }
             catch (Exception ex)
             {
@@ -126,8 +124,6 @@ namespace SectorModel.Server.Managers
 
             return x > 0;
         }
-
         #endregion
-
     }
 }

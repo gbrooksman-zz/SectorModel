@@ -5,38 +5,47 @@
 
 @using SectorModel.Shared.Entities
 
-
 <EditForm Model="EditModelItem" OnValidSubmit="HandleValidSubmit">
-	<DataAnnotationsValidator />
+    <DataAnnotationsValidator />
     <ValidationSummary />
 
-	<select id="equityDDL" @bind="selectedSymbol">
-		<option></option>
-		@foreach (var equity in appSettings.AllEquities)
-		{
-			<option value="@equity.Symbol">@equity.SymbolName</option>
-		}
-	</select>
-
-	<div class="form-control">
-			<label>Percent of Overall Model:</label>
-            <InputNumber id="txtValue" size="5" placeholder="Percent of total model" @bind-Value="EditModelItem.Percentage"></InputNumber>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <button class="btn btn-danger" type="button" @onclick="DeleteItem">Delete</button>
+            </div>
+        </div>
+        <div class="row">
+            <select id="equityDDL" @bind="selectedSymbol">
+                <option></option>
+                @foreach (var equity in appSettings.AllEquities)
+                {
+                    <option value="@equity.Symbol">@equity.SymbolName</option>
+                }
+            </select>
+        </div>
+        <div class="row">
+            <div class="form-control">
+                <label>Percent of Overall Model:</label>
+                <InputNumber id="txtValue" size="5" placeholder="Percent of total model" @bind-Value="EditModelItem.Percentage"></InputNumber>
+            </div>
+        </div>
+        <div class="row">
+            <div class="row form-group">
+                <div class="col-sm-4">
+                    <button class="btn btn-primary" type="submit">Save</button>
+                </div>
+                <div class="col-sm-4">
+                    <button class="btn btn-secondary" type="button" @onclick="Close">Cancel</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-		<div class="row form-group">
-		<div class="col-sm-4">
- 			<button class="btn btn-primary" type="submit">Save</button>
-		</div>
-		<div class="col-sm-8">
- 			<button class="btn btn-secondary" type="button" @onclick="Close">Cancel</button>
-		</div>
-    </div>
-	
 </EditForm>
 
 @code
 {	
-
     [Parameter]
     public ModelItem EditModelItem { get; set; }
 
@@ -49,12 +58,12 @@
     void HandleSelection(ChangeEventArgs e)
     {
         selectedSymbol = e.Value.ToString();
-
     }
 
     protected override void OnInitialized()
     {
         EditModelItem.ModelId = Model.Id;
+        selectedSymbol = EditModelItem.Equity.Symbol;
     }
 
     private async Task HandleValidSubmit()
@@ -77,9 +86,12 @@
 
     private void Close()
     {
-       // string routeString = $"/Models/ModelItemList/{EditModelItem.ModelId}/true/true";
-
         nav.NavigateTo($"/Redirect/{EditModelItem.ModelId}");
     }
 
+    private async Task DeleteItem()
+    {
+        await httpClient.DeleteAsync ($"model/RemoveModelItem?modelItemId={EditModelItem.Id}");
+        Close();
+    }
 }

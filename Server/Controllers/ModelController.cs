@@ -228,5 +228,14 @@ namespace SectorModel.Server.Controllers
                 return Ok(modelItem);
             }
         }
+        [HttpDelete]
+        [Route("RemoveModelItem")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<bool>> RemoveModelItem(Guid modelItemId)
+        {
+            bool deleted = await miMgr.RemoveModelItem(modelItemId);
+            return Ok(deleted);
+
+        }
     }
 }
