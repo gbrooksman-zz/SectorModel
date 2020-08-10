@@ -144,6 +144,9 @@ namespace SectorModel.Server.Managers
   		public async Task<List<Quote>> GetList(DateTime quoteDate)
         {
             List<Quote> quoteList = new List<Quote>();
+
+            quoteDate = await GetNearestQuoteDate(quoteDate);
+
             try
             {
                 using (var db = new ReadContext(appSettings))
