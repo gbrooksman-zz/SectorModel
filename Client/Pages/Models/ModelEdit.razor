@@ -1,4 +1,4 @@
-﻿@page "/ModelEdit/{modelId:guid}/{IsEdit:bool}"
+﻿@page "/Models/ModelEdit/{modelId:guid}/{IsEdit:bool}"
 
 @inject AppSettings appSettings
 @inject AppState appState
@@ -6,7 +6,6 @@
 @inject HttpClient httpClient
 
 @using SectorModel.Shared.Entities
-@using System.Net.Http.Json
 
 <AppHeader/>
 
@@ -47,7 +46,7 @@
     </div>
 
 	<div class="form-control">
-			<label>Ending Value</label>
+			<label>Current Value</label>
             <InputNumber id="txtEndingValue" size="50" placeholder="ending value" @bind-Value="model.StopValue"></InputNumber>
     </div>
 
@@ -84,6 +83,7 @@
 		if (IsEdit)
 		{
         	model = await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={modelId}");
+			model.StopValue = await httpClient.GetFromJsonAsync<decimal>($"model/get?modelId={modelId}&quoteDate={DateTime.Now}");
 		}	
 		else
 		{

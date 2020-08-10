@@ -1,5 +1,5 @@
-@page "/Core/CoreModel"
-@page "/Core/CoreModel/{IsSPDR:bool}"
+@* @page "/Core/CoreModel" *@
+@page "/Core/CoreModel/{IsSPDR:bool}" 
 
 @inject AppSettings appSettings
 @inject HttpClient httpClient
@@ -7,6 +7,7 @@
 
 @using SectorModel.Client.Pages.Components
 @using SectorModel.Shared.Entities
+@using SectorModel.Client.Common
 
 <AppHeader/>
 
@@ -21,31 +22,39 @@
     </div>
     <div class="row">
         <div class="col-12">
-           <DataGrid Items="@modelEquityList" TItem="ModelItem" Context="m">
+          <DataGrid Items="@modelEquityList" TItem="ModelItem" Context="m">
 				<HeaderTemplate>
 					<th>Symbol</th>
 					<th>Name</th>
 					<th>Percent</th>
 					<th>Last Price</th>
+					<th>Shares</th>
+					<th>Current Value</th>
+					<th>Cost</th>
+					<th>Gain/Loss</th>
 				</HeaderTemplate>
 				<RowTemplate>
 					<td>@m.Equity.Symbol</td>
 					<td>@m.Equity.SymbolName</td>
 					<td>@Math.Round(m.Percentage, 0)</td>
 					<td>@m.LastPrice</td>
+					<td> @m.Shares</td>
+					<td> @GetValue(m.CurrentValue)</td>
+					<td> @GetCost(m.Cost)</td>
+					<td>@Utils.CalcGainLoss(m.CurrentValue, m.Cost) </td>
 				</RowTemplate>
 				<FooterTemplate>
 					<td colspan="4">
 						Equities in Model: @m.Count
 					</td>
 					<td>
-						Total Cost: @totalCost.ToString("n")
+						Total Cost: @Utils.FormatNumber(totalCost)
 					</td>
 					<td>
-						Current Value: @totalValue.ToString("n")
+						Current Value: @Utils.FormatNumber(totalValue)
 					</td>
 					<td>
-						Overall: (totalValue - totalCost).ToString("n")
+						Overall:  @Utils.FormatNumber(totalValue - totalCost)
 					</td>
 				</FooterTemplate>
 			</DataGrid>
@@ -81,17 +90,18 @@
 
 	}
 
-	private decimal GetValue(decimal inValue)
+	private MarkupString GetValue(decimal inValue)
     {
         totalValue += inValue;
-        return inValue;
+        return Utils.FormatNumber(inValue);
     }
 
-    private decimal GetCost(decimal inValue)
+    private MarkupString GetCost(decimal inValue)
     {
         totalCost += inValue;
-        return inValue;
+        return Utils.FormatNumber(inValue);
     }
+
 
 
 

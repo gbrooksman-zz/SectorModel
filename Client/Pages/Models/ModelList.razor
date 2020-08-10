@@ -26,9 +26,9 @@
 		<td>@m.IsPrivate</td>
         <td>@m.StartDate</td>
         <td>@m.StopDate</td>
-        <td>@m.StartValue.ToString("n")</td>
-        <td>@m.StopValue.ToString("n")</td>
-        <td>@Utils.CalcGainLoss(m.StartValue, m.StopValue).ToString("n") </td>
+        <td>@Utils.FormatNumber(m.StartValue)</td>
+        <td>@Utils.FormatNumber(m.StopValue)</td>
+        <td>@Utils.CalcGainLoss(m.StartValue, m.StopValue) </td>
         <td>
              <input type="button" id="btnDetails" class="btn btn-info" @onclick="@( () => { EditModel(@m.Id); } )" value="Details" />
 			 <input type="button" id="btnConfigure" class="btn btn-info" @onclick="@( () => { Configure(@m.Id); } )" value="Configure" />
@@ -46,18 +46,26 @@
     [Parameter]
     public List<Model> UserModelList { get; set; }
 
+	decimal stopValue;
+
+	@* protected override async Task OnInitializedAsync() 
+	{
+
+		
+	}	 *@
+
     private void EditModel(Guid modelId)
     {
-		nav.NavigateTo($"/ModelEdit/{modelId}/true");
+		nav.NavigateTo($"/Models/ModelEdit/{modelId}/true");
     }
 
  	private void Configure(Guid modelId)
     {
-       nav.NavigateTo($"/ModelItemList/{modelId}/true/true");
+       nav.NavigateTo($"/Models/ModelItemList/{modelId}/true/true");
     }
 
 	  private void AddModel()
     {
-        nav.NavigateTo($"/ModelEdit/{Guid.Empty}/false");
+        nav.NavigateTo($"/Models/ModelEdit/{Guid.Empty}/false");
     }
 }

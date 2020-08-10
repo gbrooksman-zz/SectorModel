@@ -28,10 +28,13 @@ namespace SectorModel.Shared.Entities
 
         public DateTime StopDate { get; set; }
 
+		[Required]
+		[Range(100,10000000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
         public decimal StartValue { get; set; }
 
         public decimal StopValue { get; set; }	
 	
+		[Required]
         public bool IsPrivate { get; set; }
 
 		[NotMapped]

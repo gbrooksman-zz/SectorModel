@@ -5,6 +5,7 @@
 
 @using SectorModel.Shared.Entities
 
+
 <EditForm Model="EditModelItem" OnValidSubmit="HandleValidSubmit">
 	<DataAnnotationsValidator />
     <ValidationSummary />
@@ -18,8 +19,8 @@
 </select>
 
 	<div class="form-control">
-			<label>Starting Value</label>
-            <InputNumber id="txtValue" size="50" placeholder="Percent of total model" @bind-Value="EditModelItem.Percentage"></InputNumber>
+			<label>Percent of Overall Model:</label>
+            <InputNumber id="txtValue" size="5" placeholder="Percent of total model" @bind-Value="EditModelItem.Percentage"></InputNumber>
     </div>
 
 		<div class="row form-group">
@@ -51,6 +52,7 @@
     { 
 		Equity eq = appSettings.AllEquities.Where( e => e.Symbol == selectedSymbol).FirstOrDefault();
 		EditModelItem.EquityId = eq.Id;
+		EditModelItem.Equity = eq;
 
 		HttpResponseMessage response = await httpClient.PostAsJsonAsync("model/saveitem", EditModelItem);
 		
@@ -60,7 +62,7 @@
 
 	private void Close()
 	{
-		//nav.NavigateTo($"/ModelItemList/{ModelId}");
+		nav.NavigateTo($"/ModelItemList/{EditModelItem.ModelId}");
 	}
 
 }

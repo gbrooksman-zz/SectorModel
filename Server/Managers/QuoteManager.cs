@@ -107,7 +107,8 @@ namespace SectorModel.Server.Managers
 				Quote quote = await GetByEquityIdAndDate(mi.EquityId, quoteDate);
 				mi.LastPrice = quote.Price;
 				mi.LastPriceDate = quote.Date;
-				mi.Equity = await eqMgr.Get(mi.EquityId);				
+				mi.Equity = await eqMgr.Get(mi.EquityId);	
+				mi.CurrentValue = mi.Shares * mi.LastPrice;							
 				items.Add(mi);	
 			}
 

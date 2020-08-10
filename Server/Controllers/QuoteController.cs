@@ -131,13 +131,13 @@ namespace SectorModel.Server.Controllers
 				Quote quote = await qMgr.GetLast(mi.EquityId);
 				mi.LastPrice = quote.Price;
 				mi.LastPriceDate = quote.Date;
-				mi.Equity = await eMgr.Get(mi.EquityId);				
+				mi.Equity = await eMgr.Get(mi.EquityId);
+				mi.CurrentValue = mi.Shares * mi.LastPrice;				
 				items.Add(mi);	
 			}
             
             return Ok(items);
         }
-
 
         [HttpGet]
         [Route("GetLastQuoteDate")]

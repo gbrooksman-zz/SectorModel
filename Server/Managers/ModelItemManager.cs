@@ -83,7 +83,7 @@ namespace SectorModel.Server.Managers
             {
                 using var db = new WriteContext(appSettings);
                 {
-                    if (modelItem.Id != Guid.Empty)
+                    if (modelItem.Id == Guid.Empty)
                     {
                         db.Add(modelItem);
                     }

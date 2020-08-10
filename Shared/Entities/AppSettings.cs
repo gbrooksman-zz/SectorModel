@@ -16,8 +16,7 @@ namespace SectorModel.Shared.Entities
         public Guid SPDRModelId { get; } = Guid.Parse("4237E32A-5C60-4141-8658-FA357C28EF28");  
 		public Model SPDRModel { get; set; }       
         public string DBConnectionString { get; set; } 
-        public string IEXCloudAPIKey { get; set; }
-		
+        public string IEXCloudAPIKey { get; set; }		
 		public List<Equity> AllEquities { get; set; }
 
 

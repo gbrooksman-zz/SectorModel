@@ -5,7 +5,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using SectorModel.Server.Managers;
 using System.Threading.Tasks;
-using Serilog;
+using System.Linq;
 using System;
 using SectorModel.Shared.Entities;
 
@@ -17,6 +17,7 @@ namespace SectorModel.Server.Controllers
     {
         private readonly ModelManager mMgr;
 		private readonly ModelItemManager miMgr;
+		private readonly EquityManager eqMgr;
         private readonly AppSettings appSettings;
 
         public ModelController(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings)
@@ -24,6 +25,7 @@ namespace SectorModel.Server.Controllers
             appSettings = _appSettings;
             mMgr = new ModelManager(_cache, _config, appSettings);
 			miMgr = new ModelItemManager(_cache, _config, appSettings);
+			eqMgr = new EquityManager(_cache, _config, appSettings);
         }
 
         [HttpGet]
@@ -89,6 +91,28 @@ namespace SectorModel.Server.Controllers
         public async Task<ActionResult<Model>> GetModelFullWithPrices(Guid modelId, DateTime quoteDate)
         {
             Model model = await mMgr.GetModelFullWithPrices(modelId, quoteDate);
+
+            if (model == null)
+            {
+                return BadRequest(model);
+            }
+            else
+            {
+                return Ok(model);
+            }
+        }
+
+		[HttpGet]
+        [Route("GetModelValue")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<decimal>> GetModelValue(Guid modelId, DateTime quoteDate)
+        {
+			decimal currentValue = 0;
+
+            Model model = await mMgr.GetModelFullWithPrices(modelId, quoteDate);
+
+			currentValue = model.ItemList.Sum(m => m.CurrentValue);
 
             if (model == null)
             {
@@ -192,7 +216,8 @@ namespace SectorModel.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<Model>> SaveItem(ModelItem modelItem)
         {
-            modelItem = await miMgr.Save(modelItem);
+            modelItem.Equity = await eqMgr.Get(modelItem.EquityId);
+			modelItem = await miMgr.Save(modelItem);			 
 
             if (modelItem == null)
             {

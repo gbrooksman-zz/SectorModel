@@ -30,6 +30,7 @@ namespace SectorModel.Server.Managers
         public async Task<List<Model>> GetModelList(Guid userId, bool activeOnly = false, bool privateOnly = false)
         {
             List<Model> modelList = new List<Model>();
+			List<Model> pricedModelList = new List<Model>();
            
             try
             {
@@ -45,6 +46,21 @@ namespace SectorModel.Server.Managers
 				{
 					modelList = modelList.Where( i => i.IsPrivate == true).ToList();
 				} 
+
+				foreach (Model model in modelList)
+				{
+					Model pricedModel = new Model();
+
+					if (model.StopDate > DateTime.Now)
+					{
+						pricedModel = await GetModelFullWithPrices(model.Id, model.StopDate);
+					}
+					else
+					{
+						pricedModel = await GetModelFullWithPrices(model.Id, model.StopDate);
+					}
+					pricedModelList.Add(pricedModel);
+				}				
             }
             catch (Exception ex)
             {
@@ -52,7 +68,7 @@ namespace SectorModel.Server.Managers
                 throw;
             } 
 
-            return modelList;
+            return pricedModelList;
         }
 
         public async Task<Model> GetModel(Guid modelId)
