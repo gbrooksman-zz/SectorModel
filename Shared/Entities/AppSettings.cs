@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SectorModel.Shared.Entities
 {
@@ -16,5 +17,9 @@ namespace SectorModel.Shared.Entities
 		public Model SPDRModel { get; set; }       
         public string DBConnectionString { get; set; } 
         public string IEXCloudAPIKey { get; set; }
+		
+		public List<Equity> AllEquities { get; set; }
+
+
     }
 }

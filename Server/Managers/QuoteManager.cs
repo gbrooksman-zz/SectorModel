@@ -98,6 +98,22 @@ namespace SectorModel.Server.Managers
             return quoteListSkipped;
         }
 
+		public async Task<List<ModelItem>> GetModelItemsWithPrices(Model model, DateTime quoteDate)
+		{
+			List<ModelItem> items = new List<ModelItem>();
+
+			foreach (ModelItem mi in model.ItemList)
+			{
+				Quote quote = await GetByEquityIdAndDate(mi.EquityId, quoteDate);
+				mi.LastPrice = quote.Price;
+				mi.LastPriceDate = quote.Date;
+				mi.Equity = await eqMgr.Get(mi.EquityId);				
+				items.Add(mi);	
+			}
+
+			return items;
+		}
+
         public async Task<Quote> GetLast(Guid equityid)
         {
             Quote quote = new Quote();

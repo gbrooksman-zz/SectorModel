@@ -1,13 +1,43 @@
-@page "/ModelItemList/{modelId:guid}"
+@page "/ModelItemList/{modelId:guid}/{CanAdd:bool}/{CanEdit:bool}"
 
 @inject AppSettings appSettings
 @inject HttpClient httpClient
 @inject NavigationManager nav
+@inject AppState appState;
 
 @using SectorModel.Client.Pages.Components
 @using SectorModel.Shared.Entities
 
 <AppHeader/>
+
+@if (ShowDialog)
+        {
+            <div class="modal border border-dark" tabindex="-1" style="display:block;height:700px;" role="dialog">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <p class="modal-title">Add an Item to the Model</p>
+                           <button type="button" class="close" @onclick="HideDialog">
+                                <span aria-hidden="true">X</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-12">
+                                  @* <ModelItemEdit ModelItem="@modelItem" /> *@
+                                </div>
+                            </div>                            
+                            <br />
+                            <div class="row" style="margin:2px;height:450px;overflow-x: hidden;overflow-y: scroll;">
+                                <div class="container">
+                                   this is another row in the body
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
 
 <div class="container-fluid">
     <div class="row">
@@ -17,25 +47,96 @@
         <div class="col-6" style="text-align:right;">
             <span>Starting Date:@model.StartDate.ToShortDateString()</span>
         </div>
-    </div>
+    </div>	
     <div class="row">
+
+		
         <div class="col-12">
-           <ModelEquityGrid Model="@model" CanAdd="true" CanEdit="true" />
+				@if (CanAdd)
+				{
+					<input type="button" id="btnAdd" class="btn btn-primary" @onclick="ShowAddItem" value="Add" />
+				}
+			    <DataGrid Items="@modelEquityList" TItem="ModelItem" Context="m">
+				<HeaderTemplate>
+					<th>Symbol</th>
+					<th>Name</th>
+					<th>Percent</th>
+					<th>Last Price</th>
+				</HeaderTemplate>
+				<RowTemplate>
+					<td>@m.Equity.Symbol</td>
+					<td>@m.Equity.SymbolName</td>
+					<td>@Math.Round(m.Percentage, 0)</td>
+					<td>@m.LastPrice</td>
+				</RowTemplate>
+				<FooterTemplate>
+					<td colspan="4">
+						Equities in Model: @m.Count
+					</td>
+					<td>
+						Total Cost: @totalCost.ToString("n")
+					</td>
+					<td>
+						Current Value: @totalValue.ToString("n")
+					</td>
+					<td>
+						Overall: @(totalValue - totalCost).ToString("n")
+					</td>
+				</FooterTemplate>
+			</DataGrid>
         </div>
     </div>
 </div>
 
 @code
 {
-    Model model = new Model();
-	//List<ModelItem> modelEquityList = new List<ModelItem>();
-
 	[Parameter]
 	public Guid modelId {get; set;}
 
+	[Parameter]
+	public bool CanAdd { get; set; } = false;
+
+	[Parameter]
+    public bool CanEdit { get; set; } = false;
+
+	bool ShowDialog = false;
+
+	decimal totalValue = 0;
+    decimal totalCost = 0;
+
+	Model model = new Model();
+
+	 List<ModelItem> modelEquityList = new List<ModelItem>();
+
     protected override async Task OnInitializedAsync()
     {	
-		model = await httpClient.GetFromJsonAsync<Model>($"model/GetLatestModelWithItems?modelId={modelId}");
-		//modelEquityList = model.ItemList;
+		//model = await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={modelId}");
+		model = await httpClient.GetFromJsonAsync<Model>($"model/GetModelFullWithPrices?modelId={modelId}&quoteDate={DateTime.Now}");
+		modelEquityList = model.ItemList;
+	}
+
+	private decimal GetValue(decimal inValue)
+    {
+        totalValue += inValue;
+        return inValue;
     }
+
+    private decimal GetCost(decimal inValue)
+    {
+        totalCost += inValue;
+        return inValue;
+    }
+
+	private void ShowAddItem()
+	{
+		ShowDialog = true;
+	}
+
+	private void HideDialog()
+	{
+		ShowDialog = false;
+	}
+
+
 }
+

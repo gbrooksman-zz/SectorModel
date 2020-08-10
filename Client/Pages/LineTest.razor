@@ -12,7 +12,7 @@
 <div class="row">
     <div class="row">
         <div class="col-4">
-            @foreach (Equity eq in appState.AllEquities)
+            @foreach (Equity eq in appSettings.AllEquities)
             {
                 <input type="checkbox" @bind="eq.IsSelected" /> @eq.SymbolName
             }
@@ -42,12 +42,12 @@
 
     protected override void OnInitialized()
     {
-        eqList = string.Join(";",  appState.AllEquities.Where(x => x.IsSelected == true).Select(x=>x.Symbol).ToList());
+        eqList = string.Join(";",  appSettings.AllEquities.Where(x => x.IsSelected == true).Select(x=>x.Symbol).ToList());
     }
 
     protected void refreshClick()
     {
-        eqList = string.Join(";",  appState.AllEquities.Where(x => x.IsSelected == true).Select(x=>x.Symbol).ToList());
+        eqList = string.Join(";",  appSettings.AllEquities.Where(x => x.IsSelected == true).Select(x=>x.Symbol).ToList());
         
         GraphFragement = BuildGraph(eqList);
     }

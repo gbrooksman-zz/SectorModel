@@ -29,7 +29,7 @@ namespace SectorModel.Server.Managers
             mMgr = new ModelManager(_cache, config, appSettings);            
         }
 
-        public async Task<ModelItem> GetModelEquity(Guid modelEquityId)
+        public async Task<ModelItem> GetModelItem(Guid modelEquityId)
         {
             ModelItem modelItem = new ModelItem();
 
@@ -42,15 +42,13 @@ namespace SectorModel.Server.Managers
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "ModelItemManager::GetModelEquity");
+                Log.Error(ex, "ModelItemManager::GetModelItem");
                 throw;
             }
 
             return modelItem;
         }  
 
-
-		//use this to get the latest version of a model's items
         public async Task<List<ModelItem>> GetModelItems(Guid modelId)
         {
             List<ModelItem> modelItemList = new List<ModelItem>();

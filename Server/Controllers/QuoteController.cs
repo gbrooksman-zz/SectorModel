@@ -39,22 +39,22 @@ namespace SectorModel.Server.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<Quote>>> GetRange(string symbol, DateTime startdate, DateTime stopdate)
         {
-            List<Quote> mrQuoteList = new List<Quote>();
+            List<Quote> quoteList = new List<Quote>();
             Equity equity = await eMgr.GetBySymbol(symbol);
 
             if (equity == default(Equity))
             {               
-                return BadRequest(mrQuoteList);
+                return BadRequest(quoteList);
             }
             else
             {
-                mrQuoteList = await qMgr.GetByEquityIdAndDateRange(equity.Id, startdate, stopdate);
-                if (!mrQuoteList.Any())
+                quoteList = await qMgr.GetByEquityIdAndDateRange(equity.Id, startdate, stopdate);
+                if (!quoteList.Any())
                 {
-                    return BadRequest(mrQuoteList);
+                    return BadRequest(quoteList);
                 }
             }
-            return Ok(mrQuoteList);
+            return Ok(quoteList);
         }
 
         [HttpGet]
@@ -85,21 +85,21 @@ namespace SectorModel.Server.Controllers
         {
             Equity equity = await eMgr.GetBySymbol(symbol);
 
-            Quote mrQuoteList = new Quote();
+            Quote quoteList = new Quote();
 
             if (equity == default(Equity))
             {               
-                return BadRequest(mrQuoteList);
+                return BadRequest(quoteList);
             }
             else
             {               
-                mrQuoteList = await qMgr.GetByEquityIdAndDate(equity.Id, date);
-                if (mrQuoteList == null)
+                quoteList = await qMgr.GetByEquityIdAndDate(equity.Id, date);
+                if (quoteList == null)
                 {
-                    return BadRequest(mrQuoteList);
+                    return BadRequest(quoteList);
                 }
             }
-            return Ok(mrQuoteList);
+            return Ok(quoteList);
         }
       
 
@@ -116,6 +116,28 @@ namespace SectorModel.Server.Controllers
             }
             return Ok(mrQuoteList);
         }
+
+		[HttpGet]
+        [Route("GetModelItemPrices")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<ModelItem>>> GetModelItemPrices(Guid modelId, DateTime quoteDate)
+        {
+			Model model = await mMgr.GetModelFull(modelId);
+
+			List<ModelItem> items = new List<ModelItem>();
+
+			foreach (ModelItem mi in model.ItemList)
+			{
+				Quote quote = await qMgr.GetLast(mi.EquityId);
+				mi.LastPrice = quote.Price;
+				mi.LastPriceDate = quote.Date;
+				mi.Equity = await eMgr.Get(mi.EquityId);				
+				items.Add(mi);	
+			}
+            
+            return Ok(items);
+        }
+
 
         [HttpGet]
         [Route("GetLastQuoteDate")]

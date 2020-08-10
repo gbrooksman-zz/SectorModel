@@ -7,48 +7,20 @@
 @using SectorModel.Shared.Entities
 @using SectorModel.Client.Services
 
-<style>
 
-    /*div {
-        border: 1px solid #000000;
-    }*/
-
-    .divVisible {
-        display: block;
-    }
-
-    .divHidden {
-        display: none;
-    }
-</style>
 
 <div class="container-fluid">
     <div class="row">
         <div class="col-4">
             <h3>Core Model History</h3>
         </div>
-        <div class="col-8 @showDiv">
+        <div class="col-8">
             <button style="padding:5px;" class="btn btn-link" @onclick="@(() => showPieChart = true)">Pie Chart</button>
             <button style="padding:5px;" class="btn btn-link" @onclick="@(() => showPieChart = false)">Data table</button>
         </div>
     </div>
     <div class="row">
-        <div class="col-4">
-            <DataGrid Items="@modelVersionList" TItem="Model">
-                <HeaderTemplate>
-                    <th>Version</th>
-                    <th>Start Date</th>
-                    <th>Stop Date</th>
-                    <th>Action</th>
-                </HeaderTemplate>
-                <RowTemplate>
-                    <td>@context.Version</td>
-                    <td>@context.StartDate.ToShortDateString()</td>
-                    <td>@FormatStopDate(context.StopDate, context.IsActive)</td>
-                    <td><button class="btn btn-primary" @onclick="@(() => ShowVersionInfo(@context))">Show</button></td>
-                </RowTemplate>
-            </DataGrid>
-        </div>
+     
         <div class="col-8">
             <div class="container-fluid">
                 <div class="row">
@@ -57,14 +29,7 @@
                         <div class="col-6">
                             <PieChart Height="300" Width="300" PieSlices="@modelSlices" />
                         </div>
-                        <div class="col-6">
-                            @modelVersionDescription
-                        </div>
-                    }
-                    else
-                    {
-                        <ModelEquityGrid ModelId="@appSettings.CoreModel.Id" ModelEquityList="@modelEquityList"/>
-                    }
+                    }                   
                 </div>
             </div>
         </div>
@@ -78,19 +43,10 @@
     ContentService contentService = new ContentService();
     bool showPieChart = true;
 
-    string showDiv = "divHidden";
-
-    string modelVersionId = string.Empty;
-
-    string modelVersionDescription = string.Empty;
-
-    protected async Task ShowVersionInfo(Model model)
+    protected async Task ShowInfo(Model model)
     {
-        showDiv = "divVisible";
 
-        modelVersionId = model.ModelVersionId.ToString();
-
-        modelEquityList = await httpClient.GetFromJsonAsync<List<ModelItem>>($"quote/getmodelbydate?modelId={appSettings.CoreModelId}&versionNumber={model.Version}&date={model.StartDate}");
+        modelEquityList = await httpClient.GetFromJsonAsync<List<ModelItem>>($"quote/getmodelbydate?modelId={appSettings.CoreModelId}&date={model.StartDate}");
 
         int i = 1;
         modelSlices.Clear();
@@ -105,10 +61,7 @@
             i++;
         }
 
-        //modelVersionDescription = contentService.GetModelVersionDescription(model.Version);
     }
-
-
 
 
     protected string FormatStopDate(DateTime stopDate, bool isActive)
@@ -127,11 +80,9 @@
         return isActive == true ? "(active)" : "";
     }
 
-    List<Model> modelVersionList = new List<Model>();
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        modelVersionList = await httpClient.GetFromJsonAsync<List<Model>>($"model/getmodelversions?modelId={appSettings.CoreModelId}");
-
+      
     }
 }

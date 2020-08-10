@@ -1,8 +1,10 @@
 ﻿@inject AppState appState
+@inject AppSettings appSettings
+
 
 <select id="equityDDL" @onchange="HandleSelection">
 	<option></option>
-	@foreach (var equity in appState.AllEquities)
+	@foreach (var equity in appSettings.AllEquities)
 	{
 		<option value="@equity.Symbol">@equity.SymbolName</option>
 	}

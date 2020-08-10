@@ -12,15 +12,13 @@ namespace SectorModel.Shared.Entities
 
         public Guid ModelId { get; set; }
 
-        public Guid EquityID { get; set; }      
+        public Guid EquityId { get; set; }      
 
         public decimal Percentage { get; set; }
 
         public decimal Cost { get; set; }
 
         public decimal Shares { get; set; }
-
-        public int Version { get; set; }
 
         [NotMapped]
         public Equity Equity { get; set; }

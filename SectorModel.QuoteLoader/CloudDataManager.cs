@@ -67,10 +67,12 @@ namespace SectorModel.QuoteLoader
 
             var modelItems = await GetModelItems(coreModelId);
 
-            foreach (ModelItem item in modelItems)
-            {
-                egiList.Add(await GetEquity(item.EquityID));
-            }
+            // foreach (ModelItem item in modelItems)
+            // {
+            //     egiList.Add(await GetEquity(item.EquityId));
+            // }
+
+			egiList.Add(new Equity{Symbol="XLRE", SymbolName="The Real Estate Select Sector SPDR Fund",Id= new Guid("e16836ea-056a-4187-9a99-961d77196865")});
 
             JsonSerializerOptions options = new JsonSerializerOptions
             {

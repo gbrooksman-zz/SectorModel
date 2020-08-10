@@ -15,6 +15,5 @@ namespace SectorModel.Client.Entities
         public List<ModelItem> CurrentModelItems { get; set; }
 		public Model CurrentModel { get; set; }
         public List<Model> AllUserModels { get; set; }
-		public List<Equity> AllEquities { get; set; }
     }
 }

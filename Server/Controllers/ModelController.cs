@@ -64,6 +64,52 @@ namespace SectorModel.Server.Controllers
             }
         }
 
+		[HttpGet]
+        [Route("GetWithItems")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<Model>> GetWithItems(Guid modelId)
+        {
+            Model model = await mMgr.GetModelFull(modelId);
+
+            if (model == null)
+            {
+                return BadRequest(model);
+            }
+            else
+            {
+                return Ok(model);
+            }
+        }
+
+		[HttpGet]
+        [Route("GetModelFullWithPrices")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<Model>> GetModelFullWithPrices(Guid modelId, DateTime quoteDate)
+        {
+            Model model = await mMgr.GetModelFullWithPrices(modelId, quoteDate);
+
+            if (model == null)
+            {
+                return BadRequest(model);
+            }
+            else
+            {
+                return Ok(model);
+            }
+        }
+
+
+		[HttpGet]
+        [Route("GetItems")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<ModelItem>>> GetItems(Guid modelId)
+        {
+            List<ModelItem> modelItems = await miMgr.GetModelItems(modelId);
+            return Ok(modelItems);
+        }
+
         [HttpGet]
         [Route("GetCoreModel")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

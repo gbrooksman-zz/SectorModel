@@ -21,14 +21,46 @@
     </div>
     <div class="row">
         <div class="col-12">
-           <ModelEquityGrid ModelId="@model.Id" ModelEquityList="@modelEquityList"/>
+           <DataGrid Items="@modelEquityList" TItem="ModelItem" Context="m">
+				<HeaderTemplate>
+					<th>Symbol</th>
+					<th>Name</th>
+					<th>Percent</th>
+					<th>Last Price</th>
+				</HeaderTemplate>
+				<RowTemplate>
+					<td>@m.Equity.Symbol</td>
+					<td>@m.Equity.SymbolName</td>
+					<td>@Math.Round(m.Percentage, 0)</td>
+					<td>@m.LastPrice</td>
+				</RowTemplate>
+				<FooterTemplate>
+					<td colspan="4">
+						Equities in Model: @m.Count
+					</td>
+					<td>
+						Total Cost: @totalCost.ToString("n")
+					</td>
+					<td>
+						Current Value: @totalValue.ToString("n")
+					</td>
+					<td>
+						Overall: (totalValue - totalCost).ToString("n")
+					</td>
+				</FooterTemplate>
+			</DataGrid>
+
         </div>
     </div>
 </div>
 
 @code
 {
+	decimal totalValue = 0;
+    decimal totalCost = 0;
+
     List<ModelItem> modelEquityList = new List<ModelItem>();
+
     Model model = new Model();
 
 	[Parameter]
@@ -45,6 +77,22 @@
 			model = appSettings.CoreModel;
 		}	
 	
-        modelEquityList = await httpClient.GetFromJsonAsync<List<ModelItem>>($"quote/getmodelbydate?modelId={model.Id}&date={DateTime.Now.Date}&versionNumber={model.Version}").ConfigureAwait(false);
+        modelEquityList = await httpClient.GetFromJsonAsync<List<ModelItem>>($"quote/GetModelItemPrices?modelId={model.Id}&quotedate={DateTime.Now}");
+
+	}
+
+	private decimal GetValue(decimal inValue)
+    {
+        totalValue += inValue;
+        return inValue;
     }
+
+    private decimal GetCost(decimal inValue)
+    {
+        totalCost += inValue;
+        return inValue;
+    }
+
+
+
 }

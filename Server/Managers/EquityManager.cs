@@ -146,7 +146,7 @@ namespace SectorModel.Server.Managers
         public async Task<bool> IsEquityInAnyModel(Guid equityId)
         {
             using var db = new ReadContext(appSettings);
-            return await db.ModelItems.Where(m => m.EquityID == equityId).AnyAsync();
+            return await db.ModelItems.Where(m => m.EquityId == equityId).AnyAsync();
         }
 
         public async Task<bool> Delete(Guid equityId)

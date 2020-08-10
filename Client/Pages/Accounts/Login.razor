@@ -111,14 +111,15 @@
 
 		appSettings.SPDRModel =  await httpClient.GetFromJsonAsync<Model>("model/getspdrmodel");
 
-		//=============================================================================================
-		//initialize state
-
-		if (appState.AllEquities == null)
+		if (appSettings.AllEquities == null)
         {
-            appState.AllEquities = await httpClient.GetFromJsonAsync<List<Equity>>("equity/getall");
+            appSettings.AllEquities = await httpClient.GetFromJsonAsync<List<Equity>>("equity/getall");
         }
 
+		//=============================================================================================
+		//initialize state
+	
+	
 		if (appState.CurrentUser == null)
 		{
 			appState.CurrentUser = await httpClient.GetFromJsonAsync<User>($"user/get?email={formUser.Email}");

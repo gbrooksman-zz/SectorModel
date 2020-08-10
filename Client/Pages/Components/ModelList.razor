@@ -18,7 +18,6 @@
         <th>Start Value</th>
         <th>Stop Value</th>
         <th>Gain/Loss</th>
-        <th>Version</th>
         <th>Actions</th>
     </HeaderTemplate>
     <RowTemplate>
@@ -30,7 +29,6 @@
         <td>@m.StartValue.ToString("n")</td>
         <td>@m.StopValue.ToString("n")</td>
         <td>@Utils.CalcGainLoss(m.StartValue, m.StopValue).ToString("n") </td>
-		<td>@m.Version</td>
         <td>
              <input type="button" id="btnDetails" class="btn btn-info" @onclick="@( () => { EditModel(@m.Id); } )" value="Details" />
 			 <input type="button" id="btnConfigure" class="btn btn-info" @onclick="@( () => { Configure(@m.Id); } )" value="Configure" />
@@ -50,12 +48,12 @@
 
     private void EditModel(Guid modelId)
     {
-        nav.NavigateTo($"/ModelEdit/{modelId}/true");
+		nav.NavigateTo($"/ModelEdit/{modelId}/true");
     }
 
  	private void Configure(Guid modelId)
     {
-        nav.NavigateTo($"/ModelItemList/{modelId}");
+       nav.NavigateTo($"/ModelItemList/{modelId}/true/true");
     }
 
 	  private void AddModel()

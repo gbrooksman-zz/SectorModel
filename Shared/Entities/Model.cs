@@ -30,14 +30,9 @@ namespace SectorModel.Shared.Entities
 
         public decimal StartValue { get; set; }
 
-        public decimal StopValue { get; set; }
-	
-        public int Version { get; set; }
-
+        public decimal StopValue { get; set; }	
 	
         public bool IsPrivate { get; set; }
-
-        public Guid ModelVersionId { get; set; }
 
 		[NotMapped]
 		public List<ModelItem> ItemList { get; set; }

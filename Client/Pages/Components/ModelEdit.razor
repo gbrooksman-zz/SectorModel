@@ -53,7 +53,6 @@
 
 	<div class="card">
 		<div class="card-body">
-			<label>Version: @model.Version</label>
 			<label>Created: @model.CreatedAt</label>
 			<label>Updated: @model.UpdatedAt</label>
 		</div>
@@ -93,7 +92,6 @@
 			model.IsActive = true;
 			model.IsPrivate = true;
 			model.StopDate = DateTime.Now.AddYears(3);
-			model.Version = 1;
 		}		
 	}
 

@@ -15,6 +15,8 @@ namespace SectorModel.Server.Managers
         {
             cache = _cache;
             config = _config;
-        }
+        
+		}
+
     }
 }

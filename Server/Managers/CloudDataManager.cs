@@ -66,7 +66,7 @@ namespace SectorModel.Server.Managers
 
             foreach (ModelItem item in modelItems)
             {
-                egiList.Add(await eMgr.Get(item.EquityID));
+                egiList.Add(await eMgr.Get(item.EquityId));
             }
 
             JsonSerializerOptions options = new JsonSerializerOptions

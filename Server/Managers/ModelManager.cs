@@ -76,7 +76,58 @@ namespace SectorModel.Server.Managers
             return model;
         }   
 
-       
+		public async Task<Model> GetModelFull(Guid modelId)
+        {
+            Model model = new Model();
+            try
+            {
+                using (var db = new ReadContext(appSettings))
+                {                    
+                    model = await db.Models
+                                        .Where(i => i.Id == modelId)
+                                        .FirstOrDefaultAsync();
+
+					model.ItemList = await db.ModelItems
+										.Where( m => m.ModelId == modelId)
+										.ToListAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "ModelManager::GetModelFull");
+                throw;
+            }
+
+            return model;
+        }   
+
+		public async Task<Model> GetModelFullWithPrices(Guid modelId, DateTime quoteDate)
+        {
+            Model model = new Model();
+			List<ModelItem> fullItems = new List<ModelItem>();
+            try
+            {
+                using (var db = new ReadContext(appSettings))
+                {                    
+                    model = await db.Models
+                                        .Where(i => i.Id == modelId)
+                                        .FirstOrDefaultAsync();
+
+					model.ItemList = await db.ModelItems
+										.Where( m => m.ModelId == modelId)
+										.ToListAsync();
+
+					model.ItemList = await qMgr.GetModelItemsWithPrices(model, quoteDate);					
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "ModelManager::GetModelFullWithPrices");
+                throw;
+            }
+
+            return model;
+        }   
 
         public async Task<bool> CheckDateRange(Guid modelId, DateTime startdate, DateTime stopdate)
         {
