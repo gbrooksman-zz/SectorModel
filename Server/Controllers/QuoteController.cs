@@ -118,6 +118,21 @@ namespace SectorModel.Server.Controllers
         }
 
 		[HttpGet]
+        [Route("GetList")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<Quote>>> GetList(DateTime quoteDate)
+        {
+            List<Quote> quoteList = await qMgr.GetList(quoteDate);
+
+            if (quoteList == null)
+            {
+                return BadRequest(quoteList);            
+            }
+            return Ok(quoteList);
+        }
+
+		[HttpGet]
         [Route("GetModelItemPrices")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<ModelItem>>> GetModelItemPrices(Guid modelId, DateTime quoteDate)

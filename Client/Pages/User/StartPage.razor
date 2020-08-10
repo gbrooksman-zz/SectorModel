@@ -10,7 +10,7 @@
 
 <AppHeader/>
 
-<ModelList UserModelList="@appState.AllUserModels"/>
+<ModelList UserModelList="@modelList"/>
 
  <div class="container">
 	<div class="row">
@@ -26,6 +26,13 @@
 
 @code
 {
+	List<Model> modelList = new List<Model>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		modelList = await httpClient.GetFromJsonAsync<List<Model>>($"model/GetModelList?userId={appState.CurrentUser.Id}");
+	}
+
 	private void GoToCoreModel()
 	{		
 		nav.NavigateTo($"/Core/CoreModel/false");

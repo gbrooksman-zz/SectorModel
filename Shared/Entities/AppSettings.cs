@@ -18,6 +18,7 @@ namespace SectorModel.Shared.Entities
         public string DBConnectionString { get; set; } 
         public string IEXCloudAPIKey { get; set; }		
 		public List<Equity> AllEquities { get; set; }
+		public List<Quote> LatestQuotes { get; set; }
 
 
     }

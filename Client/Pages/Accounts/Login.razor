@@ -116,6 +116,11 @@
             appSettings.AllEquities = await httpClient.GetFromJsonAsync<List<Equity>>("equity/getall");
         }
 
+		if (appSettings.LatestQuotes == null)
+		{
+			appSettings.LatestQuotes = await httpClient.GetFromJsonAsync<List<Quote>>($"quote/getlist?quoteDate={DateTime.Now}");
+		}
+
 		//=============================================================================================
 		//initialize state
 	
@@ -129,6 +134,8 @@
 		{
 			appState.AllUserModels = await httpClient.GetFromJsonAsync<List<Model>>($"model/getmodellist?userId={appState.CurrentUser.Id}");
 		}
+
+
 
 		//=============================================================================================
 

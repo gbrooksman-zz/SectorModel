@@ -46,14 +46,13 @@
     [Parameter]
     public List<Model> UserModelList { get; set; }
 
-	decimal stopValue;
 
-	@* protected override async Task OnInitializedAsync() 
+	protected override async Task OnInitializedAsync() 
 	{
 
 		
-	}	 *@
-
+	}
+	
     private void EditModel(Guid modelId)
     {
 		nav.NavigateTo($"/Models/ModelEdit/{modelId}/true");

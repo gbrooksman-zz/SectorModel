@@ -26,7 +26,7 @@
 				<div class="modal-body">
 					<div class="row">
 						<div class="col-12">
-							<ModelItemEdit EditModelItem="@modelItem" /> 
+							<ModelItemEdit EditModelItem="@modelItem" Model="@model"/> 
 						</div>
 					</div>                            
 					<br />
@@ -132,8 +132,7 @@
 	List<ModelItem> modelEquityList = new List<ModelItem>();
 
     protected override async Task OnInitializedAsync()
-    {	
-		//model = await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={modelId}");
+    {
 		model = await httpClient.GetFromJsonAsync<Model>($"model/GetModelFullWithPrices?modelId={modelId}&quoteDate={DateTime.Now}");
 		modelEquityList = model.ItemList;
 	}
@@ -158,6 +157,7 @@
 	private void EditItem(ModelItem item)
 	{
 		modelItem = item;
+		modelItem.ModelId = modelId;
 		ShowDialog = true;
 	}
 

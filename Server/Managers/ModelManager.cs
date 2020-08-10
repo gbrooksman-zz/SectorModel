@@ -53,7 +53,7 @@ namespace SectorModel.Server.Managers
 
 					if (model.StopDate > DateTime.Now)
 					{
-						pricedModel = await GetModelFullWithPrices(model.Id, model.StopDate);
+						pricedModel = await GetModelFullWithPrices(model.Id, DateTime.Now);
 					}
 					else
 					{
@@ -133,7 +133,9 @@ namespace SectorModel.Server.Managers
 										.Where( m => m.ModelId == modelId)
 										.ToListAsync();
 
-					model.ItemList = await qMgr.GetModelItemsWithPrices(model, quoteDate);					
+					model.ItemList = await qMgr.GetModelItemsWithPrices(model, quoteDate);	
+					
+					model.StopValue = model.ItemList.Sum(m => m.CurrentValue);				
                 }
             }
             catch (Exception ex)

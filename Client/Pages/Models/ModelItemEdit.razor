@@ -10,13 +10,16 @@
 	<DataAnnotationsValidator />
     <ValidationSummary />
 
-<select id="equityDDL" @bind="selectedSymbol">
-	<option></option>
-	@foreach (var equity in appSettings.AllEquities)
-	{
-		<option value="@equity.Symbol">@equity.SymbolName</option>
-	}
-</select>
+	@EditModelItem.ModelId.ToString()
+	<br/>
+
+	<select id="equityDDL" @bind="selectedSymbol">
+		<option></option>
+		@foreach (var equity in appSettings.AllEquities)
+		{
+			<option value="@equity.Symbol">@equity.SymbolName</option>
+		}
+	</select>
 
 	<div class="form-control">
 			<label>Percent of Overall Model:</label>
@@ -35,26 +38,40 @@
 </EditForm>
 
 @code
-{
-	
+{	
 
 	[Parameter]
     public ModelItem EditModelItem { get; set; }
 
+	[Parameter]
+    public Model Model { get; set; }
+
 	public string selectedSymbol;
+
+
 	void HandleSelection(ChangeEventArgs e)
     {
         selectedSymbol = e.Value.ToString();
 
     }
 
+	protected override void OnInitialized()
+	{
+		EditModelItem.ModelId = Model.Id;
+	}
+
 	private async Task HandleValidSubmit()
     { 
 		Equity eq = appSettings.AllEquities.Where( e => e.Symbol == selectedSymbol).FirstOrDefault();
+
+		Quote lastQuote = appSettings.LatestQuotes.Where(q => q.EquityId == eq.Id).FirstOrDefault();
+		
 		EditModelItem.EquityId = eq.Id;
 		EditModelItem.Equity = eq;
+		EditModelItem.Cost = (Model.StartValue * (EditModelItem.Percentage / 100));
+		EditModelItem.Shares = Math.Round((EditModelItem.Cost / lastQuote.Price),0);
 
-		HttpResponseMessage response = await httpClient.PostAsJsonAsync("model/saveitem", EditModelItem);
+		HttpResponseMessage response = await httpClient.PostAsJsonAsync<ModelItem>("model/saveitem", EditModelItem);
 		
 		appState.AllUserModels = await httpClient.GetFromJsonAsync<List<Model>>($"model/getmodellist?userId={appState.CurrentUser.Id}");
 
