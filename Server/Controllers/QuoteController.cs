@@ -132,27 +132,6 @@ namespace SectorModel.Server.Controllers
             return Ok(quoteList);
         }
 
-		// [HttpGet]
-        // [Route("GetModelItemPrices")]
-        // [ProducesResponseType(StatusCodes.Status200OK)]
-        // public async Task<ActionResult<List<ModelItem>>> GetModelItemPrices(Guid modelId, DateTime quoteDate)
-        // {
-		// 	Model model = await mMgr.GetModel(modelId, quoteDate);
-
-		// 	List<ModelItem> items = new List<ModelItem>();
-
-		// 	foreach (ModelItem mi in model.ItemList)
-		// 	{
-		// 		Quote quote = await qMgr.GetLast(mi.EquityId);
-		// 		mi.LastPrice = quote.Price;
-		// 		mi.LastPriceDate = quote.Date;
-		// 		mi.Equity = await eMgr.Get(mi.EquityId);
-		// 		mi.CurrentValue = mi.Shares * mi.LastPrice;				
-		// 		items.Add(mi);	
-		// 	}
-            
-        //     return Ok(items);
-        // }
 
         [HttpGet]
         [Route("GetLastQuoteDate")]

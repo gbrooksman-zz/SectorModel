@@ -65,8 +65,8 @@
 					<th>Percent</th>
 					<th>Last Price</th>
 					<th>Shares</th>
-					<th>Current Value</th>
 					<th>Cost</th>
+					<th>Current Value</th>					
 					<th>Gain/Loss</th>
 					@if(CanEdit)
 					{
@@ -74,20 +74,20 @@
 					}
 				</HeaderTemplate>
 				<RowTemplate>
-					<td>@m.Equity.Symbol</td>
-					<td>@m.Equity.SymbolName</td>
-					<td>@Math.Round(m.Percentage, 0)</td>
-					<td>@m.LastPrice</td>
+					<td> @m.Equity.Symbol</td>
+					<td> @m.Equity.SymbolName</td>
+					<td> @Math.Round(m.Percentage, 0)</td>
+					<td> @m.LastPrice</td>
 					<td> @m.Shares</td>
-					<td> @GetValue(m.CurrentValue)</td>
 					<td> @GetCost(m.Cost)</td>
-					<td>@Utils.CalcGainLoss(m.CurrentValue, m.Cost) </td>
+					<td> @GetValue(m.CurrentValue)</td>					
+					<td> @Utils.CalcGainLoss(m.CurrentValue, m.Cost) </td>
 
 					@if(CanEdit)
 					{
 						<td>
 							<input type="button" class="btn btn-secondary" value="Edit" @onclick="( () => {EditItem(m);})"/>
-							</td>
+						</td>
 					}
 				</RowTemplate>
 				<FooterTemplate>
@@ -95,13 +95,16 @@
 						Equities in Model: @m.Count
 					</td>
 					<td>
-						Total Cost: @Utils.FormatNumber(totalCost);
+						Totals: 
 					</td>
 					<td>
-						Current Value: @Utils.FormatNumber(totalValue);
+						@Utils.FormatNumber(totalCost)
 					</td>
 					<td>
-						Overall:  @Utils.FormatNumber(totalValue - totalCost);
+						@Utils.FormatNumber(totalValue)
+					</td>
+					<td>
+						@Utils.CalcGainLoss(totalValue, totalCost)
 					</td>
 				</FooterTemplate>
 			</DataGrid>

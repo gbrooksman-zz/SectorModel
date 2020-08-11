@@ -97,6 +97,12 @@ namespace SectorModel.Server.Managers
 
             return model;    
         }   
+
+		public async Task<Model> Get(Guid modelId)
+        {
+			using (var db = new ReadContext(appSettings))
+			return await db.Models.FindAsync(modelId);  
+        }   
 	
         public async Task<Model> Save(Model model)
         {            

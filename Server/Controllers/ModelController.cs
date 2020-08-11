@@ -48,6 +48,14 @@ namespace SectorModel.Server.Controllers
             return Ok(model);
         }		
       
+	    [HttpGet]
+        [Route("GetSimple")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<Model>> GetSimple(Guid modelId)
+        {
+            Model model = await mMgr.Get(modelId);           
+            return Ok(model);
+        }		
        
 		[HttpPost]
         [Route("Save")]

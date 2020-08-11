@@ -57,9 +57,22 @@ namespace SectorModel.QuoteLoader
             return inDate.ToString("yyyyMMdd");
         }
 
+		public async Task<DateTime> GetLastQuoteDate()
+        {
+            DateTime lastDate = new DateTime(2015, 1, 1);
+
+            using var db = new ReadContext(appSettings);
+            if (db.Quotes.Count() > 0)
+            {
+                lastDate = await db.Quotes.MaxAsync(q => q.Date);
+            }
+
+            return lastDate;
+        }
+
         public async Task<bool> UpdateQuotes(Guid coreModelId)
         {
-            DateTime lastQuoteDate = new DateTime(2015,1,1);
+            DateTime lastQuoteDate = await GetLastQuoteDate();
 
             List<string> datesToLoad = GetDatesToLoad(lastQuoteDate);
 
@@ -67,12 +80,12 @@ namespace SectorModel.QuoteLoader
 
             var modelItems = await GetModelItems(coreModelId);
 
-            // foreach (ModelItem item in modelItems)
-            // {
-            //     egiList.Add(await GetEquity(item.EquityId));
-            // }
+            foreach (ModelItem item in modelItems)
+            {
+                egiList.Add(await GetEquity(item.EquityId));
+            }
 
-			egiList.Add(new Equity{Symbol="XLRE", SymbolName="The Real Estate Select Sector SPDR Fund",Id= new Guid("e16836ea-056a-4187-9a99-961d77196865")});
+		//	egiList.Add(new Equity{Symbol="XLRE", SymbolName="The Real Estate Select Sector SPDR Fund",Id= new Guid("e16836ea-056a-4187-9a99-961d77196865")});
 
             JsonSerializerOptions options = new JsonSerializerOptions
             {

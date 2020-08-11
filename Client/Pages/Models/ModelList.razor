@@ -28,7 +28,7 @@
         <td>@m.StopDate</td>
         <td>@Utils.FormatNumber(m.StartValue)</td>
         <td>@Utils.FormatNumber(m.StopValue)</td>
-        <td>@Utils.CalcGainLoss(m.StartValue, m.StopValue) </td>
+        <td>@Utils.CalcGainLoss(m.StopValue, m.StartValue) </td>
         <td>
              <input type="button" id="btnDetails" class="btn btn-info" @onclick="@( () => { EditModel(@m.Id); } )" value="Details" />
 			 <input type="button" id="btnConfigure" class="btn btn-info" @onclick="@( () => { Configure(@m.Id); } )" value="Configure" />

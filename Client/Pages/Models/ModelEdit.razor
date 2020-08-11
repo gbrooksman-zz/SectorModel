@@ -82,7 +82,7 @@
     {
 		if (IsEdit)
 		{
-        	model = await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={modelId}");
+        	model = await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={modelId}&quoteDate={DateTime.Now}");
 			model.StopValue = model.ItemList.Sum(i => i.CurrentValue);
 		}	
 		else
