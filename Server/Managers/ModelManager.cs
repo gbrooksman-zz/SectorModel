@@ -17,8 +17,7 @@ namespace SectorModel.Server.Managers
         private readonly IConfiguration config;
         private readonly AppSettings appSettings;
 
-        public ModelManager(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings
-) : base(_cache, _config)
+        public ModelManager(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings) : base(_cache, _config)
         {
             appSettings = _appSettings;
             config = _config;
@@ -53,11 +52,11 @@ namespace SectorModel.Server.Managers
 
 					if (model.StopDate > DateTime.Now)
 					{
-						pricedModel = await GetModelFullWithPrices(model.Id, DateTime.Now);
+						pricedModel = await GetModel(model.Id, DateTime.Now);
 					}
 					else
 					{
-						pricedModel = await GetModelFullWithPrices(model.Id, model.StopDate);
+						pricedModel = await GetModel(model.Id, model.StopDate);
 					}
 					pricedModelList.Add(pricedModel);
 				}				
@@ -71,56 +70,10 @@ namespace SectorModel.Server.Managers
             return pricedModelList;
         }
 
-        public async Task<Model> GetModel(Guid modelId)
+        public async Task<Model> GetModel(Guid modelId, DateTime quoteDate)
         {
             Model model = new Model();
-            try
-            {
-                using (var db = new ReadContext(appSettings))
-                {                    
-                    model = await db.Models
-                                        .Where(i => i.Id == modelId)
-                                        .FirstOrDefaultAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "ModelManager::GetModel");
-                throw;
-            }
-
-            return model;
-        }   
-
-		public async Task<Model> GetModelFull(Guid modelId)
-        {
-            Model model = new Model();
-            try
-            {
-                using (var db = new ReadContext(appSettings))
-                {                    
-                    model = await db.Models
-                                        .Where(i => i.Id == modelId)
-                                        .FirstOrDefaultAsync();
-
-					model.ItemList = await db.ModelItems
-										.Where( m => m.ModelId == modelId)
-										.ToListAsync();
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "ModelManager::GetModelFull");
-                throw;
-            }
-
-            return model;
-        }   
-
-		public async Task<Model> GetModelFullWithPrices(Guid modelId, DateTime quoteDate)
-        {
-            Model model = new Model();
-			List<ModelItem> fullItems = new List<ModelItem>();
+			//List<ModelItem> fullItems = new List<ModelItem>();
             try
             {
                 using (var db = new ReadContext(appSettings))
@@ -134,26 +87,33 @@ namespace SectorModel.Server.Managers
 										.ToListAsync();
 
 					model.ItemList = await qMgr.GetModelItemsWithPrices(model, quoteDate);	
+
+					List<ModelItem> items = new List<ModelItem>();
+
+					foreach (ModelItem mi in model.ItemList)
+					{
+						Quote quote = await qMgr.GetLast(mi.EquityId);
+						mi.LastPrice = quote.Price;
+						mi.LastPriceDate = quote.Date;
+						mi.Equity = await eqMgr.Get(mi.EquityId);
+						mi.CurrentValue = mi.Shares * mi.LastPrice;				
+						items.Add(mi);	
+					}
+
+					model.ItemList = items;
 					
 					model.StopValue = model.ItemList.Sum(m => m.CurrentValue);				
                 }
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "ModelManager::GetModelFullWithPrices");
+                Log.Error(ex, "ModelManager::GetModel");
                 throw;
             }
 
-            return model;
+            return model;    
         }   
-
-        public async Task<bool> CheckDateRange(Guid modelId, DateTime startdate, DateTime stopdate)
-        {
-            List<Model> modelList = await GetModelList(modelId);
-
-            return modelList.Where(m => m.StartDate >= startdate && m.StopDate <= stopdate).Any();
-        }     
-
+	
         public async Task<Model> Save(Model model)
         {            
             try

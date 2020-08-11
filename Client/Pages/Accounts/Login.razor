@@ -107,9 +107,9 @@
 
         appSettings.LastQuoteDate = await httpClient.GetFromJsonAsync<DateTime>("quote/getlastquotedate");
 
-        appSettings.CoreModel =  await httpClient.GetFromJsonAsync<Model>("model/getcoremodel");
+        appSettings.CoreModel =  await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={appSettings.CoreModelId}&quoteDate={DateTime.Now}");
 
-		appSettings.SPDRModel =  await httpClient.GetFromJsonAsync<Model>("model/getspdrmodel");
+		appSettings.SPDRModel =  await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={appSettings.SPDRModelId}&quoteDate={DateTime.Now}");
 
 		if (appSettings.AllEquities == null)
         {
@@ -132,7 +132,7 @@
 
 		if (appState.AllUserModels == null)
 		{
-			appState.AllUserModels = await httpClient.GetFromJsonAsync<List<Model>>($"model/getmodellist?userId={appState.CurrentUser.Id}");
+			appState.AllUserModels = await httpClient.GetFromJsonAsync<List<Model>>($"model/getlist?userId={appState.CurrentUser.Id}");
 		}
 
 

@@ -7,15 +7,8 @@
 @using System.Collections.Generic
 @layout MainLayout
 
-@using SectorModel.Client.Common.Menu
 
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <AppMenu MenuBuilder="@menuBuilderTop" />
-            <br />
-        </div>
-    </div>
     <div class="row">
         <div class="col-12">
             <h4>Welcome to the Sector Model Guide</h4>
@@ -65,16 +58,9 @@
 
 @code
 {
-    protected MenuBuilder menuBuilderTop = new MenuBuilder();
-
     protected override void OnInitialized()
     {
 
- 		menuBuilderTop.AddItem(1, "Home", "/")
-                  .AddItem(2, "Current Model", "coregroup")
-                  .AddItem(3, "Past Models", "corehistory")
-                  .AddItem(4, "ETF List", "etflist")
-                  .AddItem(5, "Line Test", "linetest")
-                  .AddItem(6, "Sign Up", "Accounts/Signup");   
+ 	
     }
 }

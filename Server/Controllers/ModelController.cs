@@ -29,10 +29,10 @@ namespace SectorModel.Server.Controllers
         }
 
         [HttpGet]
-        [Route("GetModelList")]
+        [Route("GetList")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<Model>>> GetModelList(Guid userId)
+        public async Task<ActionResult<List<Model>>> GetList(Guid userId)
         {
             List<Model> modelList = await mMgr.GetModelList(userId);
 
@@ -40,157 +40,14 @@ namespace SectorModel.Server.Controllers
         }               
 
         [HttpGet]
-        [Route("GetModel")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<Model>> GetModel(Guid modelId)
-        {
-            return await Get(modelId);
-        }
-
-        [HttpGet]
         [Route("Get")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<Model>> Get(Guid modelId)
+        public async Task<ActionResult<Model>> Get(Guid modelId, DateTime quoteDate)
         {
-            Model model = await mMgr.GetModel(modelId);
-
-            if (model == null)
-            {
-                return BadRequest(model);
-            }
-            else
-            {
-                return Ok(model);
-            }
-        }
-
-		[HttpGet]
-        [Route("GetWithItems")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<Model>> GetWithItems(Guid modelId)
-        {
-            Model model = await mMgr.GetModelFull(modelId);
-
-            if (model == null)
-            {
-                return BadRequest(model);
-            }
-            else
-            {
-                return Ok(model);
-            }
-        }
-
-		[HttpGet]
-        [Route("GetModelFullWithPrices")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<Model>> GetModelFullWithPrices(Guid modelId, DateTime quoteDate)
-        {
-            Model model = await mMgr.GetModelFullWithPrices(modelId, quoteDate);
-
-            if (model == null)
-            {
-                return BadRequest(model);
-            }
-            else
-            {
-                return Ok(model);
-            }
-        }
-
-		[HttpGet]
-        [Route("GetModelValue")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<decimal>> GetModelValue(Guid modelId, DateTime quoteDate)
-        {
-			decimal currentValue = 0;
-
-            Model model = await mMgr.GetModelFullWithPrices(modelId, quoteDate);
-
-			currentValue = model.ItemList.Sum(m => m.CurrentValue);
-
-            if (model == null)
-            {
-                return BadRequest(model);
-            }
-            else
-            {
-                return Ok(model);
-            }
-        }
-
-
-		[HttpGet]
-        [Route("GetItems")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<ModelItem>>> GetItems(Guid modelId)
-        {
-            List<ModelItem> modelItems = await miMgr.GetModelItems(modelId);
-            return Ok(modelItems);
-        }
-
-        [HttpGet]
-        [Route("GetCoreModel")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<Model>> GetCoreModel()
-        { 
-
-			Model model = new Model();
-
-			if (appSettings.CoreModel == null)
-			{
-            	model = await mMgr.GetModel(appSettings.CoreModelId);
-				appSettings.CoreModel = model;
-			}
-			else
-			{
-				model = appSettings.CoreModel;
-			}
-
-            if (model == null)
-            {
-                return BadRequest(model);
-            }
-            else
-            {
-                return Ok(model);
-            }
-        }
-
-		[HttpGet]
-        [Route("GetSPDRModel")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<Model>> GetSPDRModel()
-        { 
-
-			Model model = new Model();
-
-			if (appSettings.SPDRModel == null)
-			{
-            	model = await mMgr.GetModel(appSettings.SPDRModelId);
-				appSettings.SPDRModel = model;
-			}
-			else
-			{
-				model = appSettings.SPDRModel;
-			}
-
-            if (model == null)
-            {
-                return BadRequest(model);
-            }
-            else
-            {
-                return Ok(model);
-            }
-		}
+            Model model = await mMgr.GetModel(modelId, quoteDate);           
+            return Ok(model);
+        }		
+      
        
 		[HttpPost]
         [Route("Save")]

@@ -30,7 +30,7 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		modelList = await httpClient.GetFromJsonAsync<List<Model>>($"model/GetModelList?userId={appState.CurrentUser.Id}");
+		modelList = await httpClient.GetFromJsonAsync<List<Model>>($"model/GetList?userId={appState.CurrentUser.Id}");
 	}
 
 	private void GoToCoreModel()

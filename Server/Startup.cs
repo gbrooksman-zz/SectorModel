@@ -36,6 +36,8 @@ namespace SectorModel.Server
             
             appState.IEXCloudAPIKey = Configuration.GetValue<string>("IEXCloudAPIKey");
 			appState.DBConnectionString = Configuration.GetValue<string>("DBConnectionString"); 
+			appState.CoreModelId = Guid.Parse(Configuration.GetValue<string>("CoreModelId"));
+			appState.SPDRModelId = Guid.Parse(Configuration.GetValue<string>("SPDRModelId"));
 
             services.AddSingleton(appState);
 

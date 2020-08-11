@@ -75,7 +75,7 @@
 	[Parameter]
 	public bool IsSPDR {get; set;}
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
 		if (IsSPDR)
 		{	
@@ -86,8 +86,7 @@
 			model = appSettings.CoreModel;
 		}	
 	
-        modelEquityList = await httpClient.GetFromJsonAsync<List<ModelItem>>($"quote/GetModelItemPrices?modelId={model.Id}&quotedate={DateTime.Now}");
-
+		modelEquityList = model.ItemList;
 	}
 
 	private MarkupString GetValue(decimal inValue)
