@@ -102,25 +102,34 @@ namespace SectorModel.Server.Managers
 		{
 			List<ModelItem> items = new List<ModelItem>();
 
-			quoteDate = await GetNearestQuoteDate(quoteDate);			
+			quoteDate = await GetNearestQuoteDate(quoteDate);
+
+            List<Quote> quoteList = await GetForDate(quoteDate);
+            List<Equity> equityList = await eqMgr.GetAll();
 
 			foreach (ModelItem mi in model.ItemList)
 			{
-				Quote quote = await GetByEquityIdAndDate(mi.EquityId, quoteDate);
-				if (quote != null)
-				{
-					mi.LastPrice = quote.Price;
-					mi.LastPriceDate = quote.Date;
-					mi.CurrentValue = mi.Shares * mi.LastPrice;	
-				}
-				
-				mi.Equity = await eqMgr.Get(mi.EquityId);
+                    Quote quote = quoteList.Where( q => q.EquityId == mi.EquityId).FirstOrDefault();
+                    if (quote != null)
+                    {
+                        mi.LastPrice = quote.Price;
+                        mi.LastPriceDate = quote.Date;
+                        mi.CurrentValue = mi.Shares * mi.LastPrice;
+                    }
+
+                mi.Equity = equityList.Where(e => e.Id == mi.EquityId).FirstOrDefault();
 				mi.ModelId = model.Id;										
 				items.Add(mi);	
 			}
 
 			return items;
 		}
+
+        public async Task <List<Quote>> GetForDate(DateTime quoteDate)
+        {
+            using (var db = new ReadContext(appSettings))
+            return  await db.Quotes.Where(q => q.Date == quoteDate).ToListAsync();
+          }
 
         public async Task<Quote> GetLast(Guid equityid)
         {

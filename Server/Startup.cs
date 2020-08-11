@@ -32,14 +32,14 @@ namespace SectorModel.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            AppSettings appState = new AppSettings();
-            
-            appState.IEXCloudAPIKey = Configuration.GetValue<string>("IEXCloudAPIKey");
-			appState.DBConnectionString = Configuration.GetValue<string>("DBConnectionString"); 
-			appState.CoreModelId = Guid.Parse(Configuration.GetValue<string>("CoreModelId"));
-			appState.SPDRModelId = Guid.Parse(Configuration.GetValue<string>("SPDRModelId"));
+            AppSettings appSettings = new AppSettings();
 
-            services.AddSingleton(appState);
+            appSettings.IEXCloudAPIKey = Configuration.GetValue<string>("IEXCloudAPIKey");
+            appSettings.DBConnectionString = Configuration.GetValue<string>("DBConnectionString");
+            appSettings.CoreModelId = Guid.Parse(Configuration.GetValue<string>("CoreModelId"));
+            appSettings.SPDRModelId = Guid.Parse(Configuration.GetValue<string>("SPDRModelId"));
+
+            services.AddSingleton(appSettings);
 
             services.AddControllersWithViews();
             services.AddRazorPages();

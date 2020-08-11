@@ -19,7 +19,13 @@ namespace SectorModel.Client
 
             builder.Services.AddTransient(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
-            builder.Services.AddSingleton(new AppSettings());
+            AppSettings appSettings = new AppSettings();
+
+            appSettings.CoreModelId = Guid.Parse("FAC8A666-74D8-4531-B3AD-DA7B95360462");
+            appSettings.SPDRModelId = Guid.Parse("4237E32A-5C60-4141-8658-FA357C28EF28");
+
+            builder.Services.AddSingleton(appSettings);
+
 			builder.Services.AddSingleton(new AppState());
 
             await builder.Build().RunAsync();

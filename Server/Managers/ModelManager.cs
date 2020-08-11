@@ -73,36 +73,20 @@ namespace SectorModel.Server.Managers
         public async Task<Model> GetModel(Guid modelId, DateTime quoteDate)
         {
             Model model = new Model();
-			//List<ModelItem> fullItems = new List<ModelItem>();
+
             try
             {
                 using (var db = new ReadContext(appSettings))
-                {                    
-                    model = await db.Models
-                                        .Where(i => i.Id == modelId)
-                                        .FirstOrDefaultAsync();
+                {
+                    model = await db.Models.FindAsync(modelId);
 
 					model.ItemList = await db.ModelItems
 										.Where( m => m.ModelId == modelId)
 										.ToListAsync();
 
-					model.ItemList = await qMgr.GetModelItemsWithPrices(model, quoteDate);	
+					model.ItemList = await qMgr.GetModelItemsWithPrices(model, quoteDate);
 
-					List<ModelItem> items = new List<ModelItem>();
-
-					foreach (ModelItem mi in model.ItemList)
-					{
-						Quote quote = await qMgr.GetLast(mi.EquityId);
-						mi.LastPrice = quote.Price;
-						mi.LastPriceDate = quote.Date;
-						mi.Equity = await eqMgr.Get(mi.EquityId);
-						mi.CurrentValue = mi.Shares * mi.LastPrice;				
-						items.Add(mi);	
-					}
-
-					model.ItemList = items;
-					
-					model.StopValue = model.ItemList.Sum(m => m.CurrentValue);				
+                    model.StopValue = model.ItemList.Sum(m => m.CurrentValue);				
                 }
             }
             catch (Exception ex)
