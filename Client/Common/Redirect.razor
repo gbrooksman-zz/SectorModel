@@ -1,14 +1,11 @@
-﻿@page "/Redirect/{modelId:guid}"
+﻿@page "/Redirect/"
 
 @inject NavigationManager nav
 
 @code
 {
-	[Parameter]
-	public Guid modelId { get; set; }
-
     protected override void OnInitialized()
     {
-        nav.NavigateTo($"/Models/ModelItemList/{modelId}/true/true");
+        nav.NavigateTo($"/ModelItemList/true/true");
     }
 }

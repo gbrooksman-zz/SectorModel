@@ -1,24 +1,42 @@
-@page "/ModelChart/{ModelId:guid}"
+@page "/ModelPieChart"
+
 @inject AppSettings appSettings
 @inject AppState appState
 @inject HttpClient httpClient
+@inject NavigationManager nav
 
+@using SectorModel.Client.Common
+@using SectorModel.Shared.Entities
 @using SectorModel.Client.Pages.Components
-
-<h3>Model Pie Chart</h3>
 
 <AppHeader/>
 
-
+<PieChart PieSlices="@slices" Height="500" Width="500"/>
 
 @code 
 {
-	[Parameter] public Guid ModelId {get; set;}
-
 	private Model model = new Model();
+
+	List<PieSlice> slices = new List<PieSlice>();
 
 	protected override void OnInitialized()
     {
-		model = appState.Model;		
+		model = appState.Model;	
+		GetSlices(model);	
 	}
+
+    private void GetSlices(Model model)
+    {
+		int x = 1;
+
+		foreach (ModelItem mi in model.ItemList)
+		{
+			slices.Add(new PieSlice()
+			{
+				Name = mi.Equity.SymbolName,
+				Percent = mi.Percentage,
+				Color = ColorPicker.Get(x++)
+			});		
+		}     
+    }
 }

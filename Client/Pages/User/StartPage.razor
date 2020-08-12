@@ -34,12 +34,14 @@
 	}
 
 	private void GoToCoreModel()
-	{		
-		nav.NavigateTo($"/Models/ModelItemList/{appSettings.CoreModelId}/false/false");
+	{	
+		appState.Model = appSettings.CoreModel;	
+		nav.NavigateTo($"/ModelItemList/false/false");
 	}
 
 	private void GoToSPDRModel()
 	{	
-		nav.NavigateTo($"/Models/ModelItemList/{appSettings.SPDRModelId}/false/false");
+		appState.Model = appSettings.SPDRModel;	
+		nav.NavigateTo($"/ModelItemList/false/false");
 	}
 }

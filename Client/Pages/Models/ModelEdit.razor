@@ -1,4 +1,4 @@
-﻿@page "/Models/ModelEdit/{modelId:guid}/{IsEdit:bool}"
+﻿@page "/ModelEdit/{IsEdit:bool}"
 
 @inject AppSettings appSettings
 @inject AppState appState
@@ -67,17 +67,16 @@
 {
     private Model model = new Model();
 
-    [Parameter]
-    public Guid modelId { get; set; }
-
 	[Parameter]
     public bool IsEdit { get; set; }
 
     protected override void OnInitialized()
     {
+		model = appState.Model;
+
 		if (IsEdit)
 		{
-        	model = appState.ModelList.Where(m => m.Id == modelId).FirstOrDefault();
+        	model = appState.ModelList.Where(m => m.Id == model.Id).FirstOrDefault();
 			model.StopValue = model.ItemList.Sum(i => i.CurrentValue);
 		}	
 		else
@@ -86,6 +85,7 @@
 			model.StartDate = DateTime.Now;
 			model.IsActive = true;
 			model.StopDate = DateTime.Now.AddYears(3);
+			model.ItemList = new List<ModelItem>();
 		}
 	}
 

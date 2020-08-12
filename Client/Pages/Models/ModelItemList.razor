@@ -1,4 +1,4 @@
-@page "/Models/ModelItemList/{modelId:guid}/{CanAdd:bool}/{CanEdit:bool}"
+@page "/ModelItemList/{CanAdd:bool}/{CanEdit:bool}"
 
 @inject AppSettings appSettings
 @inject HttpClient httpClient
@@ -114,8 +114,8 @@
 
 @code
 {
-	[Parameter]
-	public Guid modelId {get; set;}
+	
+	
 
 	[Parameter]
 	public bool CanAdd { get; set; } = false;
@@ -128,15 +128,17 @@
 	decimal totalValue = 0;
     decimal totalCost = 0;
 
+	Guid modelId {get; set;}
+
 	Model model = new Model();
 
 	ModelItem modelItem = new ModelItem();
 
 	List<ModelItem> modelEquityList = new List<ModelItem>();
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-		model = await httpClient.GetFromJsonAsync<Model>($"model/Get?modelId={modelId}&quoteDate={DateTime.Now}");
+		model = appState.Model;  //await httpClient.GetFromJsonAsync<Model>($"model/Get?modelId={modelId}&quoteDate={DateTime.Now}");
 		modelEquityList = model.ItemList;
 	}
 

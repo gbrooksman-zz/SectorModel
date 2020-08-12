@@ -63,7 +63,11 @@
     protected override void OnInitialized()
     {
         EditModelItem.ModelId = Model.Id;
-        selectedSymbol = EditModelItem.Equity.Symbol;
+
+		if (EditModelItem.Equity != null)
+		{
+        	selectedSymbol = EditModelItem.Equity.Symbol;
+		}
     }
 
     private async Task HandleValidSubmit()
@@ -89,7 +93,7 @@
 
     private void Close()
     {	
-        nav.NavigateTo($"/Redirect/{EditModelItem.ModelId}");
+        nav.NavigateTo($"/Redirect");
     }
 
     private async Task DeleteItem()
@@ -117,6 +121,4 @@
 		appState.ModelList.Add(Model);
 
 	}
-
-
 }
