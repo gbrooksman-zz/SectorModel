@@ -122,7 +122,7 @@
 		}
 
 		//=============================================================================================
-		//initialize state
+		//initialize state - 
 	
 	
 		if (appState.CurrentUser == null)
@@ -130,9 +130,9 @@
 			appState.CurrentUser = await httpClient.GetFromJsonAsync<User>($"user/get?email={formUser.Email}");
 		}		
 
-		if (appState.AllUserModels == null)
+		if (appState.ModelList == null)
 		{
-			appState.AllUserModels = await httpClient.GetFromJsonAsync<List<Model>>($"model/getlist?userId={appState.CurrentUser.Id}");
+			appState.ModelList = await httpClient.GetFromJsonAsync<List<Model>>($"model/getlist?userId={appState.CurrentUser.Id}");
 		}
 
 

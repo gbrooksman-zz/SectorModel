@@ -41,10 +41,6 @@ namespace SectorModel.Server.Managers
 				{
 					modelList = modelList.Where( i => i.IsActive == true).ToList();
 				} 
-				if (privateOnly)
-				{
-					modelList = modelList.Where( i => i.IsPrivate == true).ToList();
-				} 
 
 				foreach (Model model in modelList)
 				{

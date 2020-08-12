@@ -12,8 +12,7 @@ namespace SectorModel.Client.Entities
         }
 
 		public User CurrentUser { get; set; }		
-        public List<ModelItem> CurrentModelItems { get; set; }
-		public Model CurrentModel { get; set; }
-        public List<Model> AllUserModels { get; set; }
+		public Model Model { get; set; }
+        public List<Model> ModelList { get; set; }
     }
 }

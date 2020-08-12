@@ -47,7 +47,7 @@
             <h4>@model.Name</h4>
         </div>
         <div class="col-6" style="text-align:right;">
-            <span>Starting Date:@model.StartDate.ToShortDateString()</span>
+            <span>Starting Date:@Utils.FormatDate(model.StartDate)</span>
         </div>
     </div>	
     <div class="row">

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using System;
+using Microsoft.AspNetCore.Components;
 
 namespace SectorModel.Client.Common
 {
@@ -19,6 +20,11 @@ namespace SectorModel.Client.Common
 			{
 				return (MarkupString) $"<p> {inValue.ToString("n")} </p>";	
 			}
+		}
+
+		public static string FormatDate(DateTime inValue)
+		{
+			return  inValue.ToShortDateString();	
 		}
     }
 }

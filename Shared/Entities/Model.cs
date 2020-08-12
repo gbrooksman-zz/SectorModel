@@ -12,7 +12,6 @@ namespace SectorModel.Shared.Entities
         {
             
         }
-
 		
         public Guid UserId { get; set; }
 	
@@ -33,9 +32,6 @@ namespace SectorModel.Shared.Entities
         public decimal StartValue { get; set; }
 
         public decimal StopValue { get; set; }	
-	
-		[Required]
-        public bool IsPrivate { get; set; }
 
 		[NotMapped]
 		public List<ModelItem> ItemList { get; set; }

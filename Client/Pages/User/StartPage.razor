@@ -28,9 +28,9 @@
 {
 	List<Model> modelList = new List<Model>();
 
-	protected override async Task OnInitializedAsync()
+	protected override void OnInitialized()
 	{
-		modelList = await httpClient.GetFromJsonAsync<List<Model>>($"model/GetList?userId={appState.CurrentUser.Id}");
+		modelList = appState.ModelList;  //await httpClient.GetFromJsonAsync<List<Model>>($"model/GetList?userId={appState.CurrentUser.Id}");
 	}
 
 	private void GoToCoreModel()

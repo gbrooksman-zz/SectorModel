@@ -77,21 +77,46 @@
         EditModelItem.Cost = (Model.StartValue * (EditModelItem.Percentage / 100));
         EditModelItem.Shares = Math.Round((EditModelItem.Cost / lastQuote.Price),0);
 
+		RemoveFromState(EditModelItem);
+		
         HttpResponseMessage response = await httpClient.PostAsJsonAsync<ModelItem>("model/saveitem", EditModelItem);
-
-        appState.AllUserModels = await httpClient.GetFromJsonAsync<List<Model>>($"model/getlist?userId={appState.CurrentUser.Id}");
-
+		ModelItem item = await response.Content.ReadFromJsonAsync<ModelItem>();
+		
+		AddToState(item);
+  
         Close();
     }
 
     private void Close()
-    {
+    {	
         nav.NavigateTo($"/Redirect/{EditModelItem.ModelId}");
     }
 
     private async Task DeleteItem()
     {
-        await httpClient.DeleteAsync ($"model/RemoveModelItem?modelItemId={EditModelItem.Id}");
+		RemoveFromState(EditModelItem);
+
+        HttpResponseMessage response = await httpClient.DeleteAsync ($"model/RemoveModelItem?modelItemId={EditModelItem.Id}");
+		ModelItem item = await response.Content.ReadFromJsonAsync<ModelItem>();
+		
+		AddToState(item);
+
         Close();
     }
+
+	private void RemoveFromState(ModelItem item)
+	{
+		appState.ModelList.Remove(Model);
+		Model.ItemList.Remove(item);
+	}
+
+	private void AddToState(ModelItem item)
+	{
+		Model.ItemList.Add(item);
+		appState.Model = Model;
+		appState.ModelList.Add(Model);
+
+	}
+
+
 }

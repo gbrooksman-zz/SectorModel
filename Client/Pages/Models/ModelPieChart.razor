@@ -1,0 +1,24 @@
+@page "/ModelChart/{ModelId:guid}"
+@inject AppSettings appSettings
+@inject AppState appState
+@inject HttpClient httpClient
+
+@using SectorModel.Client.Pages.Components
+
+<h3>Model Pie Chart</h3>
+
+<AppHeader/>
+
+
+
+@code 
+{
+	[Parameter] public Guid ModelId {get; set;}
+
+	private Model model = new Model();
+
+	protected override void OnInitialized()
+    {
+		model = appState.Model;		
+	}
+}

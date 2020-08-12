@@ -18,12 +18,7 @@
     <div class="form-control">
 			<label>Name</label>
             <InputText id="txtName" size="50" placeholder="model name" @bind-Value="model.Name"></InputText>
-    </div>
-
-    <div class="form-control">
-			<label for="chkPrivate" >Is Private?</label>	
-            <InputCheckbox id="chkPrivate" @bind-Value="model.IsPrivate"></InputCheckbox>
-    </div>
+    </div>   
 
     <div class="form-control">
 			<label for="chkActive" >Is Active?</label>	
@@ -78,11 +73,11 @@
 	[Parameter]
     public bool IsEdit { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
 		if (IsEdit)
 		{
-        	model = await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={modelId}&quoteDate={DateTime.Now}");
+        	model = appState.ModelList.Where(m => m.Id == modelId).FirstOrDefault();
 			model.StopValue = model.ItemList.Sum(i => i.CurrentValue);
 		}	
 		else
@@ -90,23 +85,36 @@
 			model.UserId = appState.CurrentUser.Id;
 			model.StartDate = DateTime.Now;
 			model.IsActive = true;
-			model.IsPrivate = true;
 			model.StopDate = DateTime.Now.AddYears(3);
-		}		
+		}
 	}
 
 
     private async Task HandleValidSubmit()
     { 
+		RemoveFromState(model);
+
 		HttpResponseMessage response = await httpClient.PostAsJsonAsync("model/save", model);
+		model = await response.Content.ReadFromJsonAsync<Model>();
+
+		AddToState(model);
 		
-		appState.AllUserModels = await httpClient.GetFromJsonAsync<List<Model>>($"model/getlist?userId={appState.CurrentUser.Id}");
-		
-		nav.NavigateTo("/User/StartPage");       
+		Close();      
     }
 
 	private void Close()
-	{
+	{		
 		nav.NavigateTo("/User/StartPage");
+	}
+
+	private void RemoveFromState(Model item)
+	{
+		appState.ModelList.Remove(item);
+	}
+
+	private void AddToState(Model item)
+	{
+		appState.Model = item;	
+		appState.ModelList.Add(item);
 	}
 }

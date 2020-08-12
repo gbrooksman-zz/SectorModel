@@ -1,18 +1,17 @@
 @inject AppState appState
 @inject AppSettings appSettings
 
+@using SectorModel.Client.Common
+
  <div class="container">
 	<div class="row">
-		<div class="col-sm-3">
-			<p>Quotes as of @appSettings.LastQuoteDate</p>
+		<div class="col-sm-4">
+			<p>Quotes as of @Utils.FormatDate(appSettings.LastQuoteDate)</p>
 		</div>
 		<div class="col-sm-4">
 			<p>Welcome @appState.CurrentUser.Email</p>
 		</div>
-		<div class="col-sm-2">
-			<p>@DateTime.Now</p>
-		</div>
-		<div class="col-sm-3">
+		<div class="col-sm-4">
 			<a href="/User/StartPage">Home</a>
 		</div>
 	</div>

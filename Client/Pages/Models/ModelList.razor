@@ -12,7 +12,6 @@
     <HeaderTemplate>
         <th>Name</th>
         <th>Active?</th>
-        <th>Private?</th>
         <th>Start Date</th>
         <th>Stop Date</th>
         <th>Start Value</th>
@@ -23,9 +22,8 @@
     <RowTemplate>
         <td>@m.Name</td>
         <td>@m.IsActive</td>
-		<td>@m.IsPrivate</td>
-        <td>@m.StartDate</td>
-        <td>@m.StopDate</td>
+        <td>@Utils.FormatDate(m.StartDate)</td>
+        <td>@Utils.FormatDate(m.StopDate)</td>
         <td>@Utils.FormatNumber(m.StartValue)</td>
         <td>@Utils.FormatNumber(m.StopValue)</td>
         <td>@Utils.CalcGainLoss(m.StopValue, m.StartValue) </td>
