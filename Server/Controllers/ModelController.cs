@@ -55,7 +55,16 @@ namespace SectorModel.Server.Controllers
         {
             Model model = await mMgr.Get(modelId);           
             return Ok(model);
-        }		
+        }	
+
+		[HttpGet]
+        [Route("GetQuotesForDateRange")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<Quote>>> GetQuotesForDateRange(Guid modelId, DateTime startdate, DateTime stopdate, int interval)
+        {
+            List<Quote> quoteList = await mMgr.GetDateRangeWithInterval(modelId, startdate, stopdate,interval);
+            return Ok(quoteList);
+        }	
        
 		[HttpPost]
         [Route("Save")]

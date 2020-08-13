@@ -16,8 +16,8 @@ namespace SectorModel.Server.Managers
         private readonly EquityManager eqMgr;
         private readonly IConfiguration config;
         private readonly AppSettings appSettings;
-
-		private readonly ModelManager mMgr;
+		
+		//private readonly ModelManager mMgr;
 
         public QuoteManager(IMemoryCache cache, IConfiguration _config, AppSettings _appSettings) : base(cache, _config)
         {
@@ -25,7 +25,7 @@ namespace SectorModel.Server.Managers
             config = _config;
 
             eqMgr = new EquityManager(cache, config, appSettings);            
-			mMgr = new ModelManager(cache, config, appSettings);
+			//mMgr = new ModelManager(cache, config, appSettings);
             
         }
       
@@ -72,33 +72,7 @@ namespace SectorModel.Server.Managers
             return quotes;
         }
 
-        public async Task<List<Quote>> GetDateRangeWithInterval(Guid modelId, DateTime startdate, DateTime stopdate, int quoteInterval )
-        {
-			Model model = await mMgr.GetModel(modelId, stopdate);
-
-            List<Quote> quoteListSkipped = new List<Quote>();
-
-            try
-            {
-				List<Guid> equityGuids = model.ItemList.Select(e => e.EquityId).ToList();
-
-				using (var db = new ReadContext(appSettings))
-				{	
-					var results = await (from q in db.Quotes
-						join l in equityGuids on q.EquityId equals l	
-						where q.Date >= model.StartDate	&& q.Date <= stopdate 					
-						select q).Skip(quoteInterval).Take(1).ToListAsync();
-				}               
-            }
-            catch(Exception ex)
-            {
-                Log.Error(ex, "QuoteManager::GetDateRangeWithInterval");
-                throw;
-            }
-
-            return quoteListSkipped;
-        }
-
+       
 		public async Task<List<ModelItem>> GetModelItemsWithPrices(Model model, DateTime quoteDate)
 		{
 			List<ModelItem> items = new List<ModelItem>();

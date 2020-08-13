@@ -92,7 +92,51 @@ namespace SectorModel.Server.Managers
             }
 
             return model;    
-        }   
+        }  
+
+		public async Task<List<Quote>> GetDateRangeWithInterval(Guid modelId, DateTime startdate, DateTime stopdate, int quoteInterval )
+        {			
+            List<Quote> quoteList = new List<Quote>();
+			List<Quote> finalQuoteList = new List<Quote>();
+
+            try
+            {
+				using (var db = new ReadContext(appSettings))
+				{	
+					Model  model = await db.Models.FindAsync(modelId);
+
+					model.ItemList = await db.ModelItems
+										.Where( m => m.ModelId == modelId)
+										.ToListAsync();
+
+					List<Guid> equityGuids = model.ItemList.Select(e => e.EquityId).ToList();
+
+					var allQuotes = await db.Quotes.ToListAsync();
+
+					quoteList = (from q in allQuotes
+								join l in equityGuids on q.EquityId equals l select q).ToList();
+
+					quoteList = quoteList.Where (q => q.Date >= model.StartDate	&& q.Date <= stopdate).ToList();
+
+					int skipLoops = quoteList.Count/quoteInterval;
+
+					for ( int x = 0 ; x <= skipLoops ; x = x + quoteInterval)
+					{
+						finalQuoteList.Add(quoteList.Skip(x).Take(1).FirstOrDefault());
+					}
+
+
+				}               
+            }
+            catch(Exception ex)
+            {
+                Log.Error(ex, "QuoteManager::GetDateRangeWithInterval");
+                throw;
+            }
+
+            return finalQuoteList;
+        }
+ 
 
 		public async Task<Model> Get(Guid modelId)
         {

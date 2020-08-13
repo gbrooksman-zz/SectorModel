@@ -7,7 +7,7 @@
 @inject AppSettings appSettings
 @inject HttpClient httpClient
 
-@if(quoteList == null)
+@if(quoteList.Count == 0)
 {
 	<p>Loading...</p>
 }
@@ -78,7 +78,7 @@ else
 
         int quoteInterval = Utils.GetInterval(Model.StartDate, StopDate);
 
-        quoteList = await httpClient.GetFromJsonAsync<List<Quote>>($"quote/GetDateRangeWithInterval?modelId={Model.Id}&startdate={Model.StartDate}&stopdate={StopDate}&interval={quoteInterval}");
+        quoteList = await httpClient.GetFromJsonAsync<List<Quote>>($"model/GetQuotesForDateRange?modelId={Model.Id}&startdate={Model.StartDate}&stopdate={StopDate}&interval={quoteInterval}");
 	}
 
     private string BuildChartItemPath( List<Quote> itemQuotes)
@@ -172,18 +172,21 @@ else
         {
             List<Quote> quotes = quoteList.Where(e => e.EquityId == item.EquityId).ToList();
 
-			decimal startingPrice = quotes.FirstOrDefault().Price;
-			string symbolName = item.Equity.SymbolName;
+			if (quotes.Count > 0)
+			{
+				decimal startingPrice = quotes.FirstOrDefault().Price;
+				string symbolName = item.Equity.SymbolName;
 
-            chartItems.Add(new ChartItem()
-            {
-                ColorIndex = x,
-                LowPrice = quotes.Min(q => q.Price),
-                HighPrice = quotes.Max(q => q.Price),
-                LegendText = symbolName,
-                StartPrice = startingPrice,
-                ChartPath = BuildChartItemPath(quotes)
-            }); ;
+				chartItems.Add(new ChartItem()
+				{
+					ColorIndex = x,
+					LowPrice = quotes.Min(q => q.Price),
+					HighPrice = quotes.Max(q => q.Price),
+					LegendText = symbolName,
+					StartPrice = startingPrice,
+					ChartPath = BuildChartItemPath(quotes)
+				});
+			}
 
             x++;
         }

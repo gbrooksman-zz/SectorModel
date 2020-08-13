@@ -55,16 +55,7 @@ namespace SectorModel.Server.Controllers
                 }
             }
             return Ok(quoteList);
-        }
-
-        [HttpGet]
-        [Route("GetDateRangeWithInterval")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<Quote>>> GetDateRangeWithInterval(Guid modelId, DateTime startdate, DateTime stopdate, int interval)
-        {
-            List<Quote> quoteList = await qMgr.GetDateRangeWithInterval(modelId, startdate, stopdate,interval);
-            return Ok(quoteList);
-        }
+        }      
 
         [HttpGet]
         [Route("GetDate")]
@@ -128,7 +119,6 @@ namespace SectorModel.Server.Controllers
         public async Task<ActionResult<DateTime>> GetLastQuoteDate()
         {
             DateTime lastQuoteDate = await qMgr.GetLastQuoteDate();
-
 			appSettings.LastQuoteDate = lastQuoteDate;		
             return Ok(lastQuoteDate);
         }
