@@ -58,23 +58,12 @@ namespace SectorModel.Server.Controllers
         }
 
         [HttpGet]
-        [Route("GetRangeForList")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Route("GetDateRangeWithInterval")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<Quote>>> GetRangeForList(string symbols, DateTime startdate, DateTime stopdate)
+        public async Task<ActionResult<List<Quote>>> GetDateRangeWithInterval(Guid modelId, DateTime startdate, DateTime stopdate, int interval)
         {
-            List<string> symbolList = new List<string>(symbols.Split(","));
-
-            List<Quote> mrQuoteList = await qMgr.GetBySymbolListAndDateRange(symbolList, startdate, stopdate);
-
-            if (mrQuoteList == null)
-            {
-                return BadRequest(mrQuoteList);
-            }
-            else
-            {
-                return Ok(mrQuoteList);
-            }
+            List<Quote> quoteList = await qMgr.GetDateRangeWithInterval(modelId, startdate, stopdate,interval);
+            return Ok(quoteList);
         }
 
         [HttpGet]
@@ -135,23 +124,13 @@ namespace SectorModel.Server.Controllers
 
         [HttpGet]
         [Route("GetLastQuoteDate")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<DateTime>> GetLastQuoteDate()
         {
             DateTime lastQuoteDate = await qMgr.GetLastQuoteDate();
 
-			appSettings.LastQuoteDate = lastQuoteDate;
-
-            if (lastQuoteDate == null)
-            {
-                return BadRequest(lastQuoteDate);
-            }
-			
+			appSettings.LastQuoteDate = lastQuoteDate;		
             return Ok(lastQuoteDate);
         }
-
-
-
     }
 }

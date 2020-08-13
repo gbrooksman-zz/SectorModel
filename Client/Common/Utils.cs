@@ -26,5 +26,31 @@ namespace SectorModel.Client.Common
 		{
 			return  inValue.ToShortDateString();	
 		}
+
+		public static int GetInterval(DateTime startDate, DateTime stopDate)
+        {
+            int ret = 0;
+
+            int daysInPeriod = (stopDate - startDate).Days;
+
+            if ((daysInPeriod >= 0) && (daysInPeriod <= 31))
+            {
+                ret = 1;
+            }
+            else if ((daysInPeriod > 31) && (daysInPeriod <= 100))
+            {
+                ret = 3;
+            }
+            else if ((daysInPeriod > 101) && (daysInPeriod <= 365))
+            {
+                ret = 5;
+            }
+            else if (daysInPeriod > 365)
+            {
+                ret = 10;
+            }
+
+            return ret;
+        }
     }
 }

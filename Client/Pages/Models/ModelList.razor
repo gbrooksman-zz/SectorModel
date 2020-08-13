@@ -28,9 +28,10 @@
         <td>@Utils.FormatNumber(m.StopValue)</td>
         <td>@Utils.CalcGainLoss(m.StopValue, m.StartValue) </td>
         <td>
+			<input type="button" id="btnLineChart" class="btn btn-info" @onclick="@( () => { ShowLineChart(@m.Id); } )" value="View Line Chart" />
 			<input type="button" id="btnPieChart" class="btn btn-info" @onclick="@( () => { ShowPieChart(@m.Id); } )" value="View Pie Chart" />
-             <input type="button" id="btnDetails" class="btn btn-info" @onclick="@( () => { EditModel(@m.Id); } )" value="Details" />
-			 <input type="button" id="btnConfigure" class="btn btn-info" @onclick="@( () => { Configure(@m.Id); } )" value="Configure" />
+            <input type="button" id="btnDetails" class="btn btn-info" @onclick="@( () => { EditModel(@m.Id); } )" value="Details" />
+			<input type="button" id="btnConfigure" class="btn btn-info" @onclick="@( () => { Configure(@m.Id); } )" value="Configure" />
         </td>
     </RowTemplate>
     <FooterTemplate>
@@ -61,6 +62,12 @@
     {
 		SetModel(modelId);
     	nav.NavigateTo("/ModelPieChart");
+    }
+
+	private void ShowLineChart(Guid modelId)
+    {
+		SetModel(modelId);
+    	nav.NavigateTo("/ModelLineChart");
     }
 
 	private void AddModel()

@@ -3,10 +3,18 @@
 @using Microsoft.AspNetCore.Components
 @using SectorModel.Client.Common
 @using SectorModel.Client.Entities
-@using SectorModel.Client.Services
 
 @inject AppSettings appSettings
 @inject HttpClient httpClient
+
+@if(quoteList == null)
+{
+	<p>Loading...</p>
+}
+else
+{
+
+<h3>@Model.Name</h3>
 
 <figure>
 
@@ -32,27 +40,21 @@
         @DrawLegend();
     </ul>
 </figcaption>
-
+}
 
 @code
 {
     [Parameter]
-    public string EquityList { get; set; }
+    public Model Model { get; set; }
 
     [Parameter]
-    public string StartDate { get; set; }
-
-    [Parameter]
-    public string StopDate { get; set; }
+    public DateTime StopDate { get; set; }
 
     [Parameter]
     public string Width { get; set; }
 
     [Parameter]
     public string Height { get; set; }
-
-    [Parameter]
-    public string Title { get; set; } = "Equities";
 
     [Parameter]
     public int HorizontalGridLines { get; set; } = 10;
@@ -63,32 +65,23 @@
     [Parameter]
     public bool RelativeCompare { get; set; }
 
+
     protected double gridWidth = 0;
     protected double gridHeight = 0;
+  
+	private List<Quote> quoteList = new List<Quote>();
 
-    private EquityService eSvc;
-
-  //  private List<Quote> equitiesWithQuotes = new List<EquityQuotes>();
-
-    protected override void OnInitialized()
-    {
-        DateTime beginDate = DateTime.Parse(StartDate);
-        DateTime endDate = DateTime.Parse(StopDate);
-
+    protected override async Task OnInitializedAsync()
+    {       
         gridWidth = double.Parse(Width) / (double)HorizontalGridLines;
         gridHeight = double.Parse(Height) / (double)VerticalGridLines;
 
-        eSvc = new EquityService(httpClient, appSettings);
+        int quoteInterval = Utils.GetInterval(Model.StartDate, StopDate);
 
-        int quoteInterval = eSvc.GetInterval(beginDate, endDate);
+        quoteList = await httpClient.GetFromJsonAsync<List<Quote>>($"quote/GetDateRangeWithInterval?modelId={Model.Id}&startdate={Model.StartDate}&stopdate={StopDate}&interval={quoteInterval}");
+	}
 
-       // equitiesWithQuotes = await httpClient.GetFromJsonAsync<List<EquityQuotes>>($"equity/GetEquitiesWithQuotes?EquityList={EquityList}&StartDate={beginDate}&StopDate={endDate}&QuoteInterval={quoteInterval}");
-    }
-
-
-
-
-    private string BuildChartItemPath( List<Quote> quotes)
+    private string BuildChartItemPath( List<Quote> itemQuotes)
     {
         decimal height = int.Parse(Height);
         decimal width = int.Parse(Width);
@@ -97,22 +90,20 @@
 
         string path = $"M 0 {startY} L";
 
-        decimal firstPrice = quotes.First().Price;
-        decimal lowPrice = quotes.Min(q => q.Price);
-        decimal highPrice = quotes.Max(q => q.Price);
+        decimal firstPrice = itemQuotes.First().Price;
+        decimal lowPrice = itemQuotes.Min(q => q.Price);
+        decimal highPrice = itemQuotes.Max(q => q.Price);
 
         decimal heightScaleFactor = height / ((highPrice - lowPrice) * 2 );
         decimal widthScaleFactor = 0; // width / quotes.Count;
         decimal x = 0;
 
-        foreach (var quote in quotes)
+        foreach (var quote in itemQuotes)
         {
             decimal price = quote.Price;
             path += $" {x += widthScaleFactor} {(startY - ((firstPrice - price) * heightScaleFactor)) } ";
-            if (widthScaleFactor == 0) widthScaleFactor = width / quotes.Count;
+            if (widthScaleFactor == 0) widthScaleFactor = width / itemQuotes.Count;
         }
-
-        //Console.WriteLine($"quotes: {quotes.Count} ");
 
         return path;
     }
@@ -157,10 +148,10 @@
         int yCoord = 0;
         int i = 0;
 
-        foreach (string equity in EquityList.Split(",".ToCharArray()))
+        foreach (ModelItem mi in Model.ItemList)
         {
             frag += BuildLegendPath(legendPath, ColorPicker.Get(i++), xCoord, yCoord);
-            frag += BuildLegendText(equity, xCoord, yCoord);
+            frag += BuildLegendText(mi.Equity.SymbolName, xCoord, yCoord);
         }
 
         return frag;
@@ -175,24 +166,27 @@
 
         List<ChartItem> chartItems = new List<ChartItem>();
 
-        //int x = 1;
+       int x = 1;
 
-       @* foreach (EquityQuotes equityquote in equitiesWithQuotes)
+       foreach (ModelItem item in Model.ItemList)
         {
-            List<Quote> quotes = equityquote.Quotes;
+            List<Quote> quotes = quoteList.Where(e => e.EquityId == item.EquityId).ToList();
+
+			decimal startingPrice = quotes.FirstOrDefault().Price;
+			string symbolName = item.Equity.SymbolName;
 
             chartItems.Add(new ChartItem()
             {
                 ColorIndex = x,
                 LowPrice = quotes.Min(q => q.Price),
                 HighPrice = quotes.Max(q => q.Price),
-                LegendText = equityquote.Equity.SymbolName,
-                StartPrice = quotes.FirstOrDefault().Price,
+                LegendText = symbolName,
+                StartPrice = startingPrice,
                 ChartPath = BuildChartItemPath(quotes)
             }); ;
 
             x++;
-        }*@
+        }
 
         foreach (var chartItem in chartItems)
         {

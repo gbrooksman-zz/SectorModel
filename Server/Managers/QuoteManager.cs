@@ -17,12 +17,15 @@ namespace SectorModel.Server.Managers
         private readonly IConfiguration config;
         private readonly AppSettings appSettings;
 
+		private readonly ModelManager mMgr;
+
         public QuoteManager(IMemoryCache cache, IConfiguration _config, AppSettings _appSettings) : base(cache, _config)
         {
             appSettings = _appSettings;
             config = _config;
 
-            eqMgr = new EquityManager(cache, config, appSettings);
+            eqMgr = new EquityManager(cache, config, appSettings);            
+			mMgr = new ModelManager(cache, config, appSettings);
             
         }
       
@@ -69,29 +72,27 @@ namespace SectorModel.Server.Managers
             return quotes;
         }
 
-        public async Task<List<Quote>> GetBySymbolListDateRangeWithInterval(List<string> symbols, DateTime startdate, DateTime stopdate, int quoteInterval )
+        public async Task<List<Quote>> GetDateRangeWithInterval(Guid modelId, DateTime startdate, DateTime stopdate, int quoteInterval )
         {
+			Model model = await mMgr.GetModel(modelId, stopdate);
+
             List<Quote> quoteListSkipped = new List<Quote>();
 
             try
             {
-                foreach (string symbol in symbols)
-                {
-                    Equity equity = await eqMgr.GetBySymbol(symbol);
+				List<Guid> equityGuids = model.ItemList.Select(e => e.EquityId).ToList();
 
-                    List<Quote> quoteList = await GetByEquityId(equity.Id);
-
-                    var tempquoteList = quoteList.Where(q => q.Date >= startdate && q.Date <= stopdate).ToList();
-
-                    for (int u = 0; u < tempquoteList.Count; u += quoteInterval)
-                    {
-                        quoteListSkipped.Add(tempquoteList.Skip(u).Take(1).FirstOrDefault());
-                    }               
-                }
+				using (var db = new ReadContext(appSettings))
+				{	
+					var results = await (from q in db.Quotes
+						join l in equityGuids on q.EquityId equals l	
+						where q.Date >= model.StartDate	&& q.Date <= stopdate 					
+						select q).Skip(quoteInterval).Take(1).ToListAsync();
+				}               
             }
             catch(Exception ex)
             {
-                Log.Error(ex, "QuoteManager::GetBySymbolListDateRangeWithInterval");
+                Log.Error(ex, "QuoteManager::GetDateRangeWithInterval");
                 throw;
             }
 

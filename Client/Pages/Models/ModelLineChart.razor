@@ -1,0 +1,27 @@
+@page "/ModelLineChart"
+
+@inject AppState appState
+@inject NavigationManager nav
+
+@using SectorModel.Shared.Entities
+@using SectorModel.Client.Pages.Components
+
+<AppHeader/>
+
+<LineChart 	Height="500" Width="700" 
+			HorizontalGridLines="10" 
+			VerticalGridLines="10" 
+			Model="@appState.Model" 
+			StopDate="@DateTime.Now"/>
+
+<div>
+	<button class="btn btn-secondary" type="button" @onclick="Close">Close</button>
+</div>
+
+@code 
+{
+	private void Close()
+	{		
+		nav.NavigateTo("/User/StartPage");
+	}
+}
