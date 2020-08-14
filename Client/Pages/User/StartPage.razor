@@ -2,46 +2,22 @@
 
 @inject AppSettings appSettings
 @inject AppState appState
-@inject HttpClient httpClient
-@inject NavigationManager nav
 
 @using SectorModel.Shared.Entities
 @using SectorModel.Client.Pages.Models
 
-<AppHeader/>
+<AppHeader IsStart=true/>
 
-<ModelList UserModelList="@modelList"/>
-
- <div class="container">
-	<div class="row">
-		<div class="col-sm-6">
-			<input type="button" id="btnCore" class="button button-primary" @onclick="GoToCoreModel" value="Go To Core Model"/>
-		</div>
-		<div class="col-sm-6">
-			<input type="button" id="btnSPDR" class="button button-primary" @onclick="GoToSPDRModel" value="Go To SPDR Model"/>
-		</div>
-	</div>
-</div>
-
+<ModelList Models="@appState.ModelList" IsCore=false/>
+<hr/>
+<ModelList Models="@coreModelList" IsCore=true/>
 
 @code
 {
-	List<Model> modelList = new List<Model>();
+	List<Model> coreModelList = new List<Model>();
 
 	protected override void OnInitialized()
-	{
-		modelList = appState.ModelList;  //await httpClient.GetFromJsonAsync<List<Model>>($"model/GetList?userId={appState.CurrentUser.Id}");
-	}
-
-	private void GoToCoreModel()
-	{	
-		appState.Model = appSettings.CoreModel;	
-		nav.NavigateTo($"/ModelItemList/false/false");
-	}
-
-	private void GoToSPDRModel()
-	{	
-		appState.Model = appSettings.SPDRModel;	
-		nav.NavigateTo($"/ModelItemList/false/false");
+	{		
+		coreModelList.Add(appSettings.CoreModel);
 	}
 }

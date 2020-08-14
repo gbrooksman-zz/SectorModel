@@ -6,9 +6,12 @@
 @using SectorModel.Client.Common
 @using SectorModel.Shared.Entities
 
-<input type="button" id="btnAdd" class="btn btn-primary" @onclick="@( () => { AddModel(); } )" value="Add" />
+@if (!IsCore)
+{
+	<input type="button" id="btnAdd" class="btn btn-primary" @onclick="@( () => { AddModel(); } )" value="Add" />
+}
 
-<DataGrid Items="@UserModelList" TItem="Model" Context="m">
+<DataGrid Items="@Models" TItem="Model" Context="m">
     <HeaderTemplate>
         <th>Name</th>
         <th>Active?</th>
@@ -28,10 +31,14 @@
         <td>@Utils.FormatNumber(m.StopValue)</td>
         <td>@Utils.CalcGainLoss(m.StopValue, m.StartValue) </td>
         <td>
-			<input type="button" id="btnLineChart" class="btn btn-info" @onclick="@( () => { ShowLineChart(@m.Id); } )" value="View Line Chart" />
-			<input type="button" id="btnPieChart" class="btn btn-info" @onclick="@( () => { ShowPieChart(@m.Id); } )" value="View Pie Chart" />
-            <input type="button" id="btnDetails" class="btn btn-info" @onclick="@( () => { EditModel(@m.Id); } )" value="Details" />
-			<input type="button" id="btnConfigure" class="btn btn-info" @onclick="@( () => { Configure(@m.Id); } )" value="Configure" />
+			<input type="button" id="btnLineChart" class="btn btn-info" @onclick="@( () => { ShowLineChart(@m.Id); } )" value="History" />
+			<input type="button" id="btnPieChart" class="btn btn-info" @onclick="@( () => { ShowPieChart(@m.Id); } )" value="Pie" />
+            
+			@if (!IsCore)
+			{
+				<input type="button" id="btnDetails" class="btn btn-info" @onclick="@( () => { EditModel(@m.Id); } )" value="Details" />
+				<input type="button" id="btnConfigure" class="btn btn-info" @onclick="@( () => { Configure(@m.Id); } )" value="Configure" />
+			}
         </td>
     </RowTemplate>
     <FooterTemplate>
@@ -43,8 +50,9 @@
 
 @code
 {
-    [Parameter]
-    public List<Model> UserModelList { get; set; }	
+ 	[Parameter]	public List<Model> Models { get; set; }	
+
+	[Parameter] public bool IsCore {get; set;}
 	
     private void EditModel(Guid modelId)
     {

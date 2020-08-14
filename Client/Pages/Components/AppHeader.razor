@@ -6,13 +6,23 @@
  <div class="container">
 	<div class="row">
 		<div class="col-sm-4">
-			<p>Quotes as of @Utils.FormatDate(appSettings.LastQuoteDate)</p>
-		</div>
-		<div class="col-sm-4">
 			<p>Welcome @appState.CurrentUser.Email</p>
 		</div>
 		<div class="col-sm-4">
+			<p>Quotes as of @Utils.FormatDate(appSettings.LastQuoteDate)</p>
+		</div>		
+		<div class="col-sm-4">
+			@if (!IsStart)
+			{
 			<a href="/User/StartPage">Home</a>
+			}
 		</div>
 	</div>
 </div>
+
+
+@code
+{
+	[Parameter] public bool IsStart {get; set;} = false;
+
+}

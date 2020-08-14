@@ -9,38 +9,65 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-12">
-                <button class="btn btn-danger" type="button" @onclick="DeleteItem">Delete</button>
-            </div>
-        </div>
-        <div class="row">
-            <select id="equityDDL" @bind="selectedSymbol">
-                <option></option>
-                @foreach (var equity in appSettings.AllEquities)
-                {
-                    <option value="@equity.Symbol">@equity.SymbolName</option>
-                }
-            </select>
-        </div>
-        <div class="row">
-            <div class="form-control">
-                <label>Percent of Overall Model:</label>
-                <InputNumber id="txtValue" size="5" placeholder="Percent of total model" @bind-Value="EditModelItem.Percentage"></InputNumber>
-            </div>
-        </div>
-        <div class="row">
-            <div class="row form-group">
-                <div class="col-sm-4">
-                    <button class="btn btn-primary" type="submit">Save</button>
-                </div>
-                <div class="col-sm-4">
-                    <button class="btn btn-secondary" type="button" @onclick="Close">Cancel</button>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div class="container-fluid"> 
+		<div class="row">
+			<div class="col">
+				<label>1. Select a Sector Fund:</label>  
+			</div>
+		</div>    
+		<div class="row">
+			<div class="col">				  
+				<select id="equityDDL" @bind="selectedSymbol">
+					<option></option>
+					@foreach (var equity in appSettings.AllEquities)
+					{
+						<option value="@equity.Symbol">@equity.SymbolName (@equity.Symbol)</option>
+					}
+				</select>
+			</div>	
+		</div>
+
+		<br/>
+		<hr/>
+		
+		<div class="row">
+			<div class="col">
+				<label>2. Choose a percent to allocate:</label>  
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-sm-4">
+				<label>Percent:</label>
+			</div>
+			<div class="col-sm-4">
+				<InputNumber id="txtPercent" size="5" placeholder="Percent" @bind-Value="EditModelItem.Percentage"></InputNumber>
+			</div>						
+			<div class="col-sm-4">
+				<label>Model percent remaining: @remainingPercent:</label>                
+			</div>
+		</div>
+
+		<br/>
+		<hr/>
+
+		<div class="row">
+			<div class="col">
+				<label>3. Review and Submit</label>  
+			</div>		
+		</div>	
+		<div class="row">
+			<div class="col">
+				<button class="btn btn-success" type="submit">Save</button> 
+			</div>
+			<div class="col">
+				<button class="btn btn-secondary" @onclick="Close">Close</button>
+			</div>
+			<div class="col">
+				<button class="btn btn-danger btn-block" @onclick="DeleteItem">Delete this item</button>
+			</div>				
+		</div>
+
+	</div>
 
 </EditForm>
 
@@ -52,13 +79,30 @@
     [Parameter]
     public Model Model { get; set; }
 
-    public string selectedSymbol;
+	private string _selectedSymbol;
+	public string selectedSymbol
+	{
+		get => _selectedSymbol;
+		set
+		{
+			_selectedSymbol = value;
+			HandleSelection(_selectedSymbol);
+		}
+	}
+   
+	private decimal lastPrice = 0;
 
+	private decimal remainingPercent = 0;
 
-    void HandleSelection(ChangeEventArgs e)
+    protected void HandleSelection(string selSymbol)
     {
-        selectedSymbol = e.Value.ToString();
-    }
+		Equity eq = appSettings.AllEquities.Where(e => e.Symbol == selSymbol).FirstOrDefault();		
+		Quote quote = appSettings.LatestQuotes.Where( q => q.EquityId == eq.Id).FirstOrDefault();
+		if (quote != null)
+		{
+			lastPrice = quote.Price;
+		}
+    } 
 
     protected override void OnInitialized()
     {
@@ -68,6 +112,8 @@
 		{
         	selectedSymbol = EditModelItem.Equity.Symbol;
 		}
+
+		remainingPercent = (100 - Model.ItemList.Sum( p => p.Percentage));
     }
 
     private async Task HandleValidSubmit()
@@ -79,7 +125,7 @@
         EditModelItem.EquityId = eq.Id;
         EditModelItem.Equity = eq;
         EditModelItem.Cost = (Model.StartValue * (EditModelItem.Percentage / 100));
-        EditModelItem.Shares = Math.Round((EditModelItem.Cost / lastQuote.Price),0);
+        EditModelItem.Shares = Math.Round((EditModelItem.Cost / lastQuote.Price),3);
 
 		RemoveFromState(EditModelItem);
 		
@@ -100,12 +146,12 @@
     {
 		RemoveFromState(EditModelItem);
 
-        HttpResponseMessage response = await httpClient.DeleteAsync ($"model/RemoveModelItem?modelItemId={EditModelItem.Id}");
+		HttpResponseMessage response = await httpClient.DeleteAsync ($"model/RemoveModelItem?modelItemId={EditModelItem.Id}");
 		ModelItem item = await response.Content.ReadFromJsonAsync<ModelItem>();
 		
 		AddToState(item);
 
-        Close();
+		Close();
     }
 
 	private void RemoveFromState(ModelItem item)
@@ -119,6 +165,5 @@
 		Model.ItemList.Add(item);
 		appState.Model = Model;
 		appState.ModelList.Add(Model);
-
 	}
 }
