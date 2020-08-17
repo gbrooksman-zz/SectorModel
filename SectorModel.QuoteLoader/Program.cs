@@ -15,7 +15,8 @@ namespace SectorModel.QuoteLoader
 
              Console.WriteLine("started loading quotes");
 
-             await cdm.UpdateQuotes(Guid.Parse("FAC8A666-74D8-4531-B3AD-DA7B95360462"));
+            //htis model is the SPDR model which has all ETFs in it
+             await cdm.UpdateQuotes(Guid.Parse("4237E32A-5C60-4141-8658-FA357C28EF28"));
 
             Console.WriteLine("finished loading quotes");
 
