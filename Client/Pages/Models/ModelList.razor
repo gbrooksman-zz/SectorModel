@@ -5,6 +5,7 @@
 
 @using SectorModel.Client.Common
 @using SectorModel.Shared.Entities
+@using System.Linq
 
 @if (!IsCore)
 {
@@ -14,31 +15,33 @@
 <DataGrid Items="@Models" TItem="Model" Context="m">
     <HeaderTemplate>
         <th>Name</th>
-        <th>Active?</th>
         <th>Start Date</th>
         <th>Stop Date</th>
         <th>Start Value</th>
-        <th>Stop Value</th>
+        <th>Latest Value</th>
         <th>Gain/Loss</th>
         <th>Actions</th>
     </HeaderTemplate>
     <RowTemplate>
         <td>@m.Name</td>
-        <td>@m.IsActive</td>
-        <td>@Utils.FormatDate(m.StartDate)</td>
+         <td>@Utils.FormatDate(m.StartDate)</td>
         <td>@Utils.FormatDate(m.StopDate)</td>
         <td>@Utils.FormatNumber(m.StartValue)</td>
         <td>@Utils.FormatNumber(m.StopValue)</td>
         <td>@Utils.CalcGainLoss(m.StopValue, m.StartValue) </td>
         <td>
-			<input type="button" id="btnLineChart" class="btn btn-info" @onclick="@( () => { ShowLineChart(@m.Id); } )" value="History" />
-			<input type="button" id="btnPieChart" class="btn btn-info" @onclick="@( () => { ShowPieChart(@m.Id); } )" value="Pie" />
-            
-			@if (!IsCore)
-			{
-				<input type="button" id="btnDetails" class="btn btn-info" @onclick="@( () => { EditModel(@m.Id); } )" value="Details" />
-				<input type="button" id="btnConfigure" class="btn btn-info" @onclick="@( () => { Configure(@m.Id); } )" value="Configure" />
-			}
+            <input type="button" id="btnLineChart" class="btn btn-info" @onclick="@( () => { ShowLineChart(@m.Id); } )" value="History" />
+            <input type="button" id="btnPieChart" class="btn btn-info" @onclick="@( () => { ShowPieChart(@m.Id); } )" value="Pie" />
+
+            @if (!IsCore)
+            {
+                <input type="button" id="btnDetails" class="btn btn-info" @onclick="@( () => { EditModel(@m.Id); } )" value="Details" />
+                <input type="button" id="btnConfigure" class="btn btn-info" @onclick="@( () => { Configure(@m.Id); } )" value="Composition" />
+            }
+            else
+            {
+                <input type="button" id="btnCoreComp" class="btn btn-info" @onclick="@( () => { ShowCore(@m.Id); } )" value="Composition" />
+            }
         </td>
     </RowTemplate>
     <FooterTemplate>
@@ -50,42 +53,49 @@
 
 @code
 {
- 	[Parameter]	public List<Model> Models { get; set; }	
+    [Parameter] public List<Model> Models { get; set; }
 
-	[Parameter] public bool IsCore {get; set;}
-	
+    [Parameter] public bool IsCore {get; set;}
+
     private void EditModel(Guid modelId)
     {
-		SetModel(modelId);
-		nav.NavigateTo($"/ModelEdit/true");
+        SetModel(modelId);
+        nav.NavigateTo($"/ModelEdit/true");
     }
 
- 	private void Configure(Guid modelId)
+    private void Configure(Guid modelId)
     {
-		SetModel(modelId);
-    	nav.NavigateTo($"/ModelItemList/true/true");
+        SetModel(modelId);
+        nav.NavigateTo($"/ModelItemList/true/true");
     }
 
-	private void ShowPieChart(Guid modelId)
+    private void ShowCore(Guid modelId)
     {
-		SetModel(modelId);
-    	nav.NavigateTo("/ModelPieChart");
+        SetModel(modelId);
+        nav.NavigateTo($"/ModelItemList/false/false");
     }
 
-	private void ShowLineChart(Guid modelId)
+    private void ShowPieChart(Guid modelId)
     {
-		SetModel(modelId);
-    	nav.NavigateTo("/ModelLineChart");
+        SetModel(modelId);
+        nav.NavigateTo("/ModelPieChart");
     }
 
-	private void AddModel()
-    {	
-		appState.Model = new Model();	
+    private void ShowLineChart(Guid modelId)
+    {
+        SetModel(modelId);
+        nav.NavigateTo("/ModelLineChart");
+    }
+
+    private void AddModel()
+    {
+        appState.Model = new Model();
         nav.NavigateTo($"/ModelEdit/false");
     }
 
-	private void SetModel(Guid modelId)
-	{
-		appState.Model = appState.ModelList.Where( m => m.Id == modelId).FirstOrDefault();
-	}
+    private void SetModel(Guid modelId)
+    {
+        appState.Model = appState.ModelList.Where( m => m.Id == modelId).FirstOrDefault();
+
+    }
 }

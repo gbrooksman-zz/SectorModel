@@ -8,7 +8,7 @@
 @using SectorModel.Client.Pages.Components
 @using SectorModel.Shared.Entities
 @using SectorModel.Client.Common
-
+@using System.Linq
 
 <AppHeader/>
 
@@ -36,101 +36,108 @@
         <div class="col-6">
             <h4>@model.Name</h4>
         </div>
-        <div class="col-6" style="text-align:right;">
+        <div class="col" style="text-align:right;">
             <span>Starting Date:@Utils.FormatDate(model.StartDate)</span>
         </div>
     </div>	
-    <div class="row">
-
-		
-        <div class="col-12">
-				@if (CanAdd)
+    <div class="row">		
+        <div class="col">
+		@if (CanAdd)
+		{
+			<input type="button" id="btnAdd" class="btn btn-primary" @onclick="ShowAddItem" value="Add" />
+		}
+		<DataGrid Items="@modelEquityList" TItem="ModelItem" Context="m">
+			<HeaderTemplate>
+				<th>Symbol</th>
+				<th>Name</th>
+				<th>Percent in Model</th>
+				<th>Last Price</th>
+				<th>Cost</th>
+				<th>Current Value</th>					
+				<th>Gain/Loss</th>
+				@if(CanEdit)
 				{
-					<input type="button" id="btnAdd" class="btn btn-primary" @onclick="ShowAddItem" value="Add" />
+					<th>Actions</th>
 				}
-			<DataGrid Items="@modelEquityList" TItem="ModelItem" Context="m">
-				<HeaderTemplate>
-					<th>Symbol</th>
-					<th>Name</th>
-					<th>Percent in Model</th>
-					<th>Last Price</th>
-					<th>Cost</th>
-					<th>Current Value</th>					
-					<th>Gain/Loss</th>
-					@if(CanEdit)
-					{
-						<th>Actions</th>
-					}
-				</HeaderTemplate>
-				<RowTemplate>
-					<td> @m.Equity.Symbol</td>
-					<td> @m.Equity.SymbolName</td>
-					<td> @m.Percentage</td>
-					<td> @m.LastPrice</td>
-					<td> @GetCost(m.Cost)</td>
-					<td> @GetValue(m.CurrentValue)</td>					
-					<td> @Utils.CalcGainLoss(m.CurrentValue, m.Cost) </td>
-
-					@if(CanEdit)
-					{
-						<td>
-							<input type="button" class="btn btn-secondary" value="Edit" @onclick="( () => {EditItem(m);})"/>
-						</td>
-					}
-				</RowTemplate>
-				<FooterTemplate>
-					<td colspan="3">
-						Equities in Model: @m.Count
-					</td>
-					<td>
-						Totals: 
-					</td>
-					<td>
-						@Utils.FormatNumber(totalCost)
-					</td>
-					<td>
-						@Utils.FormatNumber(totalValue)
-					</td>
-					<td>
-						@Utils.CalcGainLoss(totalValue, totalCost)
-					</td>
-				</FooterTemplate>
-			</DataGrid>
+			</HeaderTemplate>
+            <RowTemplate>
+                <td> @m.Equity.Symbol</td>
+                <td> @m.Equity.SymbolName</td>
+                <td> @m.Percentage</td>
+                <td> @m.LastPrice</td>
+                <td> @GetCost(m.Cost)</td>
+                <td> @GetValue(m.CurrentValue)</td>
+                <td> @Utils.CalcGainLoss(m.CurrentValue, m.Cost) </td>
+                <td>
+                    @if (CanEdit)
+                    {
+                        <input type="button" class="btn btn-secondary" value="Edit" @onclick="( () => {EditItem(m);})" />
+                    }
+                    @if (isCore)
+                    {
+                        <input type="button" class="btn btn-secondary" value="Close" @onclick="CloneCore" />
+                    }
+                </td>
+                </RowTemplate>
+            <FooterTemplate>
+                <td>
+                    Equities in Model: @m.Count
+                </td>
+                <td>
+                    Totals:
+                </td>
+                <td>
+                    @Math.Round(modelEquityList.Sum(i => i.Percentage), 0)
+                </td>
+                <td>
+					&nbsp; 
+                </td>
+                <td>
+                    @Utils.FormatNumber(totalCost)
+                </td>
+                <td>
+                    @Utils.FormatNumber(totalValue)
+                </td>
+                <td>
+                    @Utils.CalcGainLoss(totalValue, totalCost)
+                </td>
+            </FooterTemplate>
+		</DataGrid>
         </div>
     </div>
 </div>
 
 @code
 {
-	
-	
+    [Parameter]
+    public bool CanAdd { get; set; } = false;
 
-	[Parameter]
-	public bool CanAdd { get; set; } = false;
-
-	[Parameter]
+    [Parameter]
     public bool CanEdit { get; set; } = false;
 
-	bool ShowDialog = false;
+    private bool isCore;
 
-	decimal totalValue = 0;
+    bool ShowDialog = false;
+
+    decimal totalValue = 0;
     decimal totalCost = 0;
 
-	Guid modelId {get; set;}
+    Guid modelId {get; set;}
 
-	Model model = new Model();
+    Model model = new Model();
 
-	ModelItem modelItem = new ModelItem();
+    ModelItem modelItem = new ModelItem();
 
-	List<ModelItem> modelEquityList = new List<ModelItem>();
+    List<ModelItem> modelEquityList = new List<ModelItem>();
 
     protected override void OnInitialized()
     {
-		model = appState.Model;  //await httpClient.GetFromJsonAsync<Model>($"model/Get?modelId={modelId}&quoteDate={DateTime.Now}");
-		modelEquityList = model.ItemList;
-	}
+        model = appState.Model;
+        modelEquityList = model.ItemList;
+        isCore = (model.Id == appSettings.CoreModelId);
+    }
 
-	private MarkupString GetValue(decimal inValue)
+    private MarkupString GetValue(decimal inValue)
     {
         totalValue += inValue;
         return Utils.FormatNumber(inValue);
@@ -142,22 +149,28 @@
         return Utils.FormatNumber(inValue);
     }
 
-	private void ShowAddItem()
-	{
-		ShowDialog = true;
-	}
+    private void ShowAddItem()
+    {
+        ShowDialog = true;
+    }
 
-	private void EditItem(ModelItem item)
-	{
-		modelItem = item;
-		modelItem.ModelId = modelId;
-		ShowDialog = true;
-	}
+    private void EditItem(ModelItem item)
+    {
+        modelItem = item;
+        modelItem.ModelId = modelId;
+        ShowDialog = true;
+    }
 
-	private void HideDialog()
-	{
-		ShowDialog = false;
-	}
+    private void CloneCore()
+    {
+
+
+    }
+
+    private void HideDialog()
+    {
+        ShowDialog = false;
+    }
 
 
 }

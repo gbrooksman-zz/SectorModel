@@ -16,7 +16,8 @@
 			</div>
 		</div>    
 		<div class="row">
-			<div class="col">				  
+			<div class="col">	
+                @duplicateEquityMessage
 				<select id="equityDDL" @bind="selectedSymbol">
 					<option></option>
 					@foreach (var equity in appSettings.AllEquities)
@@ -79,41 +80,55 @@
     [Parameter]
     public Model Model { get; set; }
 
-	private string _selectedSymbol;
-	public string selectedSymbol
-	{
-		get => _selectedSymbol;
-		set
-		{
-			_selectedSymbol = value;
-			HandleSelection(_selectedSymbol);
-		}
-	}
-   
-	private decimal lastPrice = 0;
+    private string _selectedSymbol;
+    private MarkupString duplicateEquityMessage;
 
-	private decimal remainingPercent = 0;
+    public string selectedSymbol
+    {
+        get => _selectedSymbol;
+        set
+        {
+            _selectedSymbol = value;
+            HandleSelection(_selectedSymbol);
+        }
+    }
+
+    private decimal lastPrice = 0;
+
+    private decimal remainingPercent = 0;
 
     protected void HandleSelection(string selSymbol)
     {
-		Equity eq = appSettings.AllEquities.Where(e => e.Symbol == selSymbol).FirstOrDefault();		
-		Quote quote = appSettings.LatestQuotes.Where( q => q.EquityId == eq.Id).FirstOrDefault();
-		if (quote != null)
-		{
-			lastPrice = quote.Price;
-		}
-    } 
+
+        Equity eq = appSettings.AllEquities.Where(e => e.Symbol == selSymbol).FirstOrDefault();
+
+        if (Model.ItemList.Where(i => i.EquityId == eq.Id).Count() > 0)
+        {
+            duplicateEquityMessage =(MarkupString) "<label class='text-danger'> Sector Fund already exists in this model </label></br>";
+            return;
+        }
+        else
+        {
+            duplicateEquityMessage = (MarkupString) string.Empty;
+        }
+
+        Quote quote = appSettings.LatestQuotes.Where( q => q.EquityId == eq.Id).FirstOrDefault();
+        if (quote != null)
+        {
+            lastPrice = quote.Price;
+        }
+    }
 
     protected override void OnInitialized()
     {
         EditModelItem.ModelId = Model.Id;
 
-		if (EditModelItem.Equity != null)
-		{
-        	selectedSymbol = EditModelItem.Equity.Symbol;
-		}
+        if (EditModelItem.Equity != null)
+        {
+            selectedSymbol = EditModelItem.Equity.Symbol;
+        }
 
-		remainingPercent = (100 - Model.ItemList.Sum( p => p.Percentage));
+        remainingPercent = (100 - Model.ItemList.Sum( p => p.Percentage));
     }
 
     private async Task HandleValidSubmit()
@@ -127,43 +142,44 @@
         EditModelItem.Cost = (Model.StartValue * (EditModelItem.Percentage / 100));
         EditModelItem.Shares = Math.Round((EditModelItem.Cost / lastQuote.Price),3);
 
-		RemoveFromState(EditModelItem);
-		
+        RemoveFromState(EditModelItem);
+
         HttpResponseMessage response = await httpClient.PostAsJsonAsync<ModelItem>("model/saveitem", EditModelItem);
-		ModelItem item = await response.Content.ReadFromJsonAsync<ModelItem>();
-		
-		AddToState(item);
-  
+        ModelItem item = await response.Content.ReadFromJsonAsync<ModelItem>();
+
+        AddToState(item);
+
         Close();
     }
 
     private void Close()
-    {	
+    {
         nav.NavigateTo($"/Redirect");
     }
 
     private async Task DeleteItem()
     {
-		RemoveFromState(EditModelItem);
+        RemoveFromState(EditModelItem);
 
-		HttpResponseMessage response = await httpClient.DeleteAsync ($"model/RemoveModelItem?modelItemId={EditModelItem.Id}");
-		ModelItem item = await response.Content.ReadFromJsonAsync<ModelItem>();
-		
-		AddToState(item);
+        HttpResponseMessage response = await httpClient.DeleteAsync ($"model/RemoveModelItem?modelItemId={EditModelItem.Id}");
+        bool isDeleted = await response.Content.ReadFromJsonAsync<bool>();
 
-		Close();
+        appState.Model = Model;
+        appState.ModelList.Add(Model);
+
+        Close();
     }
 
-	private void RemoveFromState(ModelItem item)
-	{
-		appState.ModelList.Remove(Model);
-		Model.ItemList.Remove(item);
-	}
+    private void RemoveFromState(ModelItem item)
+    {
+        appState.ModelList.Remove(Model);
+        Model.ItemList.Remove(item);
+    }
 
-	private void AddToState(ModelItem item)
-	{
-		Model.ItemList.Add(item);
-		appState.Model = Model;
-		appState.ModelList.Add(Model);
-	}
+    private void AddToState(ModelItem item)
+    {
+        Model.ItemList.Add(item);
+        appState.Model = Model;
+        appState.ModelList.Add(Model);
+    }
 }

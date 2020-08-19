@@ -7,58 +7,68 @@
 
 @using SectorModel.Shared.Entities
 
-<AppHeader/>
+<AppHeader />
 
-<h4>@model.Name details</h4>
+@if (IsEdit)
+{
+    <h4>@model.Name details</h4>
+}
+else
+{
+    <h4>Add a new model</h4>
+}
 
 <EditForm Model="model" OnValidSubmit="HandleValidSubmit">
-	<DataAnnotationsValidator />
+    <DataAnnotationsValidator />
     <ValidationSummary />
+    <div class="container-fluid py-5">
+        <div class="row">
+            <div class="col-2">
+                <label>Name</label>
+            </div>
+            <div class="col">
+                <InputText id="txtName" size="50" placeholder="model name" @bind-Value="model.Name"></InputText>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-2">
+                <label>Starting Date</label>
+            </div>
+            <div class="col">
+                <InputDate id="dtStartDate" @bind-Value="model.StartDate"></InputDate>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-2">
+                <label>Starting Value</label>
+            </div>
+            <div class="col">
+                <InputNumber id="txtStartingValue" size="50" placeholder="starting value" @bind-Value="model.StartValue"></InputNumber>
+            </div>
+        </div>
 
-    <div class="form-control">
-			<label>Name</label>
-            <InputText id="txtName" size="50" placeholder="model name" @bind-Value="model.Name"></InputText>
-    </div>   
+        @if (IsEdit)
+        {
+            <div class="row">
+                <div class="col-lg">
+                    <div class="card">
+                        <div class="card-body">
+                            <label>Created: @model.CreatedAt</label>
+                            <label>Updated: @model.UpdatedAt</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
 
-    <div class="form-control">
-			<label for="chkActive" >Is Active?</label>	
-            <InputCheckbox id="chkActive" @bind-Value="model.IsActive"></InputCheckbox>
-    </div>
-
-	 <div class="form-control">
-			<label >Starting Date</label>	
-            <InputDate id="dtStartDate" @bind-Value="model.StartDate"></InputDate>
-    </div>
-
-	 <div class="form-control">
-			<label >Ending Date</label>	
-            <InputDate id="dtStopDate" @bind-Value="model.StopDate"></InputDate>
-    </div>
-
-	<div class="form-control">
-			<label>Starting Value</label>
-            <InputNumber id="txtStartingValue" size="50" placeholder="starting value" @bind-Value="model.StartValue"></InputNumber>
-    </div>
-
-	<div class="form-control">
-			<label>Current Value</label>
-            <InputNumber id="txtEndingValue" size="50" placeholder="ending value" @bind-Value="model.StopValue"></InputNumber>
-    </div>
-
-	<div class="card">
-		<div class="card-body">
-			<label>Created: @model.CreatedAt</label>
-			<label>Updated: @model.UpdatedAt</label>
-		</div>
-    </div>
-
-	<div class="row form-group">
-		<div class="col-sm-4">
- 			<button class="btn btn-primary" type="submit">Save</button>
-		</div>
-		<div class="col-sm-8">
- 			<button class="btn btn-secondary" type="button" @onclick="Close">Cancel</button>
-		</div>
+        <div class="row">
+            <div class="col-4">
+                <button class="btn btn-primary" type="submit">Save</button>
+            </div>
+            <div class="col-8">
+                <button class="btn btn-secondary" type="button" @onclick="Close">Cancel</button>
+            </div>
+        </div>
     </div>
 
 </EditForm>
@@ -67,54 +77,54 @@
 {
     private Model model = new Model();
 
-	[Parameter]
+    [Parameter]
     public bool IsEdit { get; set; }
 
     protected override void OnInitialized()
     {
-		model = appState.Model;
+        model = appState.Model;
 
-		if (IsEdit)
-		{
-        	model = appState.ModelList.Where(m => m.Id == model.Id).FirstOrDefault();
-			model.StopValue = model.ItemList.Sum(i => i.CurrentValue);
-		}	
-		else
-		{
-			model.UserId = appState.CurrentUser.Id;
-			model.StartDate = DateTime.Now;
-			model.IsActive = true;
-			model.StopDate = DateTime.Now.AddYears(3);
-			model.ItemList = new List<ModelItem>();
-		}
-	}
+        if (IsEdit)
+        {
+            model = appState.ModelList.Where(m => m.Id == model.Id).FirstOrDefault();
+            model.StopValue = model.ItemList.Sum(i => i.CurrentValue);
+        }
+        else
+        {
+            model.UserId = appState.CurrentUser.Id;
+            model.StartDate = DateTime.Now;
+            model.IsActive = true;
+            model.StopDate = DateTime.Now.AddYears(3);
+            model.ItemList = new List<ModelItem>();
+        }
+    }
 
 
     private async Task HandleValidSubmit()
-    { 
-		RemoveFromState(model);
+    {
+        RemoveFromState(model);
 
-		HttpResponseMessage response = await httpClient.PostAsJsonAsync("model/save", model);
-		model = await response.Content.ReadFromJsonAsync<Model>();
+        HttpResponseMessage response = await httpClient.PostAsJsonAsync("model/save", model);
+        model = await response.Content.ReadFromJsonAsync<Model>();
 
-		AddToState(model);
-		
-		Close();      
+        AddToState(model);
+
+        Close();
     }
 
-	private void Close()
-	{		
-		nav.NavigateTo("/User/StartPage");
-	}
+    private void Close()
+    {
+        nav.NavigateTo("/User/StartPage");
+    }
 
-	private void RemoveFromState(Model item)
-	{
-		appState.ModelList.Remove(item);
-	}
+    private void RemoveFromState(Model item)
+    {
+        appState.ModelList.Remove(item);
+    }
 
-	private void AddToState(Model item)
-	{
-		appState.Model = item;	
-		appState.ModelList.Add(item);
-	}
+    private void AddToState(Model item)
+    {
+        appState.Model = item;
+        appState.ModelList.Add(item);
+    }
 }
