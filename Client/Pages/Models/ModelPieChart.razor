@@ -5,7 +5,7 @@
 @inject HttpClient httpClient
 @inject NavigationManager nav
 
-@using SectorModel.Client.Common
+@*@using SectorModel.Client.Common*@
 @using SectorModel.Shared.Entities
 @using SectorModel.Client.Pages.Components
 
@@ -35,7 +35,7 @@
 			{
 				Name = mi.Equity.SymbolName,
 				Percent = mi.Percentage,
-				Color = ColorPicker.Get(x++)
+				Color = Utils.GetColor(x++)
 			});		
 		}     
     }

@@ -130,7 +130,7 @@ namespace SectorModel.Server.Managers
             }
             catch(Exception ex)
             {
-                Log.Error(ex, "QuoteManager::GetDateRangeWithInterval");
+                Log.Error(ex, "ModelManager::GetDateRangeWithInterval");
                 throw;
             }
 
@@ -148,19 +148,17 @@ namespace SectorModel.Server.Managers
         {            
             try
             {
-                using (var db = new WriteContext(appSettings))
+                using var db = new WriteContext(appSettings);
+                if (model.Id == Guid.Empty)
                 {
-                    if (model.Id == Guid.Empty)
-                    {
-                        db.Models.Add(model);
-                    }
-                    else
-                    {
-                        db.Models.Update(model);
-                    }
-                    await db.SaveChangesAsync();
+                    db.Models.Add(model);
                 }
-                
+                else
+                {
+                    db.Models.Update(model);
+                }
+                await db.SaveChangesAsync();
+
             }
             catch(Exception ex)
             {
@@ -169,8 +167,7 @@ namespace SectorModel.Server.Managers
             } 
 
             return model;
-        }
-
+        } 
     }
 }
 

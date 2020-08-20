@@ -1,8 +1,6 @@
 @inject AppState appState
 @inject AppSettings appSettings
 
-@using SectorModel.Client.Common
-
  <div class="container">
 	<div class="row">
 		<div class="col-sm-4">
@@ -20,9 +18,7 @@
 	</div>
 </div>
 
-
 @code
 {
 	[Parameter] public bool IsStart {get; set;} = false;
-
 }

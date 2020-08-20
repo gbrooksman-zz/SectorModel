@@ -1,7 +1,7 @@
 ﻿@using SectorModel.Client
 @using SectorModel.Shared.Entities
 @using Microsoft.AspNetCore.Components
-@using SectorModel.Client.Common
+@*@using SectorModel.Client.Common*@
 @using SectorModel.Client.Entities
 
 @inject AppSettings appSettings
@@ -114,7 +114,7 @@ else
         builder.OpenElement(1, "path");
         builder.AddAttribute(2, "d", linePath);
         builder.AddAttribute(3, "fill", "none");
-        builder.AddAttribute(4, "stroke", ColorPicker.Get(colorValue));
+        builder.AddAttribute(4, "stroke", Utils.GetColor(colorValue));
         builder.AddAttribute(5, "stroke-width", 2);
         builder.CloseElement();
     };
@@ -150,7 +150,7 @@ else
 
         foreach (ModelItem mi in Model.ItemList)
         {
-            frag += BuildLegendPath(legendPath, ColorPicker.Get(i++), xCoord, yCoord);
+            frag += BuildLegendPath(legendPath, Utils.GetColor(i++), xCoord, yCoord);
             frag += BuildLegendText(mi.Equity.SymbolName, xCoord, yCoord);
         }
 

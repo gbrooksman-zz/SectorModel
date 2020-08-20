@@ -84,7 +84,7 @@ namespace SectorModel.Server.Controllers
             }
         }
 
-		[HttpPost]
+        [HttpPost]
         [Route("SaveItem")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
