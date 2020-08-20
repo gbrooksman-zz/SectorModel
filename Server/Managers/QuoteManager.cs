@@ -133,12 +133,10 @@ namespace SectorModel.Server.Managers
 
             try
             {
-                using (var db = new ReadContext(appSettings))
-                {  
-					quoteList = await db.Quotes
-                                        .Where(i => i.Date == quoteDate)
-                                        .ToListAsync(); 
-				}                
+                using var db = new ReadContext(appSettings);
+                quoteList = await db.Quotes
+                                    .Where(i => i.Date == quoteDate)
+                                    .ToListAsync();
             }
             catch(Exception ex)
             {
