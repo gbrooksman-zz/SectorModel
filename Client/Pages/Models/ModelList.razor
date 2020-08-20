@@ -110,6 +110,9 @@
 
         HttpResponseMessage response = await httpClient.PostAsJsonAsync("model/save", model);
         Model coreCopy = await response.Content.ReadFromJsonAsync<Model>();
+
+        
+
         appState.Model = model;
         appState.ModelList.Add(model);
     }

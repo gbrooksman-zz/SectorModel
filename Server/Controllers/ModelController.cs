@@ -85,6 +85,25 @@ namespace SectorModel.Server.Controllers
         }
 
         [HttpPost]
+        [Route("Copy")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<Model>> Copy(Model model)
+        {
+            model = await mMgr.Save(model);
+            List<ModelItem> newItemList = new List<ModelItem>();
+
+            foreach (ModelItem item in model.ItemList)
+            {
+                item.ModelId = model.Id;
+                ModelItem newItem = await miMgr.Save(item);
+                newItemList.Add(newItem);
+            }
+
+            model.ItemList = newItemList;
+            return Ok(model);
+        }
+
+        [HttpPost]
         [Route("SaveItem")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]

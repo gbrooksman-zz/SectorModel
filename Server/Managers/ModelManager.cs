@@ -167,7 +167,7 @@ namespace SectorModel.Server.Managers
             } 
 
             return model;
-        } 
+        }      
     }
 }
 
