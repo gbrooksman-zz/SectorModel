@@ -1,0 +1,88 @@
+﻿@inject AppSettings appSettings
+@inject HttpClient httpClient
+@inject NavigationManager nav
+@inject AppState appState;
+
+@using SectorModel.Client.Pages.Components
+@using SectorModel.Shared.Entities
+@using System.Linq
+
+
+<div class="container">
+    <div class="row">
+        <div class="col-6">
+            <h4>@model.Name</h4>
+        </div>
+        <div class="col" style="text-align:right;">
+            <span>Starting Date:@Utils.FormatDate(model.StartDate)</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <DataGrid Items="@modelEquityList" TItem="ModelItem" Context="m">
+                <HeaderTemplate>
+                    <th>Name</th>
+                    <th>Percent in Model</th>
+                    <th>Current Value</th>
+                    <th>Gain/Loss</th>
+                </HeaderTemplate>
+                <RowTemplate>
+                    <td> @m.Equity.SymbolName</td>
+                    <td> @m.Percentage</td>
+                    <td> @GetValue(m.CurrentValue)</td>
+                    <td> @Utils.CalcGainLoss(m.CurrentValue, m.Cost) </td>
+                </RowTemplate>
+                <FooterTemplate>
+                    <td>
+                        Equities in Model: @m.Count
+                    </td>
+                    <td>
+                        @Math.Round(modelEquityList.Sum(i => i.Percentage), 0)
+                    </td>
+                    <td>
+                        @Utils.FormatNumber(totalValue)
+                    </td>
+                    <td>
+                        @Utils.CalcGainLoss(totalValue, totalCost)
+                    </td>
+                </FooterTemplate>
+            </DataGrid>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    private bool isCore;
+
+    decimal totalValue = 0;
+    decimal totalCost = 0;
+
+    Guid modelId { get; set; }
+
+    Model model = new Model();
+
+    ModelItem modelItem = new ModelItem();
+
+    List<ModelItem> modelEquityList = new List<ModelItem>();
+
+    protected override void OnInitialized()
+    {
+        model = appState.Model;
+        modelEquityList = model.ItemList;
+        isCore = (model.Id == appSettings.CoreModelId);
+    }
+
+    private MarkupString GetValue(decimal inValue)
+    {
+        totalValue += inValue;
+        return Utils.FormatNumber(inValue);
+    }
+
+    private MarkupString GetCost(decimal inValue)
+    {
+        totalCost += inValue;
+        return Utils.FormatNumber(inValue);
+    }
+}
+

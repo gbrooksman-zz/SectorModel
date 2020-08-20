@@ -3,7 +3,6 @@
 @inject HttpClient httpClient
 @inject NavigationManager nav
 
-@*@using SectorModel.Client.Common*@
 @using SectorModel.Shared.Entities
 @using System.Linq
 
@@ -31,6 +30,7 @@
         <td>@Utils.FormatNumber(m.StopValue)</td>
         <td>@Utils.CalcGainLoss(m.StopValue, m.StartValue) </td>
         <td>
+            <input type="button" id="btnComposite" class="btn btn-info" @onclick="@( () => { ShowComposite(@m.Id); } )" value="Composite" />
             <input type="button" id="btnLineChart" class="btn btn-info" @onclick="@( () => { ShowLineChart(@m.Id); } )" value="History" />
             <input type="button" id="btnPieChart" class="btn btn-info" @onclick="@( () => { ShowPieChart(@m.Id); } )" value="Pie" />
 
@@ -68,6 +68,12 @@
     {
         SetModel(modelId);
         nav.NavigateTo($"/ModelItemList/true/true");
+    }
+
+    private void ShowComposite(Guid modelId)
+    {
+        SetModel(modelId);
+        nav.NavigateTo($"/ModelComposite");
     }
 
     private void ShowCore(Guid modelId)

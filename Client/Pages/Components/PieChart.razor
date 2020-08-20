@@ -9,11 +9,14 @@
         </svg>
     </div>
     <br />
-    <figcaption>
-        <ul>
-            @DrawLegend();
-        </ul>
-    </figcaption>
+    @if (!HideLegend)
+    {
+        <figcaption>
+            <ul>
+                @DrawLegend();
+            </ul>
+        </figcaption>
+    }
 </figure>
 
 
@@ -27,6 +30,9 @@
 
     [Parameter]
     public IEnumerable<PieSlice> PieSlices { get; set; }
+
+    [Parameter]
+    public bool HideLegend { get; set; } = false;
 
     private class Point
     {
@@ -67,6 +73,9 @@
         builder.OpenElement(1, "path");
         builder.AddAttribute(2, "d", GetPath(slice));
         builder.AddAttribute(3, "fill", slice.Color);
+        builder.OpenElement(4, "title");
+        builder.AddContent(5, slice.Name);
+        builder.CloseElement();
         builder.CloseElement();
     };
 
