@@ -7,7 +7,8 @@
 
 <EditForm Model="EditModelItem" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
-    <ValidationSummary />
+               
+	@validationMessage
 
     <div class="container-fluid"> 
 		<div class="row">
@@ -16,8 +17,7 @@
 			</div>
 		</div>    
 		<div class="row">
-			<div class="col">	
-                @duplicateEquityMessage
+			<div class="col">	               
 				<select id="equityDDL" @bind="selectedSymbol">
 					<option></option>
 					@foreach (var equity in appSettings.AllEquities)
@@ -41,7 +41,7 @@
 				<label>Percent:</label>
 			</div>
 			<div class="col-sm-4">
-				<InputNumber id="txtPercent" size="5" placeholder="Percent" @bind-Value="EditModelItem.Percentage"></InputNumber>
+				<InputNumber id="txtPercent" size="5" placeholder="Percent" @onfocusout="ValidatePercent" @bind-Value="EditModelItem.Percentage"></InputNumber>
 			</div>						
 			<div class="col-sm-4">
 				<label>Model percent remaining: @remainingPercent:</label>                
@@ -58,7 +58,7 @@
 		</div>	
 		<div class="row">
 			<div class="col">
-				<button class="btn btn-success" type="submit">Save</button> 
+				<button class="btn btn-success" disabled="@(!isValid)" type="submit">Save</button> 
 			</div>
 			<div class="col">
 				<button class="btn btn-secondary" @onclick="Close">Close</button>
@@ -81,7 +81,9 @@
     public Model Model { get; set; }
 
     private string _selectedSymbol;
-    private MarkupString duplicateEquityMessage;
+    private MarkupString validationMessage;
+
+	private bool isValid = true;
 
     public string selectedSymbol
     {
@@ -89,7 +91,10 @@
         set
         {
             _selectedSymbol = value;
-            HandleSelection(_selectedSymbol);
+			if (_selectedSymbol != EditModelItem.Equity.Symbol)
+			{
+            	HandleSelection(_selectedSymbol);
+			}
         }
     }
 
@@ -99,17 +104,17 @@
 
     protected void HandleSelection(string selSymbol)
     {
-
         Equity eq = appSettings.AllEquities.Where(e => e.Symbol == selSymbol).FirstOrDefault();
 
         if (Model.ItemList.Where(i => i.EquityId == eq.Id).Count() > 0)
         {
-            duplicateEquityMessage =(MarkupString) "<label class='text-danger'> Sector Fund already exists in this model </label></br>";
-            return;
+            validationMessage = (MarkupString) "<label class='text-danger'> Sector Fund already exists in this model </label></br>";
+            isValid = false;
+			return;
         }
         else
         {
-            duplicateEquityMessage = (MarkupString) string.Empty;
+            validationMessage = (MarkupString) string.Empty;
         }
 
         Quote quote = appSettings.LatestQuotes.Where( q => q.EquityId == eq.Id).FirstOrDefault();
@@ -133,6 +138,7 @@
 
     private async Task HandleValidSubmit()
     {
+
         Equity eq = appSettings.AllEquities.Where( e => e.Symbol == selectedSymbol).FirstOrDefault();
 
         Quote lastQuote = appSettings.LatestQuotes.Where(q => q.EquityId == eq.Id).FirstOrDefault();
@@ -156,6 +162,22 @@
     {
         nav.NavigateTo($"/Redirect");
     }
+
+	private void ValidatePercent()
+	{
+		if (EditModelItem.Percentage > remainingPercent)
+		{
+			validationMessage = (MarkupString) "<label class='text-danger'> Percent must be between 1 and 100 </label></br>";
+			isValid = false;
+		}
+		else
+		{
+			validationMessage = (MarkupString) string.Empty;
+			isValid = true;
+
+		}
+
+	}
 
     private async Task DeleteItem()
     {

@@ -32,8 +32,6 @@
         <td>
             <input type="button" id="btnComposite" class="btn btn-info" @onclick="@( () => { ShowComposite(@m.Id); } )" value="Composite" />
             <input type="button" id="btnLineChart" class="btn btn-info" @onclick="@( () => { ShowLineChart(@m.Id); } )" value="History" />
-            <input type="button" id="btnPieChart" class="btn btn-info" @onclick="@( () => { ShowPieChart(@m.Id); } )" value="Pie" />
-
             @if (!IsCore)
             {
                 <input type="button" id="btnDetails" class="btn btn-info" @onclick="@( () => { EditModel(@m.Id); } )" value="Details" />
@@ -80,12 +78,6 @@
     {
         SetModel(modelId);
         nav.NavigateTo($"/ModelItemList/false/false");
-    }
-
-    private void ShowPieChart(Guid modelId)
-    {
-        SetModel(modelId);
-        nav.NavigateTo("/ModelPieChart");
     }
 
     private void ShowLineChart(Guid modelId)
