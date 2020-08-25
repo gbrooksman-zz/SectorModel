@@ -10,9 +10,10 @@
 {
     <input type="button" id="btnAdd" class="btn btn-primary" @onclick="AddModel" value="Add" />
     <input type="button" id="btnCopyCore" class="btn btn-secondary" @onclick="CopyCore" value="Clone Core as New" />
+    @*<input type="checkbox" id="chkActive" @bind="activeOnly" @onclick="ToggleActive"/><label for="chkActive">Active only?</label>*@
 }
 
-<DataGrid Items="@Models" TItem="Model" Context="m">
+<DataGrid Items="@modelList" TItem="Model" Context="m">
     <HeaderTemplate>
         <th>Name</th>
         <th>Start Date</th>
@@ -55,6 +56,15 @@
     [Parameter] public List<Model> Models { get; set; }
 
     [Parameter] public bool IsCore { get; set; }
+
+    bool activeOnly = true;
+
+    private List<Model> modelList = new List<Model>();
+
+    protected override void OnInitialized()
+    {
+        modelList = Models;
+    }
 
     private void EditModel(Guid modelId)
     {
@@ -99,11 +109,10 @@
         model.UserId = appState.CurrentUser.Id;
         model.StartDate = DateTime.Now;
         model.Id = Guid.Empty;
+        model.IsActive = true;
 
         HttpResponseMessage response = await httpClient.PostAsJsonAsync("model/save", model);
         Model coreCopy = await response.Content.ReadFromJsonAsync<Model>();
-
-        
 
         appState.Model = model;
         appState.ModelList.Add(model);
@@ -112,5 +121,11 @@
     private void SetModel(Guid modelId)
     {
         appState.Model = appState.ModelList.Where(m => m.Id == modelId).FirstOrDefault();
+    }
+
+    private void ToggleActive()
+    {
+        activeOnly = !activeOnly;
+        modelList = modelList.Where(m => m.IsActive == activeOnly).ToList();
     }
 }

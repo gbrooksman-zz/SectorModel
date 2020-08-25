@@ -61,14 +61,26 @@ else
             </div>
         }
 
-        <div class="row">
-            <div class="col-4">
-                <button class="btn btn-primary" type="submit">Save</button>
-            </div>
-            <div class="col-8">
-                <button class="btn btn-secondary" type="button" @onclick="Close">Cancel</button>
-            </div>
+    <div class="row">
+        <div class="col-4">
+            <button class="btn btn-primary" type="submit">Save</button>
         </div>
+        @if (model.IsActive)
+        {
+            <div class="col-4">
+                <button class="btn btn-secondary" type="button" @onclick="Archive">Deactivate</button>
+            </div>
+        }
+        else
+        {
+            <div class="col-4">
+                <button class="btn btn-secondary" type="button" @onclick="UnArchive">Activate</button>
+            </div>
+        }
+        <div class="col-4">
+            <button class="btn btn-secondary" type="button" @onclick="Close">Cancel</button>
+        </div>
+    </div>
     </div>
 
 </EditForm>
@@ -110,6 +122,20 @@ else
         AddToState(model);
 
         Close();
+    }
+
+    private async Task Archive()
+    {
+        model.IsActive = false;
+        model.StopDate = DateTime.Now;
+        await HandleValidSubmit();
+    }
+
+    private async Task UnArchive()
+    {
+        model.IsActive = true;
+        model.StartDate = DateTime.Now;
+        await HandleValidSubmit();
     }
 
     private void Close()

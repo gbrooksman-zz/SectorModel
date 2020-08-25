@@ -83,7 +83,7 @@
     private string _selectedSymbol;
     private MarkupString validationMessage;
 
-	private bool isValid = true;
+    private bool isValid = true;
 
     public string selectedSymbol
     {
@@ -91,10 +91,10 @@
         set
         {
             _selectedSymbol = value;
-			if (_selectedSymbol != EditModelItem.Equity.Symbol)
-			{
-            	HandleSelection(_selectedSymbol);
-			}
+            if (_selectedSymbol != EditModelItem.Equity.Symbol)
+            {
+                HandleSelection(_selectedSymbol);
+            }
         }
     }
 
@@ -110,7 +110,7 @@
         {
             validationMessage = (MarkupString) "<label class='text-danger'> Sector Fund already exists in this model </label></br>";
             isValid = false;
-			return;
+            return;
         }
         else
         {
@@ -148,12 +148,12 @@
         EditModelItem.Cost = (Model.StartValue * (EditModelItem.Percentage / 100));
         EditModelItem.Shares = Math.Round((EditModelItem.Cost / lastQuote.Price),3);
 
-        RemoveFromState(EditModelItem);
+        RemoveFromState();
 
         HttpResponseMessage response = await httpClient.PostAsJsonAsync<ModelItem>("model/saveitem", EditModelItem);
         ModelItem item = await response.Content.ReadFromJsonAsync<ModelItem>();
 
-        AddToState(item);
+        await AddToState();
 
         Close();
     }
@@ -163,45 +163,51 @@
         nav.NavigateTo($"/Redirect");
     }
 
-	private void ValidatePercent()
-	{
-		if (EditModelItem.Percentage > remainingPercent)
-		{
-			validationMessage = (MarkupString) "<label class='text-danger'> Percent must be between 1 and 100 </label></br>";
-			isValid = false;
-		}
-		else
-		{
-			validationMessage = (MarkupString) string.Empty;
-			isValid = true;
-
-		}
-
-	}
+    private void ValidatePercent()
+    {
+        if ((EditModelItem.Percentage < 1) || (EditModelItem.Percentage > 100))
+        {
+            validationMessage = (MarkupString) "<label class='text-danger'> Percent must be between 1 and 100 </label></br>";
+            isValid = false;
+        }
+        else if ((remainingPercent + EditModelItem.Percentage) > 100)
+        {
+            validationMessage = (MarkupString)"<label class='text-danger'> Total Percent can not exceed 100 </label></br>";
+            isValid = false;
+        }
+        else
+        {
+            validationMessage = (MarkupString) string.Empty;
+            remainingPercent =  (100 - Model.ItemList.Where(p => p.EquityId != EditModelItem.EquityId).Sum(p => p.Percentage)) - EditModelItem.Percentage;
+            isValid = true;
+        }
+    }
 
     private async Task DeleteItem()
     {
-        RemoveFromState(EditModelItem);
+        RemoveFromState();
 
         HttpResponseMessage response = await httpClient.DeleteAsync ($"model/RemoveModelItem?modelItemId={EditModelItem.Id}");
         bool isDeleted = await response.Content.ReadFromJsonAsync<bool>();
 
-        appState.Model = Model;
-        appState.ModelList.Add(Model);
+        await AddToState();
 
         Close();
     }
 
-    private void RemoveFromState(ModelItem item)
+    private void RemoveFromState()
     {
         appState.ModelList.Remove(Model);
-        Model.ItemList.Remove(item);
+        Model.ItemList.Remove(EditModelItem);
     }
 
-    private void AddToState(ModelItem item)
+    private async Task AddToState()
     {
-        Model.ItemList.Add(item);
-        appState.Model = Model;
-        appState.ModelList.Add(Model);
+        Model model = appState.ModelList.Where(m => m.Id == Model.Id).FirstOrDefault();
+        appState.ModelList.Remove(model);
+        model = await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={Model.Id}&quoteDate={DateTime.Now}");
+        appState.ModelList.Add(model);
+        appState.Model = model;
     }
+
 }

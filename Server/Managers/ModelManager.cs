@@ -26,7 +26,7 @@ namespace SectorModel.Server.Managers
             qMgr = new QuoteManager(_cache, config, appSettings);            
         }
 
-        public async Task<List<Model>> GetModelList(Guid userId, bool activeOnly = false, bool privateOnly = false)
+        public async Task<List<Model>> GetModelList(Guid userId)
         {
             List<Model> modelList = new List<Model>();
 			List<Model> pricedModelList = new List<Model>();
@@ -35,12 +35,8 @@ namespace SectorModel.Server.Managers
             {
                 using var db = new ReadContext(appSettings);
                 modelList = await db.Models
-                                    .Where(i => i.UserId == userId)
+                                    .Where(i => i.UserId == userId  && i.IsActive == true)
                                     .ToListAsync(); 
-				if (activeOnly)
-				{
-					modelList = modelList.Where( i => i.IsActive == true).ToList();
-				} 
 
 				foreach (Model model in modelList)
 				{
@@ -66,6 +62,7 @@ namespace SectorModel.Server.Managers
             return pricedModelList;
         }
 
+
         public async Task<Model> GetModel(Guid modelId, DateTime quoteDate)
         {
             Model model = new Model();
@@ -74,7 +71,7 @@ namespace SectorModel.Server.Managers
             {
                 using (var db = new ReadContext(appSettings))
                 {
-                    model = await db.Models.FindAsync(modelId);
+                    model = await db.Models.Where(m => m.Id == modelId && m.IsActive == true).FirstOrDefaultAsync();
 
 					model.ItemList = await db.ModelItems
 										.Where( m => m.ModelId == modelId)
@@ -148,6 +145,8 @@ namespace SectorModel.Server.Managers
         {            
             try
             {
+                model.StartDate = DateTime.Now; //whenever a model is edited reset the 'start' date
+
                 using var db = new WriteContext(appSettings);
                 if (model.Id == Guid.Empty)
                 {
