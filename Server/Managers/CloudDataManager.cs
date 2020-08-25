@@ -25,8 +25,7 @@ namespace SectorModel.Server.Managers
 
         private static HttpClient client;
 
-        private readonly ModelManager egMgr;
-        private readonly ModelItemManager miMgr;
+        private readonly ModelManager mMgr;
         private readonly QuoteManager qMgr;
         private readonly EquityManager eMgr;
         private readonly AppSettings appSettings;
@@ -35,8 +34,7 @@ namespace SectorModel.Server.Managers
         {
             appSettings = _appSettings;
 
-            egMgr = new ModelManager(cache, config, appSettings);
-            miMgr = new ModelItemManager(cache, config, appSettings);
+            mMgr = new ModelManager(cache, config, appSettings);
             qMgr = new QuoteManager(cache, config, appSettings);
             eMgr = new EquityManager(cache, config, appSettings);
 
@@ -62,7 +60,7 @@ namespace SectorModel.Server.Managers
 
             List<Equity> egiList = new List<Equity>();
 
-            var modelItems = await miMgr.GetModelItems(coreModelId);
+            var modelItems = await mMgr.GetModelItems(coreModelId);
 
             foreach (ModelItem item in modelItems)
             {

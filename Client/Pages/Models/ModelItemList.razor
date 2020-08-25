@@ -44,6 +44,7 @@
 		@if (CanAdd)
 		{
 			<input type="button" id="btnAdd" class="btn btn-primary" @onclick="ShowAddItem" value="Add" />
+			<input type="button" id="btnRebalance" class="btn btn-secondary" @onclick="Rebalance" value="Rebalance" />
 		}
 		<DataGrid Items="@modelEquityList" TItem="ModelItem" Context="m">
 			<HeaderTemplate>
@@ -71,10 +72,6 @@
                     @if (CanEdit)
                     {
                         <input type="button" class="btn btn-secondary" value="Edit" @onclick="( () => {EditItem(m);})" />
-                    }
-                    @if (isCore)
-                    {
-                        <input type="button" class="btn btn-secondary" value="Close" @onclick="CloneCore" />
                     }
                 </td>
                 </RowTemplate>
@@ -114,7 +111,7 @@
     [Parameter]
     public bool CanEdit { get; set; } = false;
 
-    private bool isCore;
+   // private bool isCore;
 
     bool ShowDialog = false;
 
@@ -133,7 +130,7 @@
     {
         model = appState.Model;
         modelEquityList = model.ItemList;
-        isCore = (model.Id == appSettings.CoreModelId);
+       // isCore = (model.Id == appSettings.CoreModelId);
     }
 
     private MarkupString GetValue(decimal inValue)
@@ -160,10 +157,18 @@
         ShowDialog = true;
     }
 
-    private void CloneCore()
-    {
-
-
+    private async Task Rebalance()
+    {		
+		totalValue = 0;
+		totalCost = 0;
+		appState.ModelList.Remove(model);
+		HttpResponseMessage response =  await httpClient.PutAsJsonAsync<Model>("model/rebalanceitems", model);
+		model = await response.Content.ReadFromJsonAsync<Model>();
+		appState.Model = model;
+		appState.ModelList.Add(model);
+		modelEquityList = model.ItemList;
+		totalValue = 0;
+		totalCost = 0;
     }
 
     private void HideDialog()
