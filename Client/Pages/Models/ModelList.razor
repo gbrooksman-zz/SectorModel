@@ -76,7 +76,7 @@
     private void ShowComposite(Guid modelId)
     {
         SetModel(modelId);
-        nav.NavigateTo($"/ModelComposite");
+        nav.NavigateTo($"/ModelComposite/{modelId}");
     }
 
     private void ShowCore(Guid modelId)

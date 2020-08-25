@@ -1,4 +1,4 @@
-﻿@page "/ModelComposite"
+﻿@page "/ModelComposite/{ModelId:guid}"
 
 @inject AppSettings appSettings
 @inject AppState appState
@@ -17,19 +17,29 @@
 		<PieChart PieSlices="@slices" Height="400" Width="400" HideLegend=true/>
 	</div>
 	<div class="col-xs-6">
-		<SimpleModelItemList/>
+		<SimpleModelItemList Model="model"/>
 	</div>
 </div>
 
 @code
 {
-    private Model model = new Model();
+    [Parameter] public Guid ModelId {get; set;}
+
+	private Model model = new Model();
 
     List<PieSlice> slices = new List<PieSlice>();
 
     protected override void OnInitialized()
     {
-        model = appState.Model;
+		if (ModelId == appSettings.CoreModelId)
+		{
+			model = appSettings.CoreModel;
+		}
+		else
+		{
+			model = appState.ModelList.Where( m => m.Id == ModelId).FirstOrDefault();
+		}
+
         GetSlices(model);
     }
 

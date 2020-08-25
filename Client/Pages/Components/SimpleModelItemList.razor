@@ -44,24 +44,20 @@
 
 @code
 {
-    private bool isCore;
-
     decimal totalValue = 0;
     decimal totalCost = 0;
 
     Guid modelId { get; set; }
 
-    Model model = new Model();
+    [Parameter] public Model Model {get; set;}
 
     ModelItem modelItem = new ModelItem();
 
     List<ModelItem> modelEquityList = new List<ModelItem>();
 
     protected override void OnInitialized()
-    {
-        model = appState.Model;
-        modelEquityList = model.ItemList;
-        isCore = (model.Id == appSettings.CoreModelId);
+    {        
+        modelEquityList = Model.ItemList;
     }
 
     private MarkupString GetValue(decimal inValue)
