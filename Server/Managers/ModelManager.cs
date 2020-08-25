@@ -37,7 +37,7 @@ namespace SectorModel.Server.Managers
             {
                 using var db = new ReadContext(appSettings);
                 modelList = await db.Models
-                                    .Where(i => i.UserId == userId  && i.IsActive == true)
+                                    .Where(i => i.UserId == userId)
                                     .ToListAsync(); 
 
 				foreach (Model model in modelList)
@@ -73,7 +73,7 @@ namespace SectorModel.Server.Managers
             {
                 using (var db = new ReadContext(appSettings))
                 {
-                    model = await db.Models.Where(m => m.Id == modelId && m.IsActive == true).FirstOrDefaultAsync();
+                    model = await db.Models.Where(m => m.Id == modelId).FirstOrDefaultAsync();
 
 					model.ItemList = await db.ModelItems
 										.Where( m => m.ModelId == modelId)

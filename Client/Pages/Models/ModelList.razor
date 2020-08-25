@@ -10,7 +10,8 @@
 {
     <input type="button" id="btnAdd" class="btn btn-primary" @onclick="AddModel" value="Add" />
     <input type="button" id="btnCopyCore" class="btn btn-secondary" @onclick="CopyCore" value="Clone Core as New" />
-    @*<input type="checkbox" id="chkActive" @bind="activeOnly" @onclick="ToggleActive"/><label for="chkActive">Active only?</label>*@
+	<input type="button" id="btnAll" class="btn btn-secondary" @onclick="ShowAll" value="All" />
+	<input type="button" id="btnActiveOnly" class="btn btn-secondary" @onclick="ShowActiveOnly" value="Active Only" />
 }
 
 <DataGrid Items="@modelList" TItem="Model" Context="m">
@@ -56,8 +57,6 @@
     [Parameter] public List<Model> Models { get; set; }
 
     [Parameter] public bool IsCore { get; set; }
-
-    bool activeOnly = true;
 
     private List<Model> modelList = new List<Model>();
 
@@ -123,9 +122,13 @@
         appState.Model = appState.ModelList.Where(m => m.Id == modelId).FirstOrDefault();
     }
 
-    private void ToggleActive()
+    private void ShowActiveOnly()
     {
-        activeOnly = !activeOnly;
-        modelList = modelList.Where(m => m.IsActive == activeOnly).ToList();
+        modelList = modelList.Where(m => m.IsActive == true).ToList();
+    }
+
+	private void ShowAll()
+    {
+        modelList = appState.ModelList;
     }
 }

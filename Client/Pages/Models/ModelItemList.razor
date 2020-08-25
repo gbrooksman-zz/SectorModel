@@ -111,8 +111,6 @@
     [Parameter]
     public bool CanEdit { get; set; } = false;
 
-   // private bool isCore;
-
     bool ShowDialog = false;
 
     decimal totalValue = 0;
@@ -129,8 +127,7 @@
     protected override void OnInitialized()
     {
         model = appState.Model;
-        modelEquityList = model.ItemList;
-       // isCore = (model.Id == appSettings.CoreModelId);
+		modelEquityList = model.ItemList;	
     }
 
     private MarkupString GetValue(decimal inValue)
@@ -159,6 +156,7 @@
 
     private async Task Rebalance()
     {		
+		//reset totals twice because change in model onbject causes recalculation
 		totalValue = 0;
 		totalCost = 0;
 		appState.ModelList.Remove(model);
@@ -175,7 +173,6 @@
     {
         ShowDialog = false;
     }
-
 
 }
 
