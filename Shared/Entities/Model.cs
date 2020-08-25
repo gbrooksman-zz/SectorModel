@@ -31,7 +31,8 @@ namespace SectorModel.Shared.Entities
 		[Range(100,10000000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
         public decimal StartValue { get; set; }
 
-        public decimal StopValue { get; set; }	
+		[NotMapped]
+        public decimal LatestValue { get; set; }	
 
 		[NotMapped]
 		public List<ModelItem> ItemList { get; set; }

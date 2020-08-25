@@ -7,16 +7,7 @@
 @using SectorModel.Shared.Entities
 @using System.Linq
 
-
-<div class="container">
-    <div class="row">
-        <div class="col-6">
-            <h4>@model.Name</h4>
-        </div>
-        <div class="col" style="text-align:right;">
-            <span>Starting Date:@Utils.FormatDate(model.StartDate)</span>
-        </div>
-    </div>
+<div class="container-fkuid">
     <div class="row">
         <div class="col">
             <DataGrid Items="@modelEquityList" TItem="ModelItem" Context="m">

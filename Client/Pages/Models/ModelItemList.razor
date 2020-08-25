@@ -9,8 +9,6 @@
 @using SectorModel.Shared.Entities
 @using System.Linq
 
-<AppHeader/>
-
 @if (ShowDialog)
 {
 	<div class="modal border border-dark" tabindex="-1" style="display:block;height:700px;" role="dialog">
@@ -30,15 +28,11 @@
 	</div>
 }
 
+<AppHeader/>
+
+<ModelHeader Model="model"/>
+
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-6">
-            <h4>@model.Name</h4>
-        </div>
-        <div class="col" style="text-align:right;">
-            <span>Starting Date:@Utils.FormatDate(model.StartDate)</span>
-        </div>
-    </div>	
     <div class="row">		
         <div class="col">
 		@if (CanAdd)

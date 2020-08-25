@@ -9,14 +9,7 @@
 
 <AppHeader />
 
-@if (IsEdit)
-{
-    <h4>@model.Name details</h4>
-}
-else
-{
-    <h4>Add a new model</h4>
-}
+<ModelHeader Model="model"/>
 
 <EditForm Model="model" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
@@ -99,7 +92,7 @@ else
         if (IsEdit)
         {
             model = appState.ModelList.Where(m => m.Id == model.Id).FirstOrDefault();
-            model.StopValue = model.ItemList.Sum(i => i.CurrentValue);
+            model.LatestValue = model.ItemList.Sum(i => i.CurrentValue);
         }
         else
         {

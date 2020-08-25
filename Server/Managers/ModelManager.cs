@@ -43,15 +43,9 @@ namespace SectorModel.Server.Managers
 				foreach (Model model in modelList)
 				{
 					Model pricedModel = new Model();
-
-					if (model.StopDate > DateTime.Now)
-					{
-						pricedModel = await GetModel(model.Id, DateTime.Now);
-					}
-					else
-					{
-						pricedModel = await GetModel(model.Id, model.StopDate);
-					}
+					
+					pricedModel = await GetModel(model.Id, DateTime.Now);
+					
 					pricedModelList.Add(pricedModel);
 				}				
             }
@@ -81,7 +75,7 @@ namespace SectorModel.Server.Managers
 
 					model.ItemList = await qMgr.GetModelItemsWithPrices(model, quoteDate);
 
-                    model.StopValue = model.ItemList.Sum(m => m.CurrentValue);				
+                    model.LatestValue = model.ItemList.Sum(m => m.CurrentValue);				
                 }
             }
             catch (Exception ex)
