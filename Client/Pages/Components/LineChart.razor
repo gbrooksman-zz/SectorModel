@@ -1,7 +1,6 @@
 ﻿@using SectorModel.Client
 @using SectorModel.Shared.Entities
 @using Microsoft.AspNetCore.Components
-@*@using SectorModel.Client.Common*@
 @using SectorModel.Client.Entities
 
 @inject AppSettings appSettings
@@ -30,45 +29,32 @@ else
 
        @DrawDataElements()
 
-       @* <circle cx="690" cy="490" r="3" fill="red" />*@
-
     </svg>
 </figure>
 
 <figcaption>
     <ul>
-        @DrawLegend();
+        @DrawLegend()
     </ul>
 </figcaption>
 }
 
 @code
 {
-    [Parameter]
-    public Model Model { get; set; }
+    [Parameter] public Model Model { get; set; }
 
-    [Parameter]
-    public DateTime StopDate { get; set; }
+    [Parameter] public string Width { get; set; }
 
-    [Parameter]
-    public string Width { get; set; }
+    [Parameter] public string Height { get; set; }
 
-    [Parameter]
-    public string Height { get; set; }
+    [Parameter] public int HorizontalGridLines { get; set; } = 10;
 
-    [Parameter]
-    public int HorizontalGridLines { get; set; } = 10;
+    [Parameter] public int VerticalGridLines { get; set; } = 10;
 
-    [Parameter]
-    public int VerticalGridLines { get; set; } = 10;
-
-    [Parameter]
-    public bool RelativeCompare { get; set; }
-
+    [Parameter] public bool RelativeCompare { get; set; }
 
     protected double gridWidth = 0;
-    protected double gridHeight = 0;
-  
+    protected double gridHeight = 0;  
 	private List<Quote> quoteList = new List<Quote>();
 
     protected override async Task OnInitializedAsync()
@@ -76,9 +62,9 @@ else
         gridWidth = double.Parse(Width) / (double)HorizontalGridLines;
         gridHeight = double.Parse(Height) / (double)VerticalGridLines;
 
-        int quoteInterval = Utils.GetInterval(Model.StartDate, StopDate);
+        int quoteInterval = Utils.GetInterval(Model.StartDate, DateTime.Now);
 
-        quoteList = await httpClient.GetFromJsonAsync<List<Quote>>($"model/GetQuotesForDateRange?modelId={Model.Id}&startdate={Model.StartDate}&stopdate={StopDate}&interval={quoteInterval}");
+        quoteList = await httpClient.GetFromJsonAsync<List<Quote>>($"model/GetQuotesForDateRange?modelId={Model.Id}&startdate={Model.StartDate}&stopdate={DateTime.Now}&interval={quoteInterval}");
 	}
 
     private string BuildChartItemPath( List<Quote> itemQuotes)
@@ -95,7 +81,7 @@ else
         decimal highPrice = itemQuotes.Max(q => q.Price);
 
         decimal heightScaleFactor = height / ((highPrice - lowPrice) * 2 );
-        decimal widthScaleFactor = 0; // width / quotes.Count;
+        decimal widthScaleFactor = 0; 
         decimal x = 0;
 
         foreach (var quote in itemQuotes)
@@ -200,29 +186,6 @@ else
     }
 
 
-    internal class ChartItem
-    {
-        internal ChartItem()
-        {
-
-        }
-
-        internal List<Quote> Quotes { get; set; }
-
-        internal decimal StartPrice { get; set; }
-
-        internal decimal HighPrice { get; set; }
-
-        internal decimal LowPrice { get; set; }
-
-        internal string ChartPath { get; set; }
-
-        internal string LegendPath { get; set; }
-
-        internal string LegendText { get; set; }
-
-        internal int ColorIndex { get; set; }
-
-    }
+  
 
 }

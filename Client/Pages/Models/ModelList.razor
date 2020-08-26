@@ -18,7 +18,6 @@
     <HeaderTemplate>
         <th>Name</th>
         <th>Start Date</th>
-        <th>Stop Date</th>
         <th>Start Value</th>
         <th>Latest Value</th>
         <th>Gain/Loss</th>
@@ -27,7 +26,6 @@
     <RowTemplate>
         <td>@m.Name</td>
         <td>@Utils.FormatDate(m.StartDate)</td>
-        <td>@Utils.FormatDate(m.StopDate)</td>
         <td>@Utils.FormatNumber(m.StartValue)</td>
         <td>@Utils.FormatNumber(m.LatestValue)</td>
         <td>@Utils.CalcGainLoss(m.LatestValue, m.StartValue) </td>
@@ -42,7 +40,7 @@
         </td>
     </RowTemplate>
     <FooterTemplate>
-        <td colspan="4">
+        <td colspan="3">
             Models: @m.Count
         </td>
     </FooterTemplate>
@@ -88,7 +86,7 @@
     private void ShowLineChart(Guid modelId)
     {
         SetModel(modelId);
-        nav.NavigateTo("/ModelLineChart");
+        nav.NavigateTo($"/ModelLineChart/{modelId}");
     }
 
     private void AddModel()

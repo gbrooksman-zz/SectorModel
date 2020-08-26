@@ -1,9 +1,8 @@
-@page "/ModelLineChart"
+@page "/ModelLineChart/{modelId:guid}"
 
 @inject AppState appState
 @inject NavigationManager nav
 
-@using SectorModel.Shared.Entities
 @using SectorModel.Client.Pages.Components
 
 <AppHeader/>
@@ -11,8 +10,7 @@
 <LineChart 	Height="400" Width="900" 
 			HorizontalGridLines="10" 
 			VerticalGridLines="10" 
-			Model="@appState.Model" 
-			StopDate="@DateTime.Now"/>
+			Model="@model"/>
 
 <div>
 	<button class="btn btn-secondary" type="button" @onclick="Close">Close</button>
@@ -20,6 +18,15 @@
 
 @code 
 {
+	private Model model = new Model();
+
+	[Parameter] public Guid modelId {get; set;}
+
+	protected override void OnInitialized()
+	{
+		model = appState.ModelList.Where(m => m.Id == modelId).FirstOrDefault();
+	}
+
 	private void Close()
 	{		
 		nav.NavigateTo("/User/StartPage");

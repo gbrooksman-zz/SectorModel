@@ -5,10 +5,7 @@ namespace SectorModel.Client.Entities
 {
     public class AppState
     {
-        public AppState()
-        {
-
-        }
+        public AppState() { }
 
 		public User CurrentUser { get; set; }		
 		public Model Model { get; set; }
