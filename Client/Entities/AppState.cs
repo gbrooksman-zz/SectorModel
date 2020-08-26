@@ -1,5 +1,4 @@
 using SectorModel.Shared.Entities;
-using System;
 using System.Collections.Generic;
 
 namespace SectorModel.Client.Entities
