@@ -22,17 +22,13 @@
 
 @code
 {
-    [Parameter]
-    public string Width { get; set; } = "auto";
+    [Parameter] public string Width { get; set; } = "auto";
 
-    [Parameter]
-    public string Height { get; set; } = "auto";
+    [Parameter] public string Height { get; set; } = "auto";
 
-    [Parameter]
-    public IEnumerable<PieSlice> PieSlices { get; set; }
+    [Parameter] public IEnumerable<PieSlice> PieSlices { get; set; }
 
-    [Parameter]
-    public bool HideLegend { get; set; } = false;
+    [Parameter] public bool HideLegend { get; set; } = false;
 
     private class Point
     {
