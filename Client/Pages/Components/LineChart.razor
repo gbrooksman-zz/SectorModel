@@ -27,41 +27,29 @@ else
 
        @DrawDataElements()
 
-       @* <circle cx="690" cy="490" r="3" fill="red" />*@
-
     </svg>
 </figure>
 
 <figcaption>
     <ul>
-        @DrawLegend();
+        @DrawLegend()
     </ul>
 </figcaption>
 }
 
 @code
 {
-    [Parameter]
-    public Model Model { get; set; }
+    [Parameter] public Model Model { get; set; }
 
-    [Parameter]
-    public DateTime StopDate { get; set; }
+    [Parameter] public string Width { get; set; }
 
-    [Parameter]
-    public string Width { get; set; }
+    [Parameter] public string Height { get; set; }
 
-    [Parameter]
-    public string Height { get; set; }
+    [Parameter] public int HorizontalGridLines { get; set; } = 10;
 
-    [Parameter]
-    public int HorizontalGridLines { get; set; } = 10;
+    [Parameter] public int VerticalGridLines { get; set; } = 10;
 
-    [Parameter]
-    public int VerticalGridLines { get; set; } = 10;
-
-    [Parameter]
-    public bool RelativeCompare { get; set; }
-
+    [Parameter] public bool RelativeCompare { get; set; }
 
     protected double gridWidth = 0;
     protected double gridHeight = 0;
@@ -83,7 +71,7 @@ else
         decimal height = int.Parse(Height);
         decimal width = int.Parse(Width);
 
-        decimal startY = height *  .5m;
+        decimal startY = height * (decimal).7 ;
 
         string path = $"M 0 {startY} L";
 
@@ -198,31 +186,4 @@ else
 
         return frag;
     }
-
-
-    internal class ChartItem
-    {
-        internal ChartItem()
-        {
-
-        }
-
-        internal List<Quote> Quotes { get; set; }
-
-        internal decimal StartPrice { get; set; }
-
-        internal decimal HighPrice { get; set; }
-
-        internal decimal LowPrice { get; set; }
-
-        internal string ChartPath { get; set; }
-
-        internal string LegendPath { get; set; }
-
-        internal string LegendText { get; set; }
-
-        internal int ColorIndex { get; set; }
-
-    }
-
 }

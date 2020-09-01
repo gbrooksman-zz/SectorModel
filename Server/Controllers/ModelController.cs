@@ -16,7 +16,6 @@ namespace SectorModel.Server.Controllers
     public class ModelController : ControllerBase
     {
         private readonly ModelManager mMgr;
-		private readonly ModelItemManager miMgr;
 		private readonly EquityManager eqMgr;
         private readonly AppSettings appSettings;
 
@@ -24,7 +23,6 @@ namespace SectorModel.Server.Controllers
         {
             appSettings = _appSettings;
             mMgr = new ModelManager(_cache, _config, appSettings);
-			miMgr = new ModelItemManager(_cache, _config, appSettings);
 			eqMgr = new EquityManager(_cache, _config, appSettings);
         }
 
@@ -95,7 +93,7 @@ namespace SectorModel.Server.Controllers
             foreach (ModelItem item in model.ItemList)
             {
                 item.ModelId = model.Id;
-                ModelItem newItem = await miMgr.Save(item);
+                ModelItem newItem = await mMgr.SaveItem(item);
                 newItemList.Add(newItem);
             }
 
@@ -107,10 +105,10 @@ namespace SectorModel.Server.Controllers
         [Route("SaveItem")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<Model>> SaveItem(ModelItem modelItem)
+        public async Task<ActionResult<ModelItem>> SaveItem(ModelItem modelItem)
         {
             modelItem.Equity = await eqMgr.Get(modelItem.EquityId);
-			modelItem = await miMgr.Save(modelItem);			 
+			modelItem = await mMgr.SaveItem(modelItem);			 
 
             if (modelItem == null)
             {
@@ -121,14 +119,26 @@ namespace SectorModel.Server.Controllers
                 return Ok(modelItem);
             }
         }
+
         [HttpDelete]
         [Route("RemoveModelItem")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<bool>> RemoveModelItem(Guid modelItemId)
         {
-            bool deleted = await miMgr.RemoveModelItem(modelItemId);
+            bool deleted = await mMgr.RemoveModelItem(modelItemId);
             return Ok(deleted);
 
         }
+
+		[HttpPut]
+        [Route("RebalanceItems")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<Model>> RebalanceItems(Model model)
+        {
+			Model newModel = await mMgr.RebalanceItems(model); 
+           	return Ok(newModel);
+        }
+
+
     }
 }

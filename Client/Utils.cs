@@ -14,11 +14,11 @@ namespace SectorModel.Client
 		{	
 			if ( inValue < 0)
 			{
-				return (MarkupString) $"<p class='text-danger'> {inValue.ToString("n")} </p>";	
+				return (MarkupString) $"<p class='text-danger'> {inValue.ToString("c2")} </p>";	
 			}
 			else
 			{
-				return (MarkupString) $"<p> {inValue.ToString("n")} </p>";	
+				return (MarkupString) $"<p> {inValue.ToString("c2")} </p>";	
 			}
 		}
 

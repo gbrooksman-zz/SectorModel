@@ -5,10 +5,7 @@ namespace SectorModel.Shared.Entities
 {
     public class AppSettings
     {
-        public AppSettings()
-        {
-
-        }
+        public AppSettings() { }
        
 	    public DateTime LastQuoteDate { get; set; }  
         public Guid CoreModelId { get; set; } 
@@ -19,7 +16,5 @@ namespace SectorModel.Shared.Entities
         public string IEXCloudAPIKey { get; set; }		
 		public List<Equity> AllEquities { get; set; }
 		public List<Quote> LatestQuotes { get; set; }
-
-
     }
 }

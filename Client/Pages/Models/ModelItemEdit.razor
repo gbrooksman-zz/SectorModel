@@ -5,6 +5,8 @@
 
 @using SectorModel.Shared.Entities
 
+<ModelHeader Model="@Model"/>
+
 <EditForm Model="EditModelItem" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
                
@@ -33,7 +35,7 @@
 		
 		<div class="row">
 			<div class="col">
-				<label>2. Choose a percent to allocate:</label>  
+				<label>2. Percent to allocate:</label>  
 			</div>
 		</div>
 		<div class="row">
@@ -44,7 +46,7 @@
 				<InputNumber id="txtPercent" size="5" placeholder="Percent" @onfocusout="ValidatePercent" @bind-Value="EditModelItem.Percentage"></InputNumber>
 			</div>						
 			<div class="col-sm-4">
-				<label>Model percent remaining: @remainingPercent:</label>                
+				<label>Model percent remaining: @remainingPercent</label>                
 			</div>
 		</div>
 
@@ -53,7 +55,7 @@
 
 		<div class="row">
 			<div class="col">
-				<label>3. Review and Submit</label>  
+				<label>3. Confirm changes</label>  
 			</div>		
 		</div>	
 		<div class="row">
@@ -74,11 +76,9 @@
 
 @code
 {	
-    [Parameter]
-    public ModelItem EditModelItem { get; set; }
+    [Parameter] public ModelItem EditModelItem { get; set; }
 
-    [Parameter]
-    public Model Model { get; set; }
+    [Parameter] public Model Model { get; set; }
 
     private string _selectedSymbol;
     private MarkupString validationMessage;
@@ -138,7 +138,6 @@
 
     private async Task HandleValidSubmit()
     {
-
         Equity eq = appSettings.AllEquities.Where( e => e.Symbol == selectedSymbol).FirstOrDefault();
 
         Quote lastQuote = appSettings.LatestQuotes.Where(q => q.EquityId == eq.Id).FirstOrDefault();
@@ -150,8 +149,7 @@
 
         RemoveFromState();
 
-        HttpResponseMessage response = await httpClient.PostAsJsonAsync<ModelItem>("model/saveitem", EditModelItem);
-        ModelItem item = await response.Content.ReadFromJsonAsync<ModelItem>();
+        await httpClient.PostAsJsonAsync<ModelItem>("model/saveitem", EditModelItem);
 
         await AddToState();
 

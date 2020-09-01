@@ -1,0 +1,22 @@
+@using SectorModel.Shared.Entities
+
+ <div class="container-fluid border border-primary">
+	<div class="row">
+		<div class="col-4">
+			<h4>@Model.Name</h4>
+			<p>Start Date: @Utils.FormatDate(Model.StartDate)</p>
+		</div>		
+		<div class="col-4">
+			<p>Start Value: @Utils.FormatNumber(Model.StartValue)</p>
+		</div>	
+		<div class="col-4">
+			<p>Gain/Loss: @Utils.FormatNumber(Model.LatestValue - Model.StartValue)</p>
+		</div>		
+	</div>
+</div>
+<br/>
+<br/>
+@code
+{
+	[Parameter] public Model Model {get; set;}
+}

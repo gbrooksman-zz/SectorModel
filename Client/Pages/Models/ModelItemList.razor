@@ -9,8 +9,6 @@
 @using SectorModel.Shared.Entities
 @using System.Linq
 
-<AppHeader/>
-
 @if (ShowDialog)
 {
 	<div class="modal border border-dark" tabindex="-1" style="display:block;height:700px;" role="dialog">
@@ -30,20 +28,17 @@
 	</div>
 }
 
+<AppHeader/>
+
+<ModelHeader Model="model"/>
+
 <div class="container-fluid">
-    <div class="row">
-        <div class="col-6">
-            <h4>@model.Name</h4>
-        </div>
-        <div class="col" style="text-align:right;">
-            <span>Starting Date:@Utils.FormatDate(model.StartDate)</span>
-        </div>
-    </div>	
     <div class="row">		
         <div class="col">
 		@if (CanAdd)
 		{
 			<input type="button" id="btnAdd" class="btn btn-primary" @onclick="ShowAddItem" value="Add" />
+			<input type="button" id="btnRebalance" class="btn btn-secondary" @onclick="Rebalance" value="Rebalance" />
 		}
 		<DataGrid Items="@modelEquityList" TItem="ModelItem" Context="m">
 			<HeaderTemplate>
@@ -71,10 +66,6 @@
                     @if (CanEdit)
                     {
                         <input type="button" class="btn btn-secondary" value="Edit" @onclick="( () => {EditItem(m);})" />
-                    }
-                    @if (isCore)
-                    {
-                        <input type="button" class="btn btn-secondary" value="Close" @onclick="CloneCore" />
                     }
                 </td>
                 </RowTemplate>
@@ -108,13 +99,9 @@
 
 @code
 {
-    [Parameter]
-    public bool CanAdd { get; set; } = false;
+    [Parameter] public bool CanAdd { get; set; } = false;
 
-    [Parameter]
-    public bool CanEdit { get; set; } = false;
-
-    private bool isCore;
+    [Parameter] public bool CanEdit { get; set; } = false;
 
     bool ShowDialog = false;
 
@@ -132,8 +119,7 @@
     protected override void OnInitialized()
     {
         model = appState.Model;
-        modelEquityList = model.ItemList;
-        isCore = (model.Id == appSettings.CoreModelId);
+		modelEquityList = model.ItemList;	
     }
 
     private MarkupString GetValue(decimal inValue)
@@ -160,17 +146,25 @@
         ShowDialog = true;
     }
 
-    private void CloneCore()
-    {
-
-
+    private async Task Rebalance()
+    {		
+		//reset totals twice because change in model onbject causes recalculation
+		totalValue = 0;
+		totalCost = 0;
+		appState.ModelList.Remove(model);
+		HttpResponseMessage response =  await httpClient.PutAsJsonAsync<Model>("model/rebalanceitems", model);
+		model = await response.Content.ReadFromJsonAsync<Model>();
+		appState.Model = model;
+		appState.ModelList.Add(model);
+		modelEquityList = model.ItemList;
+		totalValue = 0;
+		totalCost = 0;
     }
 
     private void HideDialog()
     {
         ShowDialog = false;
     }
-
 
 }
 
