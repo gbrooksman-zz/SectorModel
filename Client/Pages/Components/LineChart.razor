@@ -1,7 +1,6 @@
 ﻿@using SectorModel.Client
 @using SectorModel.Shared.Entities
 @using Microsoft.AspNetCore.Components
-@*@using SectorModel.Client.Common*@
 @using SectorModel.Client.Entities
 
 @inject AppSettings appSettings
@@ -13,8 +12,6 @@
 }
 else
 {
-
-<h3>@Model.Name</h3>
 
 <figure>
 
@@ -68,25 +65,25 @@ else
 
     protected double gridWidth = 0;
     protected double gridHeight = 0;
-  
-	private List<Quote> quoteList = new List<Quote>();
+
+    private List<Quote> quoteList = new List<Quote>();
 
     protected override async Task OnInitializedAsync()
-    {       
+    {
         gridWidth = double.Parse(Width) / (double)HorizontalGridLines;
         gridHeight = double.Parse(Height) / (double)VerticalGridLines;
 
         int quoteInterval = Utils.GetInterval(Model.StartDate, StopDate);
 
         quoteList = await httpClient.GetFromJsonAsync<List<Quote>>($"model/GetQuotesForDateRange?modelId={Model.Id}&startdate={Model.StartDate}&stopdate={StopDate}&interval={quoteInterval}");
-	}
+    }
 
     private string BuildChartItemPath( List<Quote> itemQuotes)
     {
         decimal height = int.Parse(Height);
         decimal width = int.Parse(Width);
 
-        decimal startY = height * (decimal).7 ;
+        decimal startY = height *  .5m;
 
         string path = $"M 0 {startY} L";
 
@@ -95,7 +92,7 @@ else
         decimal highPrice = itemQuotes.Max(q => q.Price);
 
         decimal heightScaleFactor = height / ((highPrice - lowPrice) * 2 );
-        decimal widthScaleFactor = 0; // width / quotes.Count;
+        decimal widthScaleFactor = 0;
         decimal x = 0;
 
         foreach (var quote in itemQuotes)
@@ -109,13 +106,16 @@ else
     }
 
 
-    RenderFragment BuildLine(string linePath, int colorValue) => builder =>
+    RenderFragment BuildLine(ChartItem item) => builder =>
     {
         builder.OpenElement(1, "path");
-        builder.AddAttribute(2, "d", linePath);
+        builder.AddAttribute(2, "d", item.ChartPath);
         builder.AddAttribute(3, "fill", "none");
-        builder.AddAttribute(4, "stroke", Utils.GetColor(colorValue));
-        builder.AddAttribute(5, "stroke-width", 2);
+        builder.AddAttribute(4, "stroke", Utils.GetColor(item.ColorIndex));
+        builder.AddAttribute(5, "stroke-width", 4);
+        builder.OpenElement(6, "title");
+        builder.AddContent(7, item.LegendText);
+        builder.CloseElement();
         builder.CloseElement();
     };
 
@@ -125,7 +125,7 @@ else
         builder.AddAttribute(2, "d", legendPath);
         builder.AddAttribute(3, "fill", "none");
         builder.AddAttribute(4, "stroke", color);
-        builder.AddAttribute(5, "stroke-width", 2);
+        builder.AddAttribute(5, "stroke-width", 4);
         builder.CloseElement();
     };
 
@@ -166,34 +166,34 @@ else
 
         List<ChartItem> chartItems = new List<ChartItem>();
 
-       int x = 1;
+        int x = 1;
 
-       foreach (ModelItem item in Model.ItemList)
+        foreach (ModelItem item in Model.ItemList)
         {
             List<Quote> quotes = quoteList.Where(e => e.EquityId == item.EquityId).ToList();
 
-			if (quotes.Count > 0)
-			{
-				decimal startingPrice = quotes.FirstOrDefault().Price;
-				string symbolName = item.Equity.SymbolName;
+            if (quotes.Count > 0)
+            {
+                decimal startingPrice = quotes.FirstOrDefault().Price;
+                string symbolName = item.Equity.SymbolName;
 
-				chartItems.Add(new ChartItem()
-				{
-					ColorIndex = x,
-					LowPrice = quotes.Min(q => q.Price),
-					HighPrice = quotes.Max(q => q.Price),
-					LegendText = symbolName,
-					StartPrice = startingPrice,
-					ChartPath = BuildChartItemPath(quotes)
-				});
-			}
+                chartItems.Add(new ChartItem()
+                {
+                    ColorIndex = x,
+                    LowPrice = quotes.Min(q => q.Price),
+                    HighPrice = quotes.Max(q => q.Price),
+                    LegendText = symbolName,
+                    StartPrice = startingPrice,
+                    ChartPath = BuildChartItemPath(quotes)
+                });
+            }
 
             x++;
         }
 
         foreach (var chartItem in chartItems)
         {
-            frag += BuildLine(chartItem.ChartPath, chartItem.ColorIndex);
+            frag += BuildLine(chartItem);
         }
 
         return frag;

@@ -8,11 +8,13 @@
 
 <AppHeader/>
 
+<ModelHeader Model="appState.Model"/>
+
 <LineChart 	Height="400" Width="900" 
 			HorizontalGridLines="10" 
 			VerticalGridLines="10" 
-			Model="@appState.Model" 
-			StopDate="@DateTime.Now"/>
+			Model="appState.Model" 
+			StopDate="DateTime.Now"/>
 
 <div>
 	<button class="btn btn-secondary" type="button" @onclick="Close">Close</button>

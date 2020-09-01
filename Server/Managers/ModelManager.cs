@@ -108,21 +108,26 @@ namespace SectorModel.Server.Managers
 
 					List<Guid> equityGuids = model.ItemList.Select(e => e.EquityId).ToList();
 
-					var allQuotes = await db.Quotes.ToListAsync();
+					var allQuotes = await db.Quotes.Where(q => q.Date >= model.StartDate && q.Date <= stopdate).ToListAsync();
 
-					quoteList = (from q in allQuotes
-								join l in equityGuids on q.EquityId equals l select q).ToList();
+					quoteList = (  from q in allQuotes
+								        join e in equityGuids 
+                                        on q.EquityId equals e 
+                                        select q
+                                     ).ToList();
 
-					quoteList = quoteList.Where (q => q.Date >= model.StartDate	&& q.Date <= stopdate).ToList();
+                    int daysInPeriod = quoteList.Select(q => q.Date).Distinct().Count();
 
-					int skipLoops = quoteList.Count/quoteInterval;
+                    int skipLoops = daysInPeriod / quoteInterval;
 
-					for ( int x = 0 ; x <= skipLoops ; x = x + quoteInterval)
+					for ( int x = 0 ; x <= skipLoops ; x += quoteInterval)
 					{
-						finalQuoteList.Add(quoteList.Skip(x).Take(1).FirstOrDefault());
+                        equityGuids.ForEach(e => 
+                            {
+                                Quote q = quoteList.Where(q => q.EquityId == e).Skip(x).Take(1).FirstOrDefault();
+                                if (q != default) finalQuoteList.Add(q);
+                            });
 					}
-
-
 				}               
             }
             catch(Exception ex)
