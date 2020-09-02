@@ -1,0 +1,25 @@
+@inject AppState appState
+
+@using SectorModel.Client.Entities
+
+ <div class="container-fluid border border-primary">
+	<div class="row">
+		<div class="col">
+			@topicText
+		</div>
+	</div>
+</div>
+
+@code
+{
+	[Parameter] public int TopicId  {get; set;}
+
+	private MarkupString topicText;
+
+	protected override void OnInitialized()
+	{
+		HelpTopic topic = appState.HelpTopics.Where(t => t.Id == TopicId).FirstOrDefault();
+		topicText = topic.Text;
+	}
+
+}
