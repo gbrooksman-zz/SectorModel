@@ -14,20 +14,29 @@ namespace SectorModel.Client
 
 		public List<HelpTopic> LoadTopics()
 		{
-			var helpTopics = new List<HelpTopic>();	
-			var topic = new HelpTopic();
+			var helpTopics = new List<HelpTopic>();
 
-			topic.Id = 1;
-			topic.Text = (MarkupString) "This is Topic 1";
-			helpTopics.Add(topic);
+            var topic1 = new HelpTopic
+            {
+                Id = 1,
+                Text =  (MarkupString) "This is Topic 1"
+            };
+            helpTopics.Add(topic1);
 
-			topic.Id = 2;
-			topic.Text = (MarkupString) "This is Topic 2";
-			helpTopics.Add(topic);
+			var topic2 = new HelpTopic
+			{
+				Id = 2,
+				Text = (MarkupString)"This is Topic 2"
+			};
+			helpTopics.Add(topic2);
 
-			topic.Id = 3;
-			topic.Text = (MarkupString) "This is Topic 3";
-			helpTopics.Add(topic);
+			var topic3 = new HelpTopic
+			{
+				Id = 3,
+				Text = (MarkupString) "This is Topic 3"
+			};
+			helpTopics.Add(topic3);
+
 
 			return helpTopics;
 		}

@@ -6,8 +6,6 @@
 @using SectorModel.Shared.Entities
 @using System.Linq
 
-<HelpItem TopicId=1/>
-
 @if (!IsCore)
 {
     <input type="button" id="btnAdd" class="btn btn-primary" @onclick="AddModel" value="Add" />
@@ -47,10 +45,6 @@
         </td>
     </FooterTemplate>
 </DataGrid>
-
-<HelpItem TopicId=2/>
-
-<HelpItem TopicId=3/>
 
 @code
 {

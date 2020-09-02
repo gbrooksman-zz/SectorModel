@@ -8,16 +8,16 @@
 
 <AppHeader IsStart=true/>
 
-<ModelList Models="@appState.ModelList" IsCore=false/>
-<hr/>
-<ModelList Models="@coreModelList" IsCore=true/>
+    <ModelList Models="@appState.ModelList" IsCore=false/>
+    <hr/>
+    <ModelList Models="@coreModelList" IsCore=true/>
 
 @code
 {
-	List<Model> coreModelList = new List<Model>();
+    List<Model> coreModelList = new List<Model>();
 
-	protected override void OnInitialized()
-	{		
-		coreModelList.Add(appSettings.CoreModel);
-	}
+    protected override void OnInitialized()
+    {
+         coreModelList.Add(appSettings.CoreModel);
+    }
 }

@@ -12,14 +12,19 @@
 
 @code
 {
-	[Parameter] public int TopicId  {get; set;}
 
-	private MarkupString topicText;
+    [Parameter] public int TopicId  {get; set;}
 
-	protected override void OnInitialized()
-	{
-		HelpTopic topic = appState.HelpTopics.Where(t => t.Id == TopicId).FirstOrDefault();
-		topicText = topic.Text;
-	}
+    private MarkupString topicText;
+
+    protected override void OnInitialized()
+    {
+        HelpTopic topic = appState.HelpTopics.Where(t => t.Id == TopicId).FirstOrDefault();
+        
+        if (topic != default)
+		{
+            topicText = topic.Text;
+        }
+    }
 
 }

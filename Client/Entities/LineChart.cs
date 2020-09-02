@@ -38,6 +38,11 @@ namespace SectorModel.Client.Entities
 
         public string LengendPath { get; set; }
 
+        public decimal FirstPrice { get; set; }
+
+        public decimal HighPrice { get; set; }
+
+        public decimal LowPrice { get; set; }
 
     }
 

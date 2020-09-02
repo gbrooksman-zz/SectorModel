@@ -35,6 +35,10 @@ else
         @DrawLegend()
     </ul>
 </figcaption>
+
+<span>startY: @chart.StartY  </span>
+<span>variance: </span>
+
 }
 
 @code
@@ -77,15 +81,22 @@ else
 
         foreach (ModelItem mi in Model.ItemList)
         {
+            List<Quote> quotes = quoteList.Where(e => e.EquityId == mi.EquityId).ToList();
+
             chart.Lines.Add(new Line
             {
                 EquityId = mi.EquityId,
                 Title = mi.Equity.SymbolName,
                 ColorIndex = ci++,
-                LengendPath = mi.Equity.SymbolName
+                LengendPath = mi.Equity.SymbolName,
+                FirstPrice = quotes.First().Price,
+                HighPrice = quotes.Max(q => q.Price),
+                LowPrice = quotes.Min(q => q.Price)
             });
         }
 
+        chart.StartX = 0;
+        chart.StartY = CalculateStartingY();
     }
 
     private RenderFragment DrawLegend()
@@ -110,25 +121,6 @@ else
     {
         RenderFragment frag = null;
 
-        chart.StartY = height;
-
-        //first examine all of the price aqction to determine the height at which to start drawing
-
-        foreach (Line line in chart.Lines)
-        {
-            List<Quote> quotes = quoteList.Where(e => e.EquityId == line.EquityId).ToList();
-
-            decimal firstPrice = quotes.First().Price;
-            decimal lowPrice = quotes.Min(q => q.Price);
-            decimal highPrice = quotes.Max(q => q.Price);
-
-            decimal highVariance = highPrice > firstPrice ? height / (highPrice - firstPrice) : height - 10;
-            decimal lowVariance = lowPrice < firstPrice ? height / (firstPrice - lowPrice) : 10;
-
-            chart.StartY = chart.StartY > highVariance ? chart.StartY : highVariance;
-
-        }
-
         foreach (Line line in chart.Lines)
         {
             List<Quote> quotes = quoteList.Where(e => e.EquityId == line.EquityId).ToList();
@@ -138,6 +130,26 @@ else
 
         return frag;
     }
+
+
+    private decimal CalculateStartingY()
+    {
+        decimal startY = height /2m;
+
+        foreach (Line line in chart.Lines)
+        {
+            // decimal highVariance = line.HighPrice > line.FirstPrice ? 1 - (line.HighPrice / line.FirstPrice) : 0;
+            decimal lowVariance =  (line.LowPrice / line.FirstPrice);
+
+            if (lowVariance > 0)
+            {
+                startY = Math.Min(startY, (height * lowVariance) + 20m);               
+            }
+        }
+
+        return startY;
+    }
+
 
     private string BuildChartItemPath( List<Quote> quotes)
     {

@@ -63,8 +63,8 @@
     {
         editContext = new EditContext(formUser);
 
-		formUser.Email = "test@test.com";
-		formUser.Password = "test";
+        formUser.Email = "test@test.com";
+        formUser.Password = "test";
     }
 
     private async Task LoginUser()
@@ -76,15 +76,15 @@
 
             if (isOK)
             {
-				await InitState();
+                await InitState();
 
-				nav.NavigateTo("/User/StartPage");
-			}
-			else
-			{
-				BadLoginDisplay = LoginError();
-			}
-              
+                nav.NavigateTo("/User/StartPage");
+            }
+            else
+            {
+                BadLoginDisplay = LoginError();
+            }
+
         }
     }
 
@@ -100,47 +100,48 @@
         builder.CloseElement();
     };
 
-	private async Task InitState()
-	{
-		Console.Write("loading help topics");
-		HelpService help = new HelpService();
-		appState.HelpTopics = help.LoadTopics();
-		Console.Write($"help topic count: {appState.HelpTopics.Count}");
+    private async Task InitState()
+    {
 
-		//=============================================================================================
-		//initialize settings
+        //	HelpService help = new HelpService();
+        //	appState.HelpTopics = help.LoadTopics();
+
+        //=============================================================================================
+        //initialize settings
+
+
 
         appSettings.LastQuoteDate = await httpClient.GetFromJsonAsync<DateTime>("quote/getlastquotedate");
 
         appSettings.CoreModel =  await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={appSettings.CoreModelId}&quoteDate={DateTime.Now}");
 
-		appSettings.SPDRModel =  await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={appSettings.SPDRModelId}&quoteDate={DateTime.Now}");
+        appSettings.SPDRModel =  await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={appSettings.SPDRModelId}&quoteDate={DateTime.Now}");
 
-		if (appSettings.AllEquities == null)
+        if (appSettings.AllEquities == null)
         {
             appSettings.AllEquities = await httpClient.GetFromJsonAsync<List<Equity>>("equity/getall");
         }
 
-		if (appSettings.LatestQuotes == null)
-		{
-			appSettings.LatestQuotes = await httpClient.GetFromJsonAsync<List<Quote>>($"quote/getlist?quoteDate={DateTime.Now}");
-		}
+        if (appSettings.LatestQuotes == null)
+        {
+            appSettings.LatestQuotes = await httpClient.GetFromJsonAsync<List<Quote>>($"quote/getlist?quoteDate={DateTime.Now}");
+        }
 
-		//=============================================================================================
-		//initialize state - 
-	
-	
-		if (appState.CurrentUser == null)
-		{
-			appState.CurrentUser = await httpClient.GetFromJsonAsync<User>($"user/get?email={formUser.Email}");
-		}		
+        //=============================================================================================
+        //initialize state - 
 
-		if (appState.ModelList == null)
-		{
-			appState.ModelList = await httpClient.GetFromJsonAsync<List<Model>>($"model/getlist?userId={appState.CurrentUser.Id}");
-		}
-		
-		//=============================================================================================
 
-	}
+        if (appState.CurrentUser == null)
+        {
+            appState.CurrentUser = await httpClient.GetFromJsonAsync<User>($"user/get?email={formUser.Email}");
+        }
+
+        if (appState.ModelList == null)
+        {
+            appState.ModelList = await httpClient.GetFromJsonAsync<List<Model>>($"model/getlist?userId={appState.CurrentUser.Id}");
+        }
+
+        //=============================================================================================
+
+    }
 }
