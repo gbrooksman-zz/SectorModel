@@ -56,8 +56,13 @@ else
     private decimal gridWidth = 0m;
     private decimal gridHeight = 0m;
 
+    private LineSet chart = new LineSet();
+
+
     protected override async Task OnInitializedAsync()
     {
+        chart.Lines = new List<Line>();
+
         height = decimal.Parse(Height);
         width = decimal.Parse(Width);
 
@@ -67,6 +72,20 @@ else
         int quoteInterval = Utils.GetInterval(Model.StartDate, DateTime.Now);
 
         quoteList = await httpClient.GetFromJsonAsync<List<Quote>>($"model/GetQuotesForDateRange?modelId={Model.Id}&startdate={Model.StartDate}&stopdate={DateTime.Now}&interval={quoteInterval}");
+
+        int ci = 1;
+
+        foreach (ModelItem mi in Model.ItemList)
+        {
+            chart.Lines.Add(new Line
+            {
+                EquityId = mi.EquityId,
+                Title = mi.Equity.SymbolName,
+                ColorIndex = ci++,
+                LengendPath = mi.Equity.SymbolName
+            });
+        }
+
     }
 
     private RenderFragment DrawLegend()
@@ -76,13 +95,12 @@ else
         string legendPath = string.Empty; //TODO: link this to text position
 
         int xCoord = 0; //TODO: link this to text position
-        int yCoord = 0; //TODO: link this to text position
-        int i = 0;      //TODO: link this to text position
+        int yCoord = 0; //TODO: link this to text position       
 
-        foreach (ModelItem mi in Model.ItemList)
+        foreach (Line line in chart.Lines)
         {
-            frag += BuildLegendPath(legendPath, Utils.GetColor(i++), xCoord, yCoord);
-            frag += BuildLegendText(mi.Equity.SymbolName, xCoord, yCoord);
+            frag += BuildLegendPath(legendPath, Utils.GetColor(line.ColorIndex), xCoord, yCoord);
+            frag += BuildLegendText(line.Title, xCoord, yCoord);
         }
 
         return frag;
@@ -92,27 +110,29 @@ else
     {
         RenderFragment frag = null;
 
-        List<Line> lines = new List<Line>();
+        chart.StartY = height;
 
-        int ci = 1;
+        //first examine all of the price aqction to determine the height at which to start drawing
 
-        foreach (ModelItem item in Model.ItemList)
+        foreach (Line line in chart.Lines)
         {
-            List<Quote> quotes = quoteList.Where(e => e.EquityId == item.EquityId).ToList();
+            List<Quote> quotes = quoteList.Where(e => e.EquityId == line.EquityId).ToList();
 
-            if (quotes.Count > 0)
-            {
-                lines.Add(new Line()
-                {
-                    ColorIndex = ci++,
-                    Title = item.Equity.SymbolName,
-                    Path = BuildChartItemPath(quotes)
-                });
-            }
+            decimal firstPrice = quotes.First().Price;
+            decimal lowPrice = quotes.Min(q => q.Price);
+            decimal highPrice = quotes.Max(q => q.Price);
+
+            decimal highVariance = highPrice > firstPrice ? height / (highPrice - firstPrice) : height - 10;
+            decimal lowVariance = lowPrice < firstPrice ? height / (firstPrice - lowPrice) : 10;
+
+            chart.StartY = chart.StartY > highVariance ? chart.StartY : highVariance;
+
         }
 
-        foreach (var line in lines)
+        foreach (Line line in chart.Lines)
         {
+            List<Quote> quotes = quoteList.Where(e => e.EquityId == line.EquityId).ToList();
+            line.Path = BuildChartItemPath(quotes);
             frag += BuildLine(line);
         }
 
@@ -122,7 +142,8 @@ else
     private string BuildChartItemPath( List<Quote> quotes)
     {
 
-        /*
+        /* 
+        
             |
             |
             | 
@@ -131,7 +152,7 @@ else
             |
             |           
             -------------------------------
-                        x
+                       x
         */
 
         decimal firstPrice = quotes.First().Price;
@@ -148,7 +169,7 @@ else
 
         //decimal startY = height * .7m;
 
-        decimal startY = (height * (lowVariance / highVariance));
+        decimal startY = chart.StartY;
 
         string path = $"M 0 {startY} L";
 

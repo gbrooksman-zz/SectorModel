@@ -30,11 +30,31 @@ namespace SectorModel.Client.Entities
 
         public int ColorIndex { get; set; }  
 
-        public string Symbol { get; set; }
+        public Guid EquityId { get; set; }
 
         public string Title { get; set; }
 
         public string Path { get; set; }
+
+        public string LengendPath { get; set; }
+
+
+    }
+
+    public class LineSet
+    {
+        public LineSet()
+        {
+
+        }
+
+        public List<Line> Lines { get; set; }
+
+        public string Title { get; set; }
+
+        public decimal StartX { get; set; }
+
+        public decimal StartY { get; set; }
 
     }
 }
