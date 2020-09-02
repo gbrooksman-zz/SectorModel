@@ -13,8 +13,6 @@
 else
 {
 
-<h3>@Model.Name</h3>
-
 <figure>
 
     <svg width="@Width" height="@Height" xmlns="http://www.w3.org/2000/svg">
@@ -51,88 +49,35 @@ else
 
     [Parameter] public int VerticalGridLines { get; set; } = 10;
 
-    [Parameter] public bool RelativeCompare { get; set; }
+    private List<Quote> quoteList = new List<Quote>();
 
-    protected double gridWidth = 0;
-    protected double gridHeight = 0;  
-	private List<Quote> quoteList = new List<Quote>();
+    private decimal height = 0m;
+    private decimal width = 0m;
+    private decimal gridWidth = 0m;
+    private decimal gridHeight = 0m;
 
     protected override async Task OnInitializedAsync()
-    {       
-        gridWidth = double.Parse(Width) / (double)HorizontalGridLines;
-        gridHeight = double.Parse(Height) / (double)VerticalGridLines;
+    {
+        height = decimal.Parse(Height);
+        width = decimal.Parse(Width);
+
+        gridHeight = height / (decimal)VerticalGridLines;
+        gridWidth = width / (decimal)HorizontalGridLines;
 
         int quoteInterval = Utils.GetInterval(Model.StartDate, DateTime.Now);
 
         quoteList = await httpClient.GetFromJsonAsync<List<Quote>>($"model/GetQuotesForDateRange?modelId={Model.Id}&startdate={Model.StartDate}&stopdate={DateTime.Now}&interval={quoteInterval}");
-	}
-
-    private string BuildChartItemPath( List<Quote> itemQuotes)
-    {
-        decimal height = int.Parse(Height);
-        decimal width = int.Parse(Width);
-
-        decimal startY = height * (decimal).7 ;
-
-        string path = $"M 0 {startY} L";
-
-        decimal firstPrice = itemQuotes.First().Price;
-        decimal lowPrice = itemQuotes.Min(q => q.Price);
-        decimal highPrice = itemQuotes.Max(q => q.Price);
-
-        decimal heightScaleFactor = height / ((highPrice - lowPrice) * 2 );
-        decimal widthScaleFactor = 0; 
-        decimal x = 0;
-
-        foreach (var quote in itemQuotes)
-        {
-            decimal price = quote.Price;
-            path += $" {x += widthScaleFactor} {(startY - ((firstPrice - price) * heightScaleFactor)) } ";
-            if (widthScaleFactor == 0) widthScaleFactor = width / itemQuotes.Count;
-        }
-
-        return path;
     }
-
-
-    RenderFragment BuildLine(string linePath, int colorValue) => builder =>
-    {
-        builder.OpenElement(1, "path");
-        builder.AddAttribute(2, "d", linePath);
-        builder.AddAttribute(3, "fill", "none");
-        builder.AddAttribute(4, "stroke", Utils.GetColor(colorValue));
-        builder.AddAttribute(5, "stroke-width", 2);
-        builder.CloseElement();
-    };
-
-    RenderFragment BuildLegendPath(string legendPath, string color, int xCoord, int yCoord) => builder =>
-    {
-        builder.OpenElement(1, "path");
-        builder.AddAttribute(2, "d", legendPath);
-        builder.AddAttribute(3, "fill", "none");
-        builder.AddAttribute(4, "stroke", color);
-        builder.AddAttribute(5, "stroke-width", 2);
-        builder.CloseElement();
-    };
-
-    RenderFragment BuildLegendText(string legendText, int xCoord, int yCoord) => builder =>
-    {
-        builder.OpenElement(1, "text");
-        builder.AddAttribute(3, "x", xCoord);
-        builder.AddAttribute(4, "y", yCoord);
-        builder.AddContent(5, legendText);
-        builder.CloseElement();
-    };
 
     private RenderFragment DrawLegend()
     {
         RenderFragment frag = null;
 
-        string legendPath = string.Empty;
+        string legendPath = string.Empty; //TODO: link this to text position
 
-        int xCoord = 0;
-        int yCoord = 0;
-        int i = 0;
+        int xCoord = 0; //TODO: link this to text position
+        int yCoord = 0; //TODO: link this to text position
+        int i = 0;      //TODO: link this to text position
 
         foreach (ModelItem mi in Model.ItemList)
         {
@@ -146,42 +91,109 @@ else
     private RenderFragment DrawDataElements()
     {
         RenderFragment frag = null;
-        string linePath = string.Empty;
-        string legendPath = string.Empty;
-        string legendText = string.Empty;
 
-        List<ChartItem> chartItems = new List<ChartItem>();
+        List<Line> lines = new List<Line>();
 
-       int x = 1;
+        int ci = 1;
 
-       foreach (ModelItem item in Model.ItemList)
+        foreach (ModelItem item in Model.ItemList)
         {
             List<Quote> quotes = quoteList.Where(e => e.EquityId == item.EquityId).ToList();
 
-			if (quotes.Count > 0)
-			{
-				decimal startingPrice = quotes.FirstOrDefault().Price;
-				string symbolName = item.Equity.SymbolName;
-
-				chartItems.Add(new ChartItem()
-				{
-					ColorIndex = x,
-					LowPrice = quotes.Min(q => q.Price),
-					HighPrice = quotes.Max(q => q.Price),
-					LegendText = symbolName,
-					StartPrice = startingPrice,
-					ChartPath = BuildChartItemPath(quotes)
-				});
-			}
-
-            x++;
+            if (quotes.Count > 0)
+            {
+                lines.Add(new Line()
+                {
+                    ColorIndex = ci++,
+                    Title = item.Equity.SymbolName,
+                    Path = BuildChartItemPath(quotes)
+                });
+            }
         }
 
-        foreach (var chartItem in chartItems)
+        foreach (var line in lines)
         {
-            frag += BuildLine(chartItem.ChartPath, chartItem.ColorIndex);
+            frag += BuildLine(line);
         }
 
         return frag;
     }
+
+    private string BuildChartItemPath( List<Quote> quotes)
+    {
+
+        /*
+            |
+            |
+            | 
+         y  |
+            |
+            |
+            |           
+            -------------------------------
+                        x
+        */
+
+        decimal firstPrice = quotes.First().Price;
+        decimal lowPrice = quotes.Min(q => q.Price);
+        decimal highPrice = quotes.Max(q => q.Price);
+
+        decimal heightScaleFactor = height / ((highPrice - lowPrice) * 2m);
+        decimal widthScaleFactor = 0;
+
+        decimal highVariance = highPrice > firstPrice ? highPrice - firstPrice : 1;
+        decimal lowVariance = lowPrice < firstPrice ? firstPrice - lowPrice : 1;
+
+        decimal x = 0;
+
+        //decimal startY = height * .7m;
+
+        decimal startY = (height * (lowVariance / highVariance));
+
+        string path = $"M 0 {startY} L";
+
+        int itemCount = quotes.Count;
+
+        foreach (var quote in quotes)
+        {
+            path += $" {x += widthScaleFactor} {(startY - ((firstPrice - quote.Price) * heightScaleFactor)) } ";
+            if (widthScaleFactor == 0) widthScaleFactor = width / itemCount;
+        }
+
+        return path;
+    }
+
+
+    RenderFragment BuildLine(Line line) => builder =>
+    {
+        builder.OpenElement(1, "path");
+        builder.AddAttribute(2, "d", line.Path);
+        builder.AddAttribute(3, "fill", "none");
+        builder.AddAttribute(4, "stroke", Utils.GetColor(line.ColorIndex));
+        builder.AddAttribute(5, "stroke-width", 4);
+        builder.OpenElement(6, "title");
+        builder.AddContent(7, line.Title);
+        builder.CloseElement();
+        builder.CloseElement();
+    };
+
+    RenderFragment BuildLegendPath(string legendPath, string color, int xCoord, int yCoord) => builder =>
+    {
+        builder.OpenElement(1, "path");
+        builder.AddAttribute(2, "d", legendPath);
+        builder.AddAttribute(3, "fill", "none");
+        builder.AddAttribute(4, "stroke", color);
+        builder.AddAttribute(5, "stroke-width", 4);
+        builder.CloseElement();
+    };
+
+    RenderFragment BuildLegendText(string legendText, int xCoord, int yCoord) => builder =>
+    {
+        builder.OpenElement(1, "text");
+        builder.AddAttribute(3, "x", xCoord);
+        builder.AddAttribute(4, "y", yCoord);
+        builder.AddContent(5, legendText);
+        builder.CloseElement();
+    };
+
 }
