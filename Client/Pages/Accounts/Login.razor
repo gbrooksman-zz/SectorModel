@@ -102,6 +102,11 @@
 
 	private async Task InitState()
 	{
+		Console.Write("loading help topics");
+		HelpService help = new HelpService();
+		appState.HelpTopics = help.LoadTopics();
+		Console.Write($"help topic count: {appState.HelpTopics.Count}");
+
 		//=============================================================================================
 		//initialize settings
 
@@ -134,9 +139,7 @@
 		{
 			appState.ModelList = await httpClient.GetFromJsonAsync<List<Model>>($"model/getlist?userId={appState.CurrentUser.Id}");
 		}
-
-
-
+		
 		//=============================================================================================
 
 	}

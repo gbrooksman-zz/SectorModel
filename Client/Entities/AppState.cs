@@ -10,5 +10,6 @@ namespace SectorModel.Client.Entities
 		public User CurrentUser { get; set; }		
 		public Model Model { get; set; }
         public List<Model> ModelList { get; set; }
+		public List<HelpTopic> HelpTopics { get; set; }
     }
 }
