@@ -69,7 +69,7 @@ namespace SectorModel.Client
                     colorName = "Green";
                     break;
                 case 4:
-                    colorName = "Yellow";
+                    colorName = "Black";
                     break;
                 case 5:
                     colorName = "Gray";

@@ -21,47 +21,71 @@ else
                 <rect width="@gridWidth" height="@gridHeight" fill="white" />
                 <path d="M @gridWidth 0 L 0 0 0 @gridHeight" fill="none" stroke="gray" stroke-width="1" />
             </pattern>
+
+
         </defs>
 
         <rect width="100%" height="100%" fill="url(#grid)" stroke="gray" stroke-width="1" />
 
-       @DrawDataElements()
+       @DrawDataElements()6
+
+	<g class="y-axis">
+		<text y="375" x="40" style="text-anchor: middle; fill: rgb(103, 102, 102); font-size: 12px;">0.00020%</text>
+		<text y="330" x="40" style="text-anchor: middle; fill: rgb(103, 102, 102); font-size: 12px;">0.00040%</text>
+		<text y="285" x="40" style="text-anchor: middle; fill: rgb(103, 102, 102); font-size: 12px;">0.00060%</text>
+		<text y="240" x="40" style="text-anchor: middle; fill: rgb(103, 102, 102); font-size: 12px;">0.00080%</text>
+		<text y="195" x="40" style="text-anchor: middle; fill: rgb(103, 102, 102); font-size: 12px;">0.000100%</text>
+		<text y="150" x="40" style="text-anchor: middle; fill: rgb(103, 102, 102); font-size: 12px;">0.000120%</text>
+		<text y="105" x="40" style="text-anchor: middle; fill: rgb(103, 102, 102); font-size: 12px;">0.000140%</text>
+		<text y="60" x="40" style="text-anchor: middle; fill: rgb(103, 102, 102); font-size: 12px;">0.000160%</text>
+  	</g>
+	<g class="x-axis" transform="matrix(1, 0, 0, 1, 32, 12)">
+		<text y="375" x="40" style="text-anchor: middle; fill: rgb(103, 102, 102); font-size: 12px;">1960</text>
+		<text y="375" x="196" style="text-anchor: middle; fill: rgb(103, 102, 102); font-size: 12px;">1970</text>
+		<text y="375" x="274" style="text-anchor: middle; fill: rgb(103, 102, 102); font-size: 12px;">1975</text>
+		<text y="375" x="352" style="text-anchor: middle; fill: rgb(103, 102, 102); font-size: 12px;">1980</text>
+		<text y="375" x="430" style="text-anchor: middle; fill: rgb(103, 102, 102); font-size: 12px;">1985</text>
+		<text y="375" x="508" style="text-anchor: middle; fill: rgb(103, 102, 102); font-size: 12px;">1990</text>
+		<text y="375" x="586" style="text-anchor: middle; fill: rgb(103, 102, 102); font-size: 12px;">1995</text>
+		<text y="375" x="664" style="text-anchor: middle; fill: rgb(103, 102, 102); font-size: 12px;">2000</text>
+		<text y="375" x="742" style="text-anchor: middle; fill: rgb(103, 102, 102); font-size: 12px;">2005</text>
+		<text y="375" x="118" style="text-anchor: middle; fill: rgb(103, 102, 102); font-size: 12px;">1965</text>
+	</g>
+
 
     </svg>
 </figure>
 
 <figcaption>
     <ul>
-        @DrawLegend()
+        @RenderLegend()
     </ul>
 </figcaption>
 
-<span>startY: @chart.StartY  </span>
-<span>variance: </span>
+@* <span>startY: @chart.StartY  </span>
+<span>varianceRatio: @varianceRatio </span>
+<span>Low Variance: @lowVariance </span>
+<span>High Variance: @highVariance </span> *@
 
 }
 
 @code
 {
     [Parameter] public Model Model { get; set; }
-
     [Parameter] public string Width { get; set; }
-
     [Parameter] public string Height { get; set; }
-
     [Parameter] public int HorizontalGridLines { get; set; } = 10;
-
     [Parameter] public int VerticalGridLines { get; set; } = 10;
 
     private List<Quote> quoteList = new List<Quote>();
-
     private decimal height = 0m;
     private decimal width = 0m;
     private decimal gridWidth = 0m;
     private decimal gridHeight = 0m;
-
     private LineSet chart = new LineSet();
-
+	private decimal highVariance = 0m;
+	private decimal lowVariance = 0m;
+	private decimal varianceRatio = 0m;
 
     protected override async Task OnInitializedAsync()
     {
@@ -96,26 +120,20 @@ else
         }
 
         chart.StartX = 0;
-        chart.StartY = CalculateStartingY();
+        chart.StartY = Math.Round(CalculateStartingY(),0);
     }
 
-    private RenderFragment DrawLegend()
-    {
-        RenderFragment frag = null;
+	private MarkupString RenderLegend()
+	{
+		string str = string.Empty;
 
-        string legendPath = string.Empty; //TODO: link this to text position
-
-        int xCoord = 0; //TODO: link this to text position
-        int yCoord = 0; //TODO: link this to text position       
-
-        foreach (Line line in chart.Lines)
+ 		foreach (Line line in chart.Lines)
         {
-            frag += BuildLegendPath(legendPath, Utils.GetColor(line.ColorIndex), xCoord, yCoord);
-            frag += BuildLegendText(line.Title, xCoord, yCoord);
+            str += $"<li style='color:{Utils.GetColor(line.ColorIndex)}'>{line.Title}</li>";
         }
 
-        return frag;
-    }
+		return (MarkupString) str;
+	}
 
     private RenderFragment DrawDataElements()
     {
@@ -138,13 +156,18 @@ else
 
         foreach (Line line in chart.Lines)
         {
-            // decimal highVariance = line.HighPrice > line.FirstPrice ? 1 - (line.HighPrice / line.FirstPrice) : 0;
-            decimal lowVariance =  (line.LowPrice / line.FirstPrice);
+            highVariance = (line.HighPrice / line.FirstPrice);
+            lowVariance =  (line.LowPrice / line.FirstPrice);
+			varianceRatio = (highVariance - lowVariance);
 
-            if (lowVariance > 0)
+            if (varianceRatio > 0)
             {
-                startY = Math.Min(startY, (height * lowVariance) + 20m);               
+                startY = Math.Min(startY, (startY - highVariance) - 20m);               
             }
+			else
+			{
+				startY = Math.Min(startY, (startY + lowVariance) + 20m); 
+			}
         }
 
         return startY;
@@ -200,33 +223,17 @@ else
     RenderFragment BuildLine(Line line) => builder =>
     {
         builder.OpenElement(1, "path");
-        builder.AddAttribute(2, "d", line.Path);
-        builder.AddAttribute(3, "fill", "none");
-        builder.AddAttribute(4, "stroke", Utils.GetColor(line.ColorIndex));
-        builder.AddAttribute(5, "stroke-width", 4);
-        builder.OpenElement(6, "title");
-        builder.AddContent(7, line.Title);
+			builder.AddAttribute(2, "d", line.Path);
+			builder.AddAttribute(3, "fill", "none");
+			builder.AddAttribute(4, "stroke", Utils.GetColor(line.ColorIndex));
+			builder.AddAttribute(5, "stroke-width", 4);
+			builder.OpenElement(6, "title");
+			builder.AddContent(7, line.Title);
+			builder.CloseElement();
         builder.CloseElement();
-        builder.CloseElement();
-    };
 
-    RenderFragment BuildLegendPath(string legendPath, string color, int xCoord, int yCoord) => builder =>
-    {
-        builder.OpenElement(1, "path");
-        builder.AddAttribute(2, "d", legendPath);
-        builder.AddAttribute(3, "fill", "none");
-        builder.AddAttribute(4, "stroke", color);
-        builder.AddAttribute(5, "stroke-width", 4);
-        builder.CloseElement();
-    };
 
-    RenderFragment BuildLegendText(string legendText, int xCoord, int yCoord) => builder =>
-    {
-        builder.OpenElement(1, "text");
-        builder.AddAttribute(3, "x", xCoord);
-        builder.AddAttribute(4, "y", yCoord);
-        builder.AddContent(5, legendText);
-        builder.CloseElement();
-    };
 
+
+    };
 }
