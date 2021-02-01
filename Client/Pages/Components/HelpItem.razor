@@ -1,4 +1,4 @@
-@inject AppState appState
+@inject UserState userState
 
 @using SectorModel.Client.Entities
 
@@ -19,12 +19,12 @@
 
     protected override void OnInitialized()
     {
-        HelpTopic topic = appState.HelpTopics.Where(t => t.Id == TopicId).FirstOrDefault();
+       @* HelpTopic topic = userState.HelpTopics.Where(t => t.Id == TopicId).FirstOrDefault();
         
         if (topic != default)
 		{
             topicText = topic.Text;
-        }
+        }*@
     }
 
 }

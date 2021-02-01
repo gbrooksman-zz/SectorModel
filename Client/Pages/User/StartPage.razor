@@ -1,14 +1,14 @@
 @page "/User/StartPage"
 
 @inject AppSettings appSettings
-@inject AppState appState
+@inject UserState userState
 
 @using SectorModel.Shared.Entities
 @using SectorModel.Client.Pages.Models
 
 <AppHeader IsStart=true/>
 
-    <ModelList Models="@appState.ModelList" IsCore=false/>
+    <ModelList Models="@userState.ModelList" IsCore=false/>
     <hr/>
     <ModelList Models="@coreModelList" IsCore=true/>
 

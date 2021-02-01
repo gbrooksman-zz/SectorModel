@@ -1,5 +1,5 @@
 @inject AppSettings appSettings
-@inject AppState appState
+@inject UserState userState
 @inject HttpClient httpClient
 @inject NavigationManager nav
 
@@ -76,136 +76,136 @@
 
 @code
 {	
-    [Parameter] public ModelItem EditModelItem { get; set; }
+	[Parameter] public ModelItem EditModelItem { get; set; }
 
-    [Parameter] public Model Model { get; set; }
+	[Parameter] public Model Model { get; set; }
 
-    private string _selectedSymbol;
-    private MarkupString validationMessage;
+	private string _selectedSymbol;
+	private MarkupString validationMessage;
 
-    private bool isValid = true;
+	private bool isValid = true;
 
-    public string selectedSymbol
-    {
-        get => _selectedSymbol;
-        set
-        {
-            _selectedSymbol = value;
-            if (_selectedSymbol != EditModelItem.Equity.Symbol)
-            {
-                HandleSelection(_selectedSymbol);
-            }
-        }
-    }
+	public string selectedSymbol
+	{
+		get => _selectedSymbol;
+		set
+		{
+			_selectedSymbol = value;
+			if (_selectedSymbol != EditModelItem.Equity.Symbol)
+			{
+				HandleSelection(_selectedSymbol);
+			}
+		}
+	}
 
-    private decimal lastPrice = 0;
+	private decimal lastPrice = 0;
 
-    private decimal remainingPercent = 0;
+	private decimal remainingPercent = 0;
 
-    protected void HandleSelection(string selSymbol)
-    {
-        Equity eq = appSettings.AllEquities.Where(e => e.Symbol == selSymbol).FirstOrDefault();
+	protected void HandleSelection(string selSymbol)
+	{
+		Equity eq = appSettings.AllEquities.Where(e => e.Symbol == selSymbol).FirstOrDefault();
 
-        if (Model.ItemList.Where(i => i.EquityId == eq.Id).Count() > 0)
-        {
-            validationMessage = (MarkupString) "<label class='text-danger'> Sector Fund already exists in this model </label></br>";
-            isValid = false;
-            return;
-        }
-        else
-        {
-            validationMessage = (MarkupString) string.Empty;
-        }
+		if (Model.ItemList.Where(i => i.EquityId == eq.Id).Count() > 0)
+		{
+			validationMessage = (MarkupString) "<label class='text-danger'> Sector Fund already exists in this model </label></br>";
+			isValid = false;
+			return;
+		}
+		else
+		{
+			validationMessage = (MarkupString) string.Empty;
+		}
 
-        Quote quote = appSettings.LatestQuotes.Where( q => q.EquityId == eq.Id).FirstOrDefault();
-        if (quote != null)
-        {
-            lastPrice = quote.Price;
-        }
-    }
+		Quote quote = appSettings.LatestQuotes.Where( q => q.EquityId == eq.Id).FirstOrDefault();
+		if (quote != null)
+		{
+			lastPrice = quote.Price;
+		}
+	}
 
-    protected override void OnInitialized()
-    {
-        EditModelItem.ModelId = Model.Id;
+	protected override void OnInitialized()
+	{
+		EditModelItem.ModelId = Model.Id;
 
-        if (EditModelItem.Equity != null)
-        {
-            selectedSymbol = EditModelItem.Equity.Symbol;
-        }
+		if (EditModelItem.Equity != null)
+		{
+			selectedSymbol = EditModelItem.Equity.Symbol;
+		}
 
-        remainingPercent = (100 - Model.ItemList.Sum( p => p.Percentage));
-    }
+		remainingPercent = (100 - Model.ItemList.Sum( p => p.Percentage));
+	}
 
-    private async Task HandleValidSubmit()
-    {
-        Equity eq = appSettings.AllEquities.Where( e => e.Symbol == selectedSymbol).FirstOrDefault();
+	private async Task HandleValidSubmit()
+	{
+		Equity eq = appSettings.AllEquities.Where( e => e.Symbol == selectedSymbol).FirstOrDefault();
 
-        Quote lastQuote = appSettings.LatestQuotes.Where(q => q.EquityId == eq.Id).FirstOrDefault();
+		Quote lastQuote = appSettings.LatestQuotes.Where(q => q.EquityId == eq.Id).FirstOrDefault();
 
-        EditModelItem.EquityId = eq.Id;
-        EditModelItem.Equity = eq;
-        EditModelItem.Cost = (Model.StartValue * (EditModelItem.Percentage / 100));
-        EditModelItem.Shares = Math.Round((EditModelItem.Cost / lastQuote.Price),3);
+		EditModelItem.EquityId = eq.Id;
+		EditModelItem.Equity = eq;
+		EditModelItem.Cost = (Model.StartValue * (EditModelItem.Percentage / 100));
+		EditModelItem.Shares = Math.Round((EditModelItem.Cost / lastQuote.Price),3);
 
-        RemoveFromState();
+		RemoveFromState();
 
-        await httpClient.PostAsJsonAsync<ModelItem>("model/saveitem", EditModelItem);
+		await httpClient.PostAsJsonAsync<ModelItem>("model/saveitem", EditModelItem);
 
-        await AddToState();
+		await AddToState();
 
-        Close();
-    }
+		Close();
+	}
 
-    private void Close()
-    {
-        nav.NavigateTo($"/Redirect");
-    }
+	private void Close()
+	{
+		nav.NavigateTo($"/Redirect");
+	}
 
-    private void ValidatePercent()
-    {
-        if ((EditModelItem.Percentage < 1) || (EditModelItem.Percentage > 100))
-        {
-            validationMessage = (MarkupString) "<label class='text-danger'> Percent must be between 1 and 100 </label></br>";
-            isValid = false;
-        }
-        else if ((remainingPercent + EditModelItem.Percentage) > 100)
-        {
-            validationMessage = (MarkupString)"<label class='text-danger'> Total Percent can not exceed 100 </label></br>";
-            isValid = false;
-        }
-        else
-        {
-            validationMessage = (MarkupString) string.Empty;
-            remainingPercent =  (100 - Model.ItemList.Where(p => p.EquityId != EditModelItem.EquityId).Sum(p => p.Percentage)) - EditModelItem.Percentage;
-            isValid = true;
-        }
-    }
+	private void ValidatePercent()
+	{
+		if ((EditModelItem.Percentage < 1) || (EditModelItem.Percentage > 100))
+		{
+			validationMessage = (MarkupString) "<label class='text-danger'> Percent must be between 1 and 100 </label></br>";
+			isValid = false;
+		}
+		else if ((remainingPercent + EditModelItem.Percentage) > 100)
+		{
+			validationMessage = (MarkupString)"<label class='text-danger'> Total Percent can not exceed 100 </label></br>";
+			isValid = false;
+		}
+		else
+		{
+			validationMessage = (MarkupString) string.Empty;
+			remainingPercent =  (100 - Model.ItemList.Where(p => p.EquityId != EditModelItem.EquityId).Sum(p => p.Percentage)) - EditModelItem.Percentage;
+			isValid = true;
+		}
+	}
 
-    private async Task DeleteItem()
-    {
-        RemoveFromState();
+	private async Task DeleteItem()
+	{
+		RemoveFromState();
 
-        HttpResponseMessage response = await httpClient.DeleteAsync ($"model/RemoveModelItem?modelItemId={EditModelItem.Id}");
-        bool isDeleted = await response.Content.ReadFromJsonAsync<bool>();
+		HttpResponseMessage response = await httpClient.DeleteAsync ($"model/RemoveModelItem?modelItemId={EditModelItem.Id}");
+		bool isDeleted = await response.Content.ReadFromJsonAsync<bool>();
 
-        await AddToState();
+		await AddToState();
 
-        Close();
-    }
+		Close();
+	}
 
-    private void RemoveFromState()
-    {
-        appState.ModelList.Remove(Model);
-        Model.ItemList.Remove(EditModelItem);
-    }
+	private void RemoveFromState()
+	{
+		userState.ModelList.Remove(Model);
+		Model.ItemList.Remove(EditModelItem);
+	}
 
-    private async Task AddToState()
-    {
-        Model model = appState.ModelList.Where(m => m.Id == Model.Id).FirstOrDefault();
-        appState.ModelList.Remove(model);
-        model = await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={Model.Id}&quoteDate={DateTime.Now}");
-        appState.ModelList.Add(model);
-        appState.Model = model;
-    }
+	private async Task AddToState()
+	{
+		Model model = userState.ModelList.Where(m => m.Id == Model.Id).FirstOrDefault();
+		userState.ModelList.Remove(model);
+		model = await httpClient.GetFromJsonAsync<Model>($"model/get?modelId={Model.Id}&quoteDate={DateTime.Now}");
+		userState.ModelList.Add(model);
+		userState.Model = model;
+	}
 
 }

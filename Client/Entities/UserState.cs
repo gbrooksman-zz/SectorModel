@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace SectorModel.Client.Entities
 {
-    public class AppState
+    public class UserState
     {
-        public AppState() { }
+        public UserState() { }
 
 		public User CurrentUser { get; set; }		
 		public Model Model { get; set; }
         public List<Model> ModelList { get; set; }
-		public List<HelpTopic> HelpTopics { get; set; }
+		//public List<HelpTopic> HelpTopics { get; set; }
     }
 }

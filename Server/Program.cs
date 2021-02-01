@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System.IO;
+using Serilog;
+using Serilog.Formatting.Compact;
 
 namespace SectorModel.Server
 {
@@ -14,7 +14,13 @@ namespace SectorModel.Server
     {
        
         public static void Main(string[] args)
-        {           
+        {
+            Log.Logger = new LoggerConfiguration()
+                 .MinimumLevel.Debug()
+                 .WriteTo.File(new CompactJsonFormatter(), "logs/cs_server.json", rollingInterval: RollingInterval.Day)
+                 .CreateLogger();
+
+            Log.Information("Application started");
 
             CreateHostBuilder(args).Build().Run();
         }

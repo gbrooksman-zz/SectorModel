@@ -1,5 +1,5 @@
 @inject AppSettings appSettings
-@inject AppState appState
+@inject UserState userState
 @inject HttpClient httpClient
 @inject NavigationManager nav
 
@@ -48,81 +48,81 @@
 
 @code
 {
-    [Parameter] public List<Model> Models { get; set; }
+	[Parameter] public List<Model> Models { get; set; }
 
-    [Parameter] public bool IsCore { get; set; }
+	[Parameter] public bool IsCore { get; set; }
 
-    private List<Model> modelList = new List<Model>();
+	private List<Model> modelList = new List<Model>();
 
-    protected override void OnInitialized()
-    {
-        modelList = Models;
-    }
+	protected override void OnInitialized()
+	{
+		modelList = Models;
+	}
 
-    private void EditModel(Guid modelId)
-    {
-        SetModel(modelId);
-        nav.NavigateTo($"/ModelEdit/true");
-    }
+	private void EditModel(Guid modelId)
+	{
+		SetModel(modelId);
+		nav.NavigateTo($"/ModelEdit/true");
+	}
 
-    private void Configure(Guid modelId)
-    {
-        SetModel(modelId);
-        nav.NavigateTo($"/ModelItemList/true/true");
-    }
+	private void Configure(Guid modelId)
+	{
+		SetModel(modelId);
+		nav.NavigateTo($"/ModelItemList/true/true");
+	}
 
-    private void ShowComposite(Guid modelId)
-    {
-        SetModel(modelId);
-        nav.NavigateTo($"/ModelComposite/{modelId}");
-    }
+	private void ShowComposite(Guid modelId)
+	{
+		SetModel(modelId);
+		nav.NavigateTo($"/ModelComposite/{modelId}");
+	}
 
-    private void ShowCore(Guid modelId)
-    {
-        SetModel(modelId);
-        nav.NavigateTo($"/ModelItemList/false/false");
-    }
+	private void ShowCore(Guid modelId)
+	{
+		SetModel(modelId);
+		nav.NavigateTo($"/ModelItemList/false/false");
+	}
 
-    private void ShowLineChart(Guid modelId)
-    {
-        SetModel(modelId);
-        nav.NavigateTo($"/ModelLineChart/{modelId}");
-    }
+	private void ShowLineChart(Guid modelId)
+	{
+		SetModel(modelId);
+		nav.NavigateTo($"/ModelLineChart/{modelId}");
+	}
 
-    private void AddModel()
-    {
-        appState.Model = new Model();
-        nav.NavigateTo($"/ModelEdit/false");
-    }
+	private void AddModel()
+	{
+		userState.Model = new Model();
+		nav.NavigateTo($"/ModelEdit/false");
+	}
 
-    private async Task CopyCore()
-    {
-        Model model = appSettings.CoreModel;
-        model.Name = $"Copy of {model.Name}";
-        model.UserId = appState.CurrentUser.Id;
-        model.StartDate = DateTime.Now;
-        model.Id = Guid.Empty;
-        model.IsActive = true;
+	private async Task CopyCore()
+	{
+		Model model = appSettings.CoreModel;
+		model.Name = $"Copy of {model.Name}";
+		model.UserId = userState.CurrentUser.Id;
+		model.StartDate = DateTime.Now;
+		model.Id = Guid.Empty;
+		model.IsActive = true;
 
-        HttpResponseMessage response = await httpClient.PostAsJsonAsync("model/save", model);
-        Model coreCopy = await response.Content.ReadFromJsonAsync<Model>();
+		HttpResponseMessage response = await httpClient.PostAsJsonAsync("model/save", model);
+		Model coreCopy = await response.Content.ReadFromJsonAsync<Model>();
 
-        appState.Model = model;
-        appState.ModelList.Add(model);
-    }
+		userState.Model = model;
+		userState.ModelList.Add(model);
+	}
 
-    private void SetModel(Guid modelId)
-    {
-        appState.Model = appState.ModelList.Where(m => m.Id == modelId).FirstOrDefault();
-    }
+	private void SetModel(Guid modelId)
+	{
+		userState.Model = userState.ModelList.Where(m => m.Id == modelId).FirstOrDefault();
+	}
 
-    private void ShowActiveOnly()
-    {
-        modelList = modelList.Where(m => m.IsActive == true).ToList();
-    }
+	private void ShowActiveOnly()
+	{
+		modelList = modelList.Where(m => m.IsActive == true).ToList();
+	}
 
 	private void ShowAll()
-    {
-        modelList = appState.ModelList;
-    }
+	{
+		modelList = userState.ModelList;
+	}
 }

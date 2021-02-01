@@ -1,7 +1,7 @@
 ﻿@page "/ModelComposite/{ModelId:guid}"
 
 @inject AppSettings appSettings
-@inject AppState appState
+@inject UserState userState
 @inject HttpClient httpClient
 @inject NavigationManager nav
 
@@ -37,7 +37,7 @@
 		}
 		else
 		{
-			model = appState.ModelList.Where( m => m.Id == ModelId).FirstOrDefault();
+			model = userState.ModelList.Where( m => m.Id == ModelId).FirstOrDefault();
 		}
 
         GetSlices(model);

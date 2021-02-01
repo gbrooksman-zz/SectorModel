@@ -1,7 +1,7 @@
 ﻿@page "/ModelEdit/{IsEdit:bool}"
 
 @inject AppSettings appSettings
-@inject AppState appState
+@inject UserState userState
 @inject NavigationManager nav
 @inject HttpClient httpClient
 
@@ -80,69 +80,69 @@
 
 @code
 {
-    private Model model = new Model();
+	private Model model = new Model();
 
-    [Parameter] public bool IsEdit { get; set; }
+	[Parameter] public bool IsEdit { get; set; }
 
-    protected override void OnInitialized()
-    {
-        model = appState.Model;
+	protected override void OnInitialized()
+	{
+		model = userState.Model;
 
-        if (IsEdit)
-        {
-            model = appState.ModelList.Where(m => m.Id == model.Id).FirstOrDefault();
-            model.LatestValue = model.ItemList.Sum(i => i.CurrentValue);
-        }
-        else
-        {
-            model.UserId = appState.CurrentUser.Id;
-            model.StartDate = DateTime.Now;
-            model.IsActive = true;
-            model.StopDate = DateTime.Now.AddYears(3);
-            model.ItemList = new List<ModelItem>();
-        }
-    }
+		if (IsEdit)
+		{
+			model = userState.ModelList.Where(m => m.Id == model.Id).FirstOrDefault();
+			model.LatestValue = model.ItemList.Sum(i => i.CurrentValue);
+		}
+		else
+		{
+			model.UserId = userState.CurrentUser.Id;
+			model.StartDate = DateTime.Now;
+			model.IsActive = true;
+			model.StopDate = DateTime.Now.AddYears(3);
+			model.ItemList = new List<ModelItem>();
+		}
+	}
 
 
-    private async Task HandleValidSubmit()
-    {
-        RemoveFromState(model);
+	private async Task HandleValidSubmit()
+	{
+		RemoveFromState(model);
 
-        HttpResponseMessage response = await httpClient.PostAsJsonAsync("model/save", model);
-        model = await response.Content.ReadFromJsonAsync<Model>();
+		HttpResponseMessage response = await httpClient.PostAsJsonAsync("model/save", model);
+		model = await response.Content.ReadFromJsonAsync<Model>();
 
-        AddToState(model);
+		AddToState(model);
 
-        Close();
-    }
+		Close();
+	}
 
-    private async Task Archive()
-    {
-        model.IsActive = false;
-        model.StopDate = DateTime.Now;
-        await HandleValidSubmit();
-    }
+	private async Task Archive()
+	{
+		model.IsActive = false;
+		model.StopDate = DateTime.Now;
+		await HandleValidSubmit();
+	}
 
-    private async Task UnArchive()
-    {
-        model.IsActive = true;
-        model.StartDate = DateTime.Now;
-        await HandleValidSubmit();
-    }
+	private async Task UnArchive()
+	{
+		model.IsActive = true;
+		model.StartDate = DateTime.Now;
+		await HandleValidSubmit();
+	}
 
-    private void Close()
-    {
-        nav.NavigateTo("/User/StartPage");
-    }
+	private void Close()
+	{
+		nav.NavigateTo("/User/StartPage");
+	}
 
-    private void RemoveFromState(Model item)
-    {
-        appState.ModelList.Remove(item);
-    }
+	private void RemoveFromState(Model item)
+	{
+		userState.ModelList.Remove(item);
+	}
 
-    private void AddToState(Model item)
-    {
-        appState.Model = item;
-        appState.ModelList.Add(item);
-    }
+	private void AddToState(Model item)
+	{
+		userState.Model = item;
+		userState.ModelList.Add(item);
+	}
 }

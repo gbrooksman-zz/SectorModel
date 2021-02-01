@@ -1,10 +1,10 @@
-@inject AppState appState
+@inject UserState userState
 @inject AppSettings appSettings
 
  <div class="container">
 	<div class="row">
 		<div class="col-sm-4">
-			<p>Welcome @appState.CurrentUser.Email</p>
+			<p>Welcome @userState.CurrentUser.Email</p>
 		</div>
 		<div class="col-sm-4">
 			<p>Quotes as of @Utils.FormatDate(appSettings.LastQuoteDate)</p>

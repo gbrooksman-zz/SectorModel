@@ -2,7 +2,7 @@
 
 @inject HttpClient httpClient
 @inject AppSettings appSettings
-@inject AppState appState
+@inject UserState userState
 
   <div class="container-fluid">
         <div class="row">
@@ -11,7 +11,7 @@
         <div class="row">
             <a href="https://iexcloud.io">Data provided by IEX Cloud</a>
             <br />
-            User: @appState.CurrentUser.Email
+            User: @userState.CurrentUser.Email
             <br />
             Last Quote Update Date: @appSettings.LastQuoteDate.ToShortDateString()
             <br />

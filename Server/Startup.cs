@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Linq;
 using System;
 using SectorModel.Shared.Entities;
 using System.IO;
+using SectorModel.Server.Data;
 
 namespace SectorModel.Server
 {
@@ -20,8 +19,7 @@ namespace SectorModel.Server
 
             var builder = new ConfigurationBuilder()
                    .SetBasePath(Directory.GetCurrentDirectory())
-                   .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                   .AddJsonFile($"secretsettings.json", optional: true);
+                   .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
             Configuration = builder.Build();
         }
@@ -32,6 +30,8 @@ namespace SectorModel.Server
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMemoryCache();
+
             AppSettings appSettings = new AppSettings();
 
             appSettings.IEXCloudAPIKey = Configuration.GetValue<string>("IEXCloudAPIKey");
@@ -40,6 +40,8 @@ namespace SectorModel.Server
             appSettings.SPDRModelId = Guid.Parse(Configuration.GetValue<string>("SPDRModelId"));
 
             services.AddSingleton(appSettings);
+
+            services.AddDbContext<AppDBContext>(options => options.UseSqlServer(appSettings.DBConnectionString, providerOptions => providerOptions.EnableRetryOnFailure()));
 
             services.AddControllersWithViews();
             services.AddRazorPages();

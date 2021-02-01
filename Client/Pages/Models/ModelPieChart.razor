@@ -1,7 +1,7 @@
 @page "/ModelPieChart"
 
 @inject AppSettings appSettings
-@inject AppState appState
+@inject UserState userState
 @inject HttpClient httpClient
 @inject NavigationManager nav
 
@@ -20,7 +20,7 @@
 
 	protected override void OnInitialized()
     {
-		model = appState.Model;	
+		model = userState.Model;	
 		GetSlices(model);	
 	}
 
