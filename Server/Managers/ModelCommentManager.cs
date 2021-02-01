@@ -7,27 +7,30 @@ using System.Threading.Tasks;
 using SectorModel.Shared.Entities;
 using Serilog;
 using Microsoft.EntityFrameworkCore;
+using SectorModel.Server.Data;
 
 namespace SectorModel.Server.Managers
 {
-    public class ModelCommentManager : BaseManager
+
+    public interface IModelCommentManager
+	{
+        Task<bool> Add(ModelComment modelComment);
+        Task<List<ModelComment>> GetModelComments(Guid modelId);
+    }
+
+    public class ModelCommentManager : IModelCommentManager
     {
-        private readonly IConfiguration config;
-        private readonly AppSettings appSettings;
-
-        public ModelCommentManager(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings) : base(_cache, _config)
+        public ModelCommentManager() 
         {
-            config = _config;
-            appSettings = _appSettings;
-        }
 
+        }
 
         public async Task<bool> Add(ModelComment modelComment)
         {
             int x = 0;
             try
             {
-                using var db = new WriteContext(appSettings);               
+                using var db = new AppDBContext();               
                 db.Add(modelComment);                 
                 x = await db.SaveChangesAsync();
             }
@@ -42,11 +45,11 @@ namespace SectorModel.Server.Managers
 
         public async Task<List<ModelComment>> GetModelComments(Guid modelId)
         {
-            List<ModelComment> modelCommentList = new List<ModelComment>();
+            List<ModelComment> modelCommentList = new();
 
             try
             {
-                using var db = new ReadContext(appSettings);
+                using var db = new AppDBContext();
                 modelCommentList = await db.ModelComments
                                     .Where(i => i.ModelId == modelId)                                    
                                     .ToListAsync();
@@ -60,6 +63,4 @@ namespace SectorModel.Server.Managers
             return modelCommentList;
         }
     }
-
-
 }

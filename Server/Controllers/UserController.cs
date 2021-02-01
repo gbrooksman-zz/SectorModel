@@ -22,7 +22,7 @@ namespace SectorModel.Server.Controllers
         {
             appSettings = _appSettings;
 
-            userMgr = new UserManager(_cache, _config, appSettings);
+            userMgr = new UserManager();
         }
 
         [HttpGet]

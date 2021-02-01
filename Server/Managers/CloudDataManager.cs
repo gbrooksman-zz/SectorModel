@@ -11,7 +11,17 @@ using System.Globalization;
 
 namespace SectorModel.Server.Managers
 {
-    public class CloudDataManager : BaseManager
+
+
+    public interface ICloudDataManager
+	{
+        Task<bool> UpdateQuotes(DateTime lastQuoteDate, Guid coreModelId);
+
+
+
+    }
+
+    public class CloudDataManager : ICloudDataManager
     {
         // this manager holds methods for equity_groups and equity_group_items tables
         // equity groups are collections of equities that are related by some criteria
@@ -30,13 +40,13 @@ namespace SectorModel.Server.Managers
         private readonly EquityManager eMgr;
         private readonly AppSettings appSettings;
 
-        public CloudDataManager(IMemoryCache cache, IConfiguration config, AppSettings _appSettings) : base(cache, config)
+        public CloudDataManager(IMemoryCache cache, IConfiguration config, AppSettings _appSettings)
         {
             appSettings = _appSettings;
 
-            mMgr = new ModelManager(cache, config, appSettings);
-            qMgr = new QuoteManager(cache, config, appSettings);
-            eMgr = new EquityManager(cache, config, appSettings);
+            mMgr = new ModelManager();
+            qMgr = new QuoteManager();
+            eMgr = new EquityManager();
 
             client = new HttpClient();
 
@@ -58,7 +68,7 @@ namespace SectorModel.Server.Managers
         {
             List<string> datesToLoad = GetDatesToLoad(lastQuoteDate);
 
-            List<Equity> egiList = new List<Equity>();
+            List<Equity> egiList = new();
 
             var modelItems = await mMgr.GetModelItems(coreModelId);
 
@@ -67,7 +77,7 @@ namespace SectorModel.Server.Managers
                 egiList.Add(await eMgr.Get(item.EquityId));
             }
 
-            JsonSerializerOptions options = new JsonSerializerOptions
+            JsonSerializerOptions options = new()
             {
                 PropertyNameCaseInsensitive = true,
                 IgnoreNullValues = true
@@ -114,7 +124,7 @@ namespace SectorModel.Server.Managers
 
         private List<string> GetDatesToLoad(DateTime lastQuoteDate)
         {
-            List<string> dateList = new List<string>();
+            List<string> dateList = new();
 
             for (var day = lastQuoteDate.Date.AddDays(1); day.Date <= DateTime.Now.Date; day = day.AddDays(1))
             {
@@ -133,7 +143,6 @@ namespace SectorModel.Server.Managers
         {
 
         }
-
         internal string Symbol { get; set; }
 
         internal decimal UClose { get; set; }

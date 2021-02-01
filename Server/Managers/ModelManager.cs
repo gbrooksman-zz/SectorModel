@@ -7,278 +7,287 @@ using System.Threading.Tasks;
 using SectorModel.Shared.Entities;
 using Serilog;
 using Microsoft.EntityFrameworkCore;
+using SectorModel.Server.Data;
 
 namespace SectorModel.Server.Managers
 {
-    public class ModelManager : BaseManager
-    {
-        private readonly EquityManager eqMgr;
-        private readonly QuoteManager qMgr;
-        private readonly IConfiguration config;
-        private readonly AppSettings appSettings;
+	public interface IModelManager
+	{		Task<Model> Get(Guid modelId);
+		Task<List<Quote>> GetDateRangeWithInterval(Guid modelId, DateTime startdate, DateTime stopdate, int quoteInterval);
+		Task<Model> GetModel(Guid modelId, DateTime quoteDate);
+		Task<ModelItem> GetModelItem(Guid modelEquityId);
+		Task<List<ModelItem>> GetModelItems(Guid modelId);
+		Task<List<Model>> GetModelList(Guid userId);
+		Task<Model> RebalanceItems(Model model);
+		Task<bool> RemoveModelItem(Guid modelItemId);
+		Task<Model> Save(Model model);
+		Task<ModelItem> SaveItem(ModelItem modelItem);
+	}
 
-        public ModelManager(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings) : base(_cache, _config)
-        {
-            appSettings = _appSettings;
-            config = _config;
+	public class ModelManager : IModelManager
+	{
+		private readonly QuoteManager qMgr;
+		/* private readonly IConfiguration config;
+		 private readonly AppSettings appSettings;*/
 
-            eqMgr = new EquityManager(_cache, config, appSettings);
-            qMgr = new QuoteManager(_cache, config, appSettings);            
-        }
+		public ModelManager()
+		{
+			qMgr = new QuoteManager();
+		}
 
 		#region Models
 
-        public async Task<List<Model>> GetModelList(Guid userId)
-        {
-            List<Model> modelList = new List<Model>();
+		public async Task<List<Model>> GetModelList(Guid userId)
+		{
+			List<Model> modelList = new List<Model>();
 			List<Model> pricedModelList = new List<Model>();
-           
-            try
-            {
-                using var db = new ReadContext(appSettings);
-                modelList = await db.Models
-                                    .Where(i => i.UserId == userId)
-                                    .ToListAsync(); 
+
+			try
+			{
+				using var db = new AppDBContext();
+				modelList = await db.Models
+									.Where(i => i.UserId == userId)
+									.ToListAsync();
 
 				foreach (Model model in modelList)
 				{
 					Model pricedModel = new Model();
-					
+
 					pricedModel = await GetModel(model.Id, DateTime.Now);
-					
+
 					pricedModelList.Add(pricedModel);
-				}				
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "ModelManager::GetModelList");
-                throw;
-            } 
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, "ModelManager::GetModelList");
+				throw;
+			}
 
-            return pricedModelList;
-        }
+			return pricedModelList;
+		}
 
 
-        public async Task<Model> GetModel(Guid modelId, DateTime quoteDate)
-        {
-            Model model = new Model();
+		public async Task<Model> GetModel(Guid modelId, DateTime quoteDate)
+		{
+			Model model = new();
 
-            try
-            {
-                using (var db = new ReadContext(appSettings))
-                {
-                    model = await db.Models.Where(m => m.Id == modelId).FirstOrDefaultAsync();
+			try
+			{
+				using (var db = new AppDBContext())
+				{
+					model = await db.Models.Where(m => m.Id == modelId).FirstOrDefaultAsync();
 
 					model.ItemList = await db.ModelItems
-										.Where( m => m.ModelId == modelId)
+										.Where(m => m.ModelId == modelId)
 										.ToListAsync();
 
 					model.ItemList = await qMgr.GetModelItemsWithPrices(model, quoteDate);
 
-                    model.LatestValue = model.ItemList.Sum(m => m.CurrentValue);				
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "ModelManager::GetModel");
-                throw;
-            }
+					model.LatestValue = model.ItemList.Sum(m => m.CurrentValue);
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, "ModelManager::GetModel");
+				throw;
+			}
 
-            return model;    
-        }  
+			return model;
+		}
 
-		public async Task<List<Quote>> GetDateRangeWithInterval(Guid modelId, DateTime startdate, DateTime stopdate, int quoteInterval )
-        {			
-            List<Quote> quoteList = new List<Quote>();
+		public async Task<List<Quote>> GetDateRangeWithInterval(Guid modelId, DateTime startdate, DateTime stopdate, int quoteInterval)
+		{
+			List<Quote> quoteList = new List<Quote>();
 			List<Quote> finalQuoteList = new List<Quote>();
 
-            try
-            {
-				using (var db = new ReadContext(appSettings))
-				{	
-					Model  model = await db.Models.FindAsync(modelId);
+			try
+			{
+				using (var db = new AppDBContext())
+				{
+					Model model = await db.Models.FindAsync(modelId);
 
 					model.ItemList = await db.ModelItems
-										.Where( m => m.ModelId == modelId)
+										.Where(m => m.ModelId == modelId)
 										.ToListAsync();
 
 					List<Guid> equityGuids = model.ItemList.Select(e => e.EquityId).ToList();
 
 					var allQuotes = await db.Quotes.Where(q => q.Date >= model.StartDate && q.Date <= stopdate).ToListAsync();
 
-					quoteList = (  from q in allQuotes
-								        join e in equityGuids 
-                                        on q.EquityId equals e 
-                                        select q
-                                     ).ToList();
+					quoteList = (from q in allQuotes
+								 join e in equityGuids
+								 on q.EquityId equals e
+								 select q
+									 ).ToList();
 
-                    int daysInPeriod = quoteList.Select(q => q.Date).Distinct().Count();
+					int daysInPeriod = quoteList.Select(q => q.Date).Distinct().Count();
 
-                    int skipLoops = daysInPeriod / quoteInterval;
+					int skipLoops = daysInPeriod / quoteInterval;
 
-					for ( int x = 0 ; x <= skipLoops ; x += quoteInterval)
+					for (int x = 0; x <= skipLoops; x += quoteInterval)
 					{
-                        equityGuids.ForEach(e => 
-                            {
-                                Quote q = quoteList.Where(q => q.EquityId == e).Skip(x).Take(1).FirstOrDefault();
-                                if (q != default) finalQuoteList.Add(q);
-                            });
+						equityGuids.ForEach(e =>
+							{
+								Quote q = quoteList.Where(q => q.EquityId == e).Skip(x).Take(1).FirstOrDefault();
+								if (q != default) finalQuoteList.Add(q);
+							});
 					}
-				}               
-            }
-            catch(Exception ex)
-            {
-                Log.Error(ex, "ModelManager::GetDateRangeWithInterval");
-                throw;
-            }
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, "ModelManager::GetDateRangeWithInterval");
+				throw;
+			}
 
-            return finalQuoteList;
-        }
- 
+			return finalQuoteList;
+		}
+
 
 		public async Task<Model> Get(Guid modelId)
-        {
-			using (var db = new ReadContext(appSettings))
-			return await db.Models.FindAsync(modelId);  
-        }  
+		{
+			using (var db = new AppDBContext())
+				return await db.Models.FindAsync(modelId);
+		}
 
 		#region CRUD 
-	
-        public async Task<Model> Save(Model model)
-        {            
-            try
-            {
-                model.StartDate = DateTime.Now; //whenever a model is edited reset the 'start' date
 
-                using var db = new WriteContext(appSettings);
-                if (model.Id == Guid.Empty)
-                {
-                    db.Models.Add(model);
-                }
-                else
-                {
-                    db.Models.Update(model);
-                }
-                await db.SaveChangesAsync();
+		public async Task<Model> Save(Model model)
+		{
+			try
+			{
+				model.StartDate = DateTime.Now; //whenever a model is edited reset the 'start' date
 
-            }
-            catch(Exception ex)
-            {
-                Log.Error(ex, "ModelManager::Save");
-                throw;
-            } 
+				using var db = new AppDBContext();
+				if (model.Id == Guid.Empty)
+				{
+					db.Models.Add(model);
+				}
+				else
+				{
+					db.Models.Update(model);
+				}
+				await db.SaveChangesAsync();
 
-            return model;
-        }  
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, "ModelManager::Save");
+				throw;
+			}
 
-#endregion
+			return model;
+		}
 
-#endregion 
+		#endregion
 
-#region ModelItems
+		#endregion
 
-   public async Task<ModelItem> GetModelItem(Guid modelEquityId)
-        {
-            ModelItem modelItem = new ModelItem();
+		#region ModelItems
 
-            try
-            {
-                using var db = new ReadContext(appSettings);
-                modelItem = await db.ModelItems
-                                    .Where(i => i.Id == modelEquityId)
-                                    .FirstOrDefaultAsync();
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "ModelItemManager::GetModelItem");
-                throw;
-            }
+		public async Task<ModelItem> GetModelItem(Guid modelEquityId)
+		{
+			ModelItem modelItem = new();
 
-            return modelItem;
-        }  
+			try
+			{
+				using var db = new AppDBContext();
+				modelItem = await db.ModelItems
+									.Where(i => i.Id == modelEquityId)
+									.FirstOrDefaultAsync();
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, "ModelItemManager::GetModelItem");
+				throw;
+			}
 
-        public async Task<List<ModelItem>> GetModelItems(Guid modelId)
-        {
-            List<ModelItem> modelItemList = new List<ModelItem>();
+			return modelItem;
+		}
 
-            try
-            {
-                using var db = new ReadContext(appSettings);
-                modelItemList = await db.ModelItems
-                                    .Where(i => i.ModelId == modelId)
-                                    .ToListAsync();
+		public async Task<List<ModelItem>> GetModelItems(Guid modelId)
+		{
+			List<ModelItem> modelItemList = new();
 
-				if(modelItemList == null)
+			try
+			{
+				using var db = new AppDBContext();
+				modelItemList = await db.ModelItems
+									.Where(i => i.ModelId == modelId)
+									.ToListAsync();
+
+				if (modelItemList == null)
 				{
 					modelItemList = new List<ModelItem>();
-				}					
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "ModelItemManager::GetModelItems");
-                throw;
-            }
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, "ModelItemManager::GetModelItems");
+				throw;
+			}
 
-            return modelItemList;
-        }
+			return modelItemList;
+		}
 
 
-        #region CRUD
+		#region CRUD
 
-        public async Task<ModelItem> SaveItem(ModelItem modelItem)
-        {
-            try
-            {
-                using var db = new WriteContext(appSettings);
-                {
-                    if (modelItem.Id == Guid.Empty)
-                    {
-                        db.Add(modelItem);
-                    }
-                    else
-                    {
-                        db.Update(modelItem);                        
-                    }
-                    await db.SaveChangesAsync();
-                }               
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "ModelItemManager::Save");
-                throw;
-            }
+		public async Task<ModelItem> SaveItem(ModelItem modelItem)
+		{
+			try
+			{
+				using var db = new AppDBContext();
+				{
+					if (modelItem.Id == Guid.Empty)
+					{
+						db.Add(modelItem);
+					}
+					else
+					{
+						db.Update(modelItem);
+					}
+					await db.SaveChangesAsync();
+				}
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, "ModelItemManager::Save");
+				throw;
+			}
 
-            return modelItem;
-        }
-       
+			return modelItem;
+		}
 
-        public async Task<bool> RemoveModelItem(Guid modelItemId)
-        {
-            int x = 0;
 
-            try
-            {
-                using var dbR = new ReadContext(appSettings);
-                ModelItem mi = dbR.ModelItems.Find(modelItemId);
+		public async Task<bool> RemoveModelItem(Guid modelItemId)
+		{
+			int x = 0;
 
-                using var dbW = new WriteContext(appSettings);
-                dbW.ModelItems.Remove(mi);
-                x = await dbW.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, "ModelItemManager::RemoveEquity");
-                throw;
-            }
+			try
+			{
+				using var dbR = new AppDBContext();
+				ModelItem mi = dbR.ModelItems.Find(modelItemId);
 
-            return x > 0;
-        }
+				using var dbW = new AppDBContext();
+				dbW.ModelItems.Remove(mi);
+				x = await dbW.SaveChangesAsync();
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, "ModelItemManager::RemoveEquity");
+				throw;
+			}
+
+			return x > 0;
+		}
 
 		public async Task<Model> RebalanceItems(Model model)
-        {   
-			List<ModelItem> newItems = new List<ModelItem>();        
-            try
-            {               
+		{
+			List<ModelItem> newItems = new();
+			try
+			{
 				model.ItemList = await qMgr.GetModelItemsWithPrices(model, DateTime.Now);
 
 				foreach (ModelItem item in model.ItemList)
@@ -291,23 +300,23 @@ namespace SectorModel.Server.Managers
 					newItems.Add(item);
 				}
 
-                model.ItemList = newItems;
+				model.ItemList = newItems;
 				await Save(model);
 
-            }
-            catch(Exception ex)
-            {
-                Log.Error(ex, "ModelManager::Rebalance");
-                throw;
-            } 
+			}
+			catch (Exception ex)
+			{
+				Log.Error(ex, "ModelManager::Rebalance");
+				throw;
+			}
 
-            return model;
-        }      
+			return model;
+		}
 
-#endregion
+		#endregion
 
-#endregion   
-	
-    }
+		#endregion
+
+	}
 }
 

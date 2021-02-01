@@ -25,9 +25,9 @@ namespace SectorModel.Server.Controllers
         {
             appSettings = _appSettings;
 
-            qMgr = new QuoteManager(_cache, _config, appSettings);
-            eMgr = new EquityManager(_cache, _config, appSettings);
-            mMgr = new ModelManager(_cache, _config, appSettings);
+            qMgr = new QuoteManager();
+            eMgr = new EquityManager();
+            mMgr = new ModelManager();
         }
 
         [HttpGet]

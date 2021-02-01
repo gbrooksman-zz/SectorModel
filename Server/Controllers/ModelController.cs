@@ -22,8 +22,8 @@ namespace SectorModel.Server.Controllers
         public ModelController(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings)
         {
             appSettings = _appSettings;
-            mMgr = new ModelManager(_cache, _config, appSettings);
-			eqMgr = new EquityManager(_cache, _config, appSettings);
+            mMgr = new ModelManager();
+			eqMgr = new EquityManager();
         }
 
         [HttpGet]

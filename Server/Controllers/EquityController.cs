@@ -22,8 +22,8 @@ namespace SectorModel.Server.Controllers
         public EquityController(IMemoryCache _cache, IConfiguration _config,AppSettings _appSettings
 )
         {
-            eqMgr = new EquityManager(_cache, _config, _appSettings);
-            qMgr = new QuoteManager(_cache, _config, _appSettings);
+            eqMgr = new EquityManager();
+            qMgr = new QuoteManager();
         }
 
         [HttpGet]
