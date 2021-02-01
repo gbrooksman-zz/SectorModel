@@ -40,7 +40,7 @@ namespace SectorModel.Server.Managers
         private readonly EquityManager eMgr;
         private readonly AppSettings appSettings;
 
-        public CloudDataManager(IMemoryCache cache, IConfiguration config, AppSettings _appSettings)
+        public CloudDataManager(AppSettings _appSettings)
         {
             appSettings = _appSettings;
 

@@ -17,13 +17,10 @@ namespace SectorModel.Server.Controllers
     public class EquityController : ControllerBase
     {
         private readonly EquityManager eqMgr;
-        private readonly QuoteManager qMgr;
 
-        public EquityController(IMemoryCache _cache, IConfiguration _config,AppSettings _appSettings
-)
+        public EquityController()
         {
             eqMgr = new EquityManager();
-            qMgr = new QuoteManager();
         }
 
         [HttpGet]

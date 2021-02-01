@@ -18,16 +18,14 @@ namespace SectorModel.Server.Controllers
     {
         private readonly QuoteManager qMgr;
         private readonly EquityManager eMgr;
-        private readonly ModelManager mMgr;
         private readonly AppSettings appSettings;
 
-        public QuoteController(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings)
+        public QuoteController(AppSettings _appSettings)
         {
             appSettings = _appSettings;
 
             qMgr = new QuoteManager();
             eMgr = new EquityManager();
-            mMgr = new ModelManager();
         }
 
         [HttpGet]

@@ -16,12 +16,9 @@ namespace SectorModel.Server.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserManager userMgr;
-        private readonly AppSettings appSettings;
 
-        public UserController(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings)
+        public UserController()
         {
-            appSettings = _appSettings;
-
             userMgr = new UserManager();
         }
 
@@ -33,7 +30,6 @@ namespace SectorModel.Server.Controllers
         {
             var result = await userMgr.GetOneById(id).ConfigureAwait(false);
             return Ok(result);
-
         }
 
         [HttpGet]

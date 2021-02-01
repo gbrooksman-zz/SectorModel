@@ -17,11 +17,9 @@ namespace SectorModel.Server.Controllers
     {
         private readonly ModelManager mMgr;
 		private readonly EquityManager eqMgr;
-        private readonly AppSettings appSettings;
 
-        public ModelController(IMemoryCache _cache, IConfiguration _config, AppSettings _appSettings)
+        public ModelController()
         {
-            appSettings = _appSettings;
             mMgr = new ModelManager();
 			eqMgr = new EquityManager();
         }
@@ -88,7 +86,7 @@ namespace SectorModel.Server.Controllers
         public async Task<ActionResult<Model>> Copy(Model model)
         {
             model = await mMgr.Save(model);
-            List<ModelItem> newItemList = new List<ModelItem>();
+            List<ModelItem> newItemList = new();
 
             foreach (ModelItem item in model.ItemList)
             {
@@ -138,7 +136,5 @@ namespace SectorModel.Server.Controllers
 			Model newModel = await mMgr.RebalanceItems(model); 
            	return Ok(newModel);
         }
-
-
     }
 }
